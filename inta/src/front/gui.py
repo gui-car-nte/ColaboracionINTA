@@ -1,14 +1,18 @@
 import tkinter as tk
 from tkinter import filedialog
 
-from inta.src.back.calculations import calculate_magnetic_moment
-from inta.src.back.file_handler import load_csv_files
+from src.back.calculations import Calculations
+from src.back.file_handler import FileHandler
 
 def start_gui():
     def load_files():
+
+        c = Calculations()
+        f = FileHandler()
+
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-        sensor_data = load_csv_files(filepaths)
-        result = calculate_magnetic_moment(sensor_data)
+        sensor_data = f.load_csv_files(filepaths)
+        result = c.calculate_magnetic_moment(sensor_data)
         result_label.config(text=str(result))
 
     root = tk.Tk()
