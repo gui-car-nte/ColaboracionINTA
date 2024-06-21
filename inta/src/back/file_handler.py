@@ -11,4 +11,3 @@ class FileHandler:
             df = pd.read_csv(path)
             self.data.append(df)
         return self.data
-

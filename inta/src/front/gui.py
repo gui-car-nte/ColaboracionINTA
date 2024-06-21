@@ -19,15 +19,15 @@ def start_gui():
         result = c.calculate_magnetic_moment(sensor_data)
         result_label.config(text=str(result))
 
+    def distance_dialog():
+        pass
+
     root = tk.Tk()
     root.title("Cálculo del Momento Magnético")
     root.configure(background=color_primary)
-    photo = tk.PhotoImage(file="")
-    photo_small = tk.PhotoImage(file="")
-    root.iconphoto(False, photo, photo_small)
-
+    
     main_frame = tk.Frame(root)
-    main_frame.configure(background=color_primary)
+    main_frame.configure(background=color_primary, )
     main_frame.pack()
 
     button_frame = tk.Frame(main_frame)
