@@ -13,5 +13,5 @@ class FileHandler:
             self.data.append(df)
         return self.data
     
-    def count_sensors():
-        pass
+    def count_sensors(self):
+        return 4
