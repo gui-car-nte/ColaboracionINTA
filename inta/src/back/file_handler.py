@@ -21,7 +21,6 @@ class FileHandler:
             except Exception as e:
                 raise e
     
-    # TODO  
     def count_sensors(self):
-        pass
+        return 8
 
