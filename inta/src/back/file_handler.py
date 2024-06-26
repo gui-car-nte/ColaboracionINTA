@@ -22,5 +22,5 @@ class FileHandler:
                 raise e
     
     def count_sensors(self):
-        return 8
+        pass
 

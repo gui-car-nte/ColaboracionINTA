@@ -3,5 +3,5 @@ class Calculations:
         pass
     
     def calculate_magnetic_moment(self, sensor_data, distances):
-        results = [1,2,3]
+        results = []
         return results
