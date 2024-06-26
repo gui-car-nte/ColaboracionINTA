@@ -1,48 +1,58 @@
 import tkinter as tk
-from tkinter import filedialog
+from PIL import Image, ImageTk
 
-from src.front.gui import start_gui
+# Función para cargar y redimensionar imágenes
+def cargar_y_redimensionar_imagen(ruta_imagen, ancho, alto):
+    img = Image.open(ruta_imagen)
+    img = img.resize((ancho, alto), Image.ANTIALIAS)
+    return ImageTk.PhotoImage(img)
 
-COLOR_PRIMARY = "#E7EFE7" # Blanco
-COLOR_SECONDARY = "#1F62B1" # Azul
-
-
+# Crear la ventana principal
 root = tk.Tk()
-root.title("Cálculo del Momento Magnético")
-root.configure(background=COLOR_PRIMARY)
+root.title("Ejemplo de disposición de imágenes y etiquetas")
 
-top_frame = tk.Frame(root)
-top_frame.configure(background=COLOR_PRIMARY)
-top_frame.pack(side=tk.TOP, pady=10)
+# Definir rutas de las imágenes locales
+ruta_imagen1 = "ruta/a/tu/imagen1.jpg"
+ruta_imagen2 = "ruta/a/tu/imagen2.jpg"
+ruta_imagen3 = "ruta/a/tu/imagen3.jpg"
 
-button1 = tk.Button(top_frame, text="Cargar Archivos CSV", command=start_gui, background=COLOR_SECONDARY)
-button1.pack(side=tk.LEFT, padx=10)
+# Definir tamaño de las imágenes
+ancho, alto = 100, 100
 
-button2 = tk.Button(top_frame, text="Introducir distancias", background=COLOR_SECONDARY)
-button2.pack(side=tk.LEFT, padx=10)
+# Cargar y redimensionar las imágenes
+imagen1 = cargar_y_redimensionar_imagen(ruta_imagen1, ancho, alto)
+imagen2 = cargar_y_redimensionar_imagen(ruta_imagen2, ancho, alto)
+imagen3 = cargar_y_redimensionar_imagen(ruta_imagen3, ancho, alto)
 
-button3 = tk.Button(top_frame, text="Exportar a PDF", background=COLOR_SECONDARY)
-button3.pack(side=tk.LEFT, padx=10)
+# Crear frames para la disposición
+frame_superior = tk.Frame(root)
+frame_superior.pack(pady=10)
 
-center_frame = tk.Frame(root)
-# center_frame.configure(background=COLOR_PRIMARY)
-center_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, pady=10)
+frame_inferior = tk.Frame(root)
+frame_inferior.pack(pady=10)
 
-result_label = tk.Label(center_frame, text="", wraplength=300, justify=tk.LEFT)
-result_label.pack(pady=20)
+# Añadir primera imagen y su etiqueta al frame superior
+frame_imagen1 = tk.Frame(frame_superior)
+frame_imagen1.pack(side=tk.LEFT, padx=10)
+label_imagen1 = tk.Label(frame_imagen1, image=imagen1)
+label_imagen1.pack()
+etiqueta1 = tk.Label(frame_imagen1, text="Imagen 1")
+etiqueta1.pack()
 
-bottom_frame = tk.Frame(root)
-bottom_frame.configure(background=COLOR_PRIMARY)
-bottom_frame.pack(side=tk.BOTTOM, pady=10)
+# Añadir segunda imagen y su etiqueta al frame superior
+frame_imagen2 = tk.Frame(frame_superior)
+frame_imagen2.pack(side=tk.LEFT, padx=10)
+label_imagen2 = tk.Label(frame_imagen2, image=imagen2)
+label_imagen2.pack()
+etiqueta2 = tk.Label(frame_imagen2, text="Imagen 2")
+etiqueta2.pack()
 
-x_label = tk.Label(bottom_frame, text="X:")
-x_label.configure(background=COLOR_PRIMARY)
-x_label.pack(side=tk.LEFT, padx=10)
+# Añadir tercera imagen y su etiqueta al frame inferior
+frame_imagen3 = tk.Frame(frame_inferior)
+frame_imagen3.pack()
+label_imagen3 = tk.Label(frame_imagen3, image=imagen3)
+label_imagen3.pack()
+etiqueta3 = tk.Label(frame_imagen3, text="Imagen 3")
+etiqueta3.pack()
 
-y_label = tk.Label(bottom_frame, text="Y:")
-y_label.configure(background=COLOR_PRIMARY)
-y_label.pack(side=tk.LEFT, padx=10)
-
-z_label = tk.Label(bottom_frame, text="Z:")
-z_label.configure(background=COLOR_PRIMARY)
-z_label.pack(side=tk.LEFT, padx=10)
+root.mainloop()
