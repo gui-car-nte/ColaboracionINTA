@@ -116,8 +116,7 @@ class GuiServices:
         c = Calculations()
         results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result in results:
-            self.mostrar_imagen_desde_archivo(frame_main, result)
-        
+            self.mostrar_imagen_desde_archivo(frame_main, result)    
 
     def mostrar_imagen_desde_archivo(self, frame_main, result):
 

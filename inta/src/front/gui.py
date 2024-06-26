@@ -21,10 +21,10 @@ def start_gui():
 
     bottom_frame = settings.create_frame(root, tk.BOTTOM, True)
 
-    settings.create_button("csv_button", top_frame, "Cargar Archivos CSV", tk.LEFT, settings.load_files, center_frame)
+    settings.create_button("csv_button", top_frame, "Cargar Archivos CSV", tk.LEFT, settings.load_files, center_frame).configure(fg='white')
     # button1 = tk.Button(top_frame, text="Cargar Archivos CSV",
     #                      command=lambda: settings.load_files(center_frame), background=COLOR_SECUNDARY)
     # button1.pack(side=tk.LEFT, padx=10)
-    # settings.create_button("export_button", top_frame, "Exportar a PDF", tk.LEFT, '','')
+    settings.create_button("export_button", top_frame, "Exportar a PDF", tk.LEFT, '','').configure(fg='white')
 
     root.mainloop()

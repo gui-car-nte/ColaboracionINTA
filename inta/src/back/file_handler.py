@@ -14,4 +14,4 @@ class FileHandler:
         return self.data
     
     def count_sensors(self):
-        return 4
+        pass
