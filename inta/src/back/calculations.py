@@ -14,6 +14,7 @@ class Calculations:
         results = []
         inverted_distances = self._invert_cube_distance(distances)
 
+        # check de archivos
         for axis in ['X', 'Y', 'Z']:
             halved_substractions = []
             for sensor in range(len(distances)):
@@ -33,7 +34,7 @@ class Calculations:
     def _invert_cube_distance(self, distances_list: list) -> list:
         result_list = []
         for distance in distances_list:
-            result = math.pow( 1 / (distance), 3 )
+            result = math.pow( 1 / float(distance), 3 )
             result_list.append(result)
             
         return result_list
@@ -43,7 +44,7 @@ class Calculations:
         
         return result
     
-    def _slope_calculation(self, y_axis: list, x_axis: list) -> float:
+    def _slope_calculation(self, y_axis, x_axis) -> float:
         y_axis = np.array(y_axis)
         x_axis = np.array(x_axis)
         slope, intercept = np.polyfit(x_axis, y_axis, 1)
