@@ -33,7 +33,7 @@ class Calculations:
     def _invert_cube_distance(self, distances_list: list) -> list:
         result_list = []
         for distance in distances_list:
-            result = math.pow( 1 / (distance), 3 )
+            result = math.pow( 1 / float(distance), 3 )
             result_list.append(result)
             
         return result_list
@@ -57,5 +57,4 @@ class Calculations:
     # def _example_of_usign_decimal(self):
     #     var1 = decimal.Decimal(str(1.4444))
     #     var2 = decimal.Decimal(str(2.2333))
-        
     #     pass
