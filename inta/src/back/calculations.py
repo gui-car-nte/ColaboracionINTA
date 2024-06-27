@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import decimal
-from inta.src.config import *
+from src.config import *
 
 decimal.getcontext().prec = PRECISION
 
