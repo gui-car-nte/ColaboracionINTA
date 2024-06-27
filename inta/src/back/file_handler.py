@@ -8,12 +8,15 @@ class FileHandler:
 
     def load_csv_files(self, filepaths):
             try:
-                csv_data_dict = {}
+                # csv_data_dict = {}
                 for path in filepaths:
+                    print(path)
                     df = pd.read_csv(path)
-                    csv_data_dict[path] = df
+                    # csv_data_dict[path] = df
+                    self.data[path] = df
                     
-                return csv_data_dict
+                # return csv_data_dict
+                return self.data
             except FileNotFoundError:
                 print(f"File not found: {path}")
             except pd.errors.ParserError:
@@ -21,7 +24,18 @@ class FileHandler:
             except Exception as e:
                 raise e
     
-    # TODO  
     def count_sensors(self):
-        pass
+        keys = self.data.keys()
+        sensors = []
+        for key in keys:
+            sensors.append(self.data[key].shape[1] / 3)
+
+        prv = 0
+        for sensor in sensors:
+            if prv == 0:
+                prv = sensor
+            if sensor != prv:
+                print('Diferentes cantidades de sensores')
+
+        return int(prv)
 

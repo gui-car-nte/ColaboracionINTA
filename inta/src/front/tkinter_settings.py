@@ -5,9 +5,13 @@ from PIL import Image, ImageTk
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
 
-COLOR_PRIMARY = "#E7EFE7" # Blanco
-COLOR_SECUNDARY = "#1F62B1" # Azul
+COLOR_PRIMARY = "#E7EFE7"  # Blanco
+COLOR_SECUNDARY = "#1F62B1"  # Azul
 RUTA_IMAGEN = 'src/front/resource/imagen.png'
+
+# TODO
+# poner icono en el center_frame para no estar vacio
+# poner iconos en el programa
 
 class GuiServices:
 
@@ -18,37 +22,45 @@ class GuiServices:
         self.window = frame_main
 
     def load_files(self, next_frame):
-
         f = FileHandler()
         
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         self.sensor_data = f.load_csv_files(filepaths)
         # numero sensores
         self.numbers_sensors = f.count_sensors()
+        self.drop_frame(next_frame)
         self.input_distance(next_frame)
 
-    def create_frame(self, frame_in, side_in, complete):
+    def create_frame(self, frame_in, side_in, complete=False, scrollable=False):
+        frame = tk.Frame(frame_in)
+        frame.configure(background=COLOR_PRIMARY)
 
         if complete:
-            frame = tk.Frame(frame_in)
-            frame.configure(background=COLOR_PRIMARY)
             frame.pack(side=side_in, fill=tk.BOTH, expand=True, pady=10)
         else:
-            frame = tk.Frame(frame_in)
-            frame.configure(background=COLOR_PRIMARY)
             frame.pack(side=side_in, pady=10)
+
+        if scrollable:
+            frame = self.create_scroll(frame)
         return frame
 
-    def create_button(self, name_in, frame_in, text_in, side_in, command_in, parameter_in):
+    def on_frame_configure(self, canvas):
+        canvas.configure(scrollregion=canvas.bbox("all"))
 
+    def _on_mouse_wheel(self, event, canvas):
+        canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    def create_button(self, name_in, frame_in, text_in, side_in, command_in, parameter_in):
         if parameter_in != "":
             button = tk.Button(frame_in, text=text_in, background=COLOR_SECUNDARY, name=name_in, command=lambda: command_in(parameter_in))
+            button.configure(fg='white')
             if side_in == "":
-                button.pack(pady=10)
+                button.pack(pady=10, anchor=tk.NW)
             else:
-                button.pack(side=side_in, pady=10)
+                button.pack(side=side_in, pady=10, anchor=tk.NW)
         else:
             button = tk.Button(frame_in, text=text_in, background=COLOR_SECUNDARY, name=name_in, command=command_in)
+            button.configure(fg='white')
             if side_in == "":
                 button.pack(pady=10)
             else:
@@ -56,51 +68,42 @@ class GuiServices:
 
         return button
 
-    def create_label(self, name_in, frame_in, text_in, side_in, diff):
-
+    def create_label(self, frame_in, text_in, side_in, diff=False):
         if diff:
             result_label = tk.Label(frame_in, text=text_in, wraplength=300, justify=side_in)
             result_label.pack(pady=20)
         else:
-            label = tk.Label(frame_in, text=text_in, name=name_in)
+            label = tk.Label(frame_in, text=text_in)
             label.configure(background=COLOR_PRIMARY)
             if side_in == "":
                 label.pack()
             else:
                 label.pack(side=side_in)
-
         return label
     
     def create_input(self, frame_in):
-        
         entry = tk.Entry(frame_in)
         entry.pack()
     
     def input_distance(self, next_frame):
-        
         for sensor in range(self.numbers_sensors):
-
             frame_input = self.create_frame(next_frame, tk.TOP, False)
-            self.create_label(f'sensor{sensor}', frame_input, f'Distancia sensor {sensor}: ', tk.LEFT, False)
+            self.create_label(frame_input, f'Distancia sensor {sensor + 1} ', tk.LEFT)
             self.create_input(frame_input)
         
         self.create_button("calculate", next_frame, "Calcular", "", self.send_distance, next_frame)
 
     def send_distance(self, frame_main: tk.Frame):
-        
         distances = self.recoger_valores(frame_main)
         print(distances)
-
-        self.vaciar_frame(frame_main)
-
+        self.drop_frame(frame_main)
         new_frame = self.create_frame(frame_main, tk.TOP, False)
-
         self.create_result(new_frame, distances)   
 
-    def vaciar_frame(self, frame_main):
+    def drop_frame(self, frame_main):
         for widget in frame_main.winfo_children():
             if isinstance(widget, tk.Frame):
-                self.vaciar_frame(widget)
+                self.drop_frame(widget)
             widget.destroy()
 
     def recoger_valores(self, frame):
@@ -114,21 +117,47 @@ class GuiServices:
     
     def create_result(self, frame_main, distances):
         c = Calculations()
+
         results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result in results:
-            self.mostrar_imagen_desde_archivo(frame_main, result)    
+            self.create_image_canvas(frame_main, RUTA_IMAGEN)
+            self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(padx=10, pady=10)
 
-    def mostrar_imagen_desde_archivo(self, frame_main, result):
+    def create_image_canvas(self, frame, image_path):
+        image = Image.open(image_path)
+        photo = ImageTk.PhotoImage(image)
+        
+        canvas = tk.Canvas(frame, width=image.width, height=image.height)
+        canvas.pack(pady=10)
+        canvas.create_image(0, 0, anchor="nw", image=photo)
+        
+        # Keep a reference to the image to prevent garbage collection
+        canvas.image = photo
+        return canvas
 
-        frame_img = self.create_frame(frame_main, tk.LEFT, True)
-        # Abrir la imagen usando Pillow
-        img = Image.open(RUTA_IMAGEN)
-        img = img.resize((400,300))
-        img_tk = ImageTk.PhotoImage(img)
+    def create_scroll(self, frame_main):
+        # Crear el lienzo
+        canvas = tk.Canvas(frame_main, bg=COLOR_PRIMARY)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Crear un label para mostrar la imagen
-        label = tk.Label(frame_img, image=img_tk)
-        label.image = img_tk  # Mantener una referencia a la imagen para evitar que sea recolectada por el garbage collector
-        label.pack(pady=10, padx=20)
+        # Crear la barra de desplazamiento
+        scrollbar_y = tk.Scrollbar(frame_main, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
+        canvas.configure(yscrollcommand=scrollbar_y.set)
 
-        label_result = self.create_label('pr', frame_img, f'Momento Magnetico: {result}', "", False)
+        # Crear un marco dentro del lienzo
+        inner_frame = tk.Frame(canvas, bg=COLOR_PRIMARY)
+        window = canvas.create_window((0, 0), window=inner_frame, anchor='n')
+
+        def center_frame(event):
+            canvas_width = event.width
+            canvas.coords(window, canvas_width // 2, 0)
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        canvas.bind('<Configure>', center_frame)
+        inner_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        # Evento de rueda del ratón para desplazar
+        canvas.bind_all("<MouseWheel>", lambda event: self._on_mouse_wheel(event, canvas))
+
+        return inner_frame
