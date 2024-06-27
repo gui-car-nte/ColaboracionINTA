@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 class FileHandler:
     def __init__(self, filepaths=None):
@@ -11,7 +12,8 @@ class FileHandler:
                 csv_data_dict = {}
                 for path in filepaths:
                     df = pd.read_csv(path)
-                    csv_data_dict[path] = df
+                    filename = self._extract_filename(path)
+                    csv_data_dict[filename] = df
                     
                 return csv_data_dict
             except FileNotFoundError:
@@ -25,3 +27,5 @@ class FileHandler:
     def count_sensors(self):
         pass
 
+    def _extract_filename(self, filepath):
+        return os.path.basename(filepath).split('.')[0]
