@@ -34,6 +34,7 @@ def start_gui():
 
     top_frame = settings.create_frame(root, tk.TOP)
     center_frame = settings.create_frame(root, tk.TOP, complete=True, scrollable=True)
+    settings.create_image_canvas(center_frame,'src/front/resource/logo.png').configure(background=COLOR_PRIMARY)
     bottom_frame = settings.create_frame(root, tk.BOTTOM)
 
     settings.create_button("csv_button", top_frame, "Cargar Archivos CSV", tk.LEFT, settings.load_files, center_frame)

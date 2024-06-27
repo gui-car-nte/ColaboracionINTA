@@ -9,6 +9,10 @@ COLOR_PRIMARY = "#E7EFE7"  # Blanco
 COLOR_SECUNDARY = "#1F62B1"  # Azul
 RUTA_IMAGEN = 'src/front/resource/imagen.png'
 
+# TODO
+# poner icono en el center_frame para no estar vacio
+# poner iconos en el programa
+
 class GuiServices:
 
     numbers_sensors = 0
@@ -84,7 +88,7 @@ class GuiServices:
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
             frame_input = self.create_frame(next_frame, tk.TOP, False)
-            self.create_label(frame_input, f'Distancia sensor {sensor}: ', tk.LEFT)
+            self.create_label(frame_input, f'Distancia sensor {sensor + 1} ', tk.LEFT)
             self.create_input(frame_input)
         
         self.create_button("calculate", next_frame, "Calcular", "", self.send_distance, next_frame)
@@ -113,6 +117,7 @@ class GuiServices:
     
     def create_result(self, frame_main, distances):
         c = Calculations()
+
         results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result in results:
             self.create_image_canvas(frame_main, RUTA_IMAGEN)
