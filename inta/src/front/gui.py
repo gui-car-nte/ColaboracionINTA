@@ -1,28 +1,21 @@
 import tkinter as tk
-from tkinter import filedialog
 
-from src.back.calculations import Calculations
-from src.back.file_handler import FileHandler
+from src.front.tkinter_settings import GuiServices, COLOR_PRIMARY, COLOR_SECUNDARY
 
 def start_gui():
-    def load_files():
-        
-        c = Calculations()
-        f = FileHandler()
-        
-        
-        filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-        sensor_data = f.load_csv_files(filepaths)
-        result = c.calculate_magnetic_moment(sensor_data)
-        result_label.config(text=str(result))
-
     root = tk.Tk()
     root.title("Cálculo del Momento Magnético")
+    root.minsize(600, 400)
+    root.configure(background=COLOR_PRIMARY)
     
-    load_button = tk.Button(root, text="Cargar Archivos CSV", command=load_files)
-    load_button.pack()
-    
-    result_label = tk.Label(root, text="Resultados aparecerán aquí")
-    result_label.pack()
-    
+    settings = GuiServices(root)
+
+    top_frame = settings.create_frame(root, tk.TOP)
+    center_frame = settings.create_frame(root, tk.TOP, complete=True, scrollable=True)
+    settings.create_image_canvas(center_frame,'src/front/resource/logo.png').configure(background=COLOR_PRIMARY)
+    bottom_frame = settings.create_frame(root, tk.BOTTOM)
+
+    settings.create_button("csv_button", top_frame, "Cargar Archivos CSV", tk.LEFT, settings.load_files, center_frame)
+    settings.create_button("export_button", top_frame, "Exportar a PDF", tk.LEFT, '', '')
+
     root.mainloop()
