@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 class FileHandler:
     def __init__(self, filepaths=None):
@@ -8,14 +9,12 @@ class FileHandler:
 
     def load_csv_files(self, filepaths):
             try:
-                # csv_data_dict = {}
                 for path in filepaths:
                     print(path)
                     df = pd.read_csv(path)
-                    # csv_data_dict[path] = df
-                    self.data[path] = df
-                    
-                # return csv_data_dict
+                    filename = self._extract_filename(path)
+                    self.data[filename] = df
+    
                 return self.data
             except FileNotFoundError:
                 print(f"File not found: {path}")
@@ -39,3 +38,5 @@ class FileHandler:
 
         return int(prv)
 
+    def _extract_filename(self, filepath):
+        return os.path.basename(filepath).split('.')[0]
