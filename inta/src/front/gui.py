@@ -16,6 +16,6 @@ def start_gui():
     bottom_frame = settings.create_frame(root, tk.BOTTOM)
 
     settings.create_button("csv_button", top_frame, "Cargar Archivos CSV", tk.LEFT, settings.load_files, center_frame)
-    settings.create_button("export_button", top_frame, "Exportar a PDF", tk.LEFT, '', '')
+    settings.create_button("export_button", top_frame, "Exportar a PDF", tk.LEFT, settings.export_to_pdf, '')
 
     root.mainloop()
