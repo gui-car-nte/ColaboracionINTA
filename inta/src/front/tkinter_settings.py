@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
@@ -10,13 +13,13 @@ COLOR_SECUNDARY = "#1F62B1"  # Azul
 RUTA_IMAGEN = 'src/front/resource/imagen.png'
 
 # TODO
-# poner icono en el center_frame para no estar vacio
 # poner iconos en el programa
 
 class GuiServices:
 
     numbers_sensors = 0
     sensor_data = ""
+    results = []
 
     def __init__(self, frame_main) -> None:
         self.window = frame_main
@@ -118,8 +121,8 @@ class GuiServices:
     def create_result(self, frame_main, distances):
         c = Calculations()
 
-        results = c.calculate_magnetic_moment(self.sensor_data, distances)
-        for result in results:
+        self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
+        for result in self.results:
             self.create_image_canvas(frame_main, RUTA_IMAGEN)
             self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(padx=10, pady=10)
 
@@ -161,3 +164,37 @@ class GuiServices:
         canvas.bind_all("<MouseWheel>", lambda event: self._on_mouse_wheel(event, canvas))
 
         return inner_frame
+    
+    def export_to_pdf(self):
+        tipos = ['x', 'y', 'z']  # Los ejes correspondientes
+        pdf_path = "momento_magnetico.pdf"
+        
+        c = canvas.Canvas(pdf_path, pagesize=letter)
+        width, height = letter
+        
+        # Agregar título centrado
+        c.setFont("Helvetica-Bold", 18)
+        titulo = "Momento Magnético"
+        c.drawCentredString(width / 2.0, height - 50, titulo)
+        
+        y_offset = 100  # Offset inicial para el primer gráfico
+        
+        for i, (eje, momento_magnetico) in enumerate(zip(tipos, self.results)):
+            # imagen = generar_grafico(eje)
+            imagen = 'src/front/resource/imagen.png'
+            
+            # Agregar el eje correspondiente encima de cada gráfico
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(275, 660, f"Eje {eje}")
+            
+            # Agregar la imagen del gráfico
+            c.drawImage(ImageReader(imagen), 100, 450, width=400, height=200)
+            
+            # Agregar el momento magnético debajo de cada gráfico
+            c.setFont("Helvetica", 12)
+            c.drawString(200, 425, f"Momento Magnético: {momento_magnetico}")
+            
+            y_offset += 300  # Incrementar el offset para el siguiente gráfico
+            c.showPage()
+        
+        c.save()
