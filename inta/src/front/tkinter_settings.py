@@ -1,4 +1,6 @@
 import tkinter as tk
+import os
+
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from reportlab.pdfgen import canvas
@@ -7,10 +9,7 @@ from reportlab.lib.utils import ImageReader
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
-
-COLOR_PRIMARY = "#E7EFE7"  # Blanco
-COLOR_SECUNDARY = "#1F62B1"  # Azul
-RUTA_IMAGEN = 'src/front/resource/imagen.png'
+from src import config
 
 # TODO
 # poner iconos en el programa
@@ -36,7 +35,7 @@ class GuiServices:
 
     def create_frame(self, frame_in, side_in, complete=False, scrollable=False):
         frame = tk.Frame(frame_in)
-        frame.configure(background=COLOR_PRIMARY)
+        frame.configure(background=config.PRIMARY_COLOR)
 
         if complete:
             frame.pack(side=side_in, fill=tk.BOTH, expand=True, pady=10)
@@ -55,14 +54,14 @@ class GuiServices:
 
     def create_button(self, name_in, frame_in, text_in, side_in, command_in, parameter_in):
         if parameter_in != "":
-            button = tk.Button(frame_in, text=text_in, background=COLOR_SECUNDARY, name=name_in, command=lambda: command_in(parameter_in))
+            button = tk.Button(frame_in, text=text_in, background=config.SECONDARY_COLOR, name=name_in, command=lambda: command_in(parameter_in))
             button.configure(fg='white')
             if side_in == "":
                 button.pack(pady=10, anchor=tk.NW)
             else:
                 button.pack(side=side_in, pady=10, anchor=tk.NW)
         else:
-            button = tk.Button(frame_in, text=text_in, background=COLOR_SECUNDARY, name=name_in, command=command_in)
+            button = tk.Button(frame_in, text=text_in, background=config.SECONDARY_COLOR, name=name_in, command=command_in)
             button.configure(fg='white')
             if side_in == "":
                 button.pack(pady=10)
@@ -77,7 +76,7 @@ class GuiServices:
             result_label.pack(pady=20)
         else:
             label = tk.Label(frame_in, text=text_in)
-            label.configure(background=COLOR_PRIMARY)
+            label.configure(background=config.PRIMARY_COLOR)
             if side_in == "":
                 label.pack()
             else:
@@ -123,7 +122,7 @@ class GuiServices:
 
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result in self.results:
-            self.create_image_canvas(frame_main, RUTA_IMAGEN)
+            self.create_image_canvas(frame_main, config.RUTA_IMAGEN)
             self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(padx=10, pady=10)
 
     def create_image_canvas(self, frame, image_path):
@@ -134,22 +133,18 @@ class GuiServices:
         canvas.pack(pady=10)
         canvas.create_image(0, 0, anchor="nw", image=photo)
         
-        # Keep a reference to the image to prevent garbage collection
         canvas.image = photo
         return canvas
 
     def create_scroll(self, frame_main):
-        # Crear el lienzo
-        canvas = tk.Canvas(frame_main, bg=COLOR_PRIMARY)
+        canvas = tk.Canvas(frame_main, bg=config.PRIMARY_COLOR)
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Crear la barra de desplazamiento
         scrollbar_y = tk.Scrollbar(frame_main, orient=tk.VERTICAL, command=canvas.yview)
         scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
         canvas.configure(yscrollcommand=scrollbar_y.set)
 
-        # Crear un marco dentro del lienzo
-        inner_frame = tk.Frame(canvas, bg=COLOR_PRIMARY)
+        inner_frame = tk.Frame(canvas, bg=config.PRIMARY_COLOR)
         window = canvas.create_window((0, 0), window=inner_frame, anchor='n')
 
         def center_frame(event):
@@ -160,41 +155,42 @@ class GuiServices:
         canvas.bind('<Configure>', center_frame)
         inner_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        # Evento de rueda del ratón para desplazar
         canvas.bind_all("<MouseWheel>", lambda event: self._on_mouse_wheel(event, canvas))
 
         return inner_frame
     
     def export_to_pdf(self):
-        tipos = ['x', 'y', 'z']  # Los ejes correspondientes
+        tipos = ['x', 'y', 'z']
         pdf_path = "momento_magnetico.pdf"
         
         c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
         
-        # Agregar título centrado
         c.setFont("Helvetica-Bold", 18)
         titulo = "Momento Magnético"
         c.drawCentredString(width / 2.0, height - 50, titulo)
         
-        y_offset = 100  # Offset inicial para el primer gráfico
+        y_offset = 100
         
         for i, (eje, momento_magnetico) in enumerate(zip(tipos, self.results)):
             # imagen = generar_grafico(eje)
             imagen = 'src/front/resource/imagen.png'
             
-            # Agregar el eje correspondiente encima de cada gráfico
             c.setFont("Helvetica-Bold", 12)
             c.drawString(275, 660, f"Eje {eje}")
             
-            # Agregar la imagen del gráfico
             c.drawImage(ImageReader(imagen), 100, 450, width=400, height=200)
             
-            # Agregar el momento magnético debajo de cada gráfico
             c.setFont("Helvetica", 12)
             c.drawString(200, 425, f"Momento Magnético: {momento_magnetico}")
             
-            y_offset += 300  # Incrementar el offset para el siguiente gráfico
+            y_offset += 300
             c.showPage()
         
         c.save()
+
+        # os.startfile(pdf_path)
+        os.system(f"xdg-open {pdf_path}")
+        
+    def log_error(self, frame_in, error):
+        self.create_label(frame_in, error, tk.TOP)
