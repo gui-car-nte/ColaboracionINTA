@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import decimal
+import matplotlib as plt
 from src.config import *
 
 decimal.getcontext().prec = PRECISION
@@ -23,6 +24,7 @@ class Calculations:
                 halved_substraction = self._substraction_halving(plus_average, minus_average)
                 halved_substractions.append(halved_substraction)
 
+            self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
             slope = self._slope_calculation(halved_substractions, inverted_distances)
             
             result = (slope / MOMENTUM) * FINAL_MOMENTUM
@@ -49,6 +51,14 @@ class Calculations:
         slope, intercept = np.polyfit(x_axis, y_axis, 1)
         
         return slope
+    
+    def _plot_calculation_graphs(self, x_axis, series, name_axis):
+        fig, ax = plt.subplots()
+        ax.plot(x_axis, series)
+        plot_name = f'{name_axis}axis_graph.png'
+        fig.savefig(f'inta/src/front/resource/{plot_name}')
+        return f'inta/src/front/resource/{plot_name}.png'
+
     
     def _rounded_number(self, num):
         return round(num, 15)
