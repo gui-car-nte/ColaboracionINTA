@@ -2,6 +2,7 @@ import numpy as np
 import math
 import decimal
 import matplotlib.pyplot as plt
+# from numpy import ndarray as arr
 from src import config
 
 decimal.getcontext().prec = config.PRECISION
@@ -40,11 +41,13 @@ class Calculations:
             
         return result_list
     
+    # TODO data typing in parameters and output
     def _substraction_halving(self, minuend, subtrahend):
         result = (minuend - subtrahend) / 2
         
         return result
     
+    # TODO correct data typing
     def _slope_calculation(self, y_axis: list, x_axis: list) -> float:
         y_axis = np.array(y_axis)
         x_axis = np.array(x_axis)
@@ -52,6 +55,7 @@ class Calculations:
         
         return slope
     
+    # TODO data typing in parameters and output
     def _plot_calculation_graphs(self, x_axis, series, name_axis):
         fig, ax = plt.subplots()
         ax.plot(x_axis, series)
@@ -61,13 +65,13 @@ class Calculations:
         plot_name = f'{name_axis}_axis_graph.png'
         fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
+        
         return f'src/front/resource/{plot_name}'
 
-    
+    # TODO data typing in parameters and output
     def _rounded_number(self, num):
         return round(num, 15)
 
-    
     # def _example_of_usign_decimal(self):
     #     var1 = decimal.Decimal(str(1.4444))
     #     var2 = decimal.Decimal(str(2.2333))
