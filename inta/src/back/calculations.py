@@ -2,9 +2,9 @@ import numpy as np
 import math
 import decimal
 import matplotlib.pyplot as plt
-from src.config import *
+from src import config
 
-decimal.getcontext().prec = PRECISION
+decimal.getcontext().prec = config.PRECISION
 
 class Calculations:
     
@@ -27,7 +27,7 @@ class Calculations:
             self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
             slope = self._slope_calculation(halved_substractions, inverted_distances)
             
-            result = (slope / MOMENTUM) * FINAL_MOMENTUM
+            result = (slope / config.MOMENTUM) * config.FINAL_MOMENTUM
             results.append(result)
             
         return results
@@ -58,10 +58,10 @@ class Calculations:
         ax.set_title(f'{name_axis} Axis Plot')
         ax.set_xlabel('Inverted Distance Cubed')
         ax.set_ylabel('Halved Substraction Average')
-        plot_name = f'{name_axis}axis_graph.png'
-        fig.savefig(f'inta/src/front/resource/{plot_name}')
+        plot_name = f'{name_axis}_axis_graph.png'
+        fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
-        return f'inta/src/front/resource/{plot_name}.png'
+        return f'src/front/resource/{plot_name}'
 
     
     def _rounded_number(self, num):
