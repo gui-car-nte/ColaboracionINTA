@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import decimal
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from src.config import *
 
 decimal.getcontext().prec = PRECISION
@@ -55,8 +55,12 @@ class Calculations:
     def _plot_calculation_graphs(self, x_axis, series, name_axis):
         fig, ax = plt.subplots()
         ax.plot(x_axis, series)
+        ax.set_title(f'{name_axis} Axis Plot')
+        ax.set_xlabel('Inverted Distance Cubed')
+        ax.set_ylabel('Halved Substraction Average')
         plot_name = f'{name_axis}axis_graph.png'
         fig.savefig(f'inta/src/front/resource/{plot_name}')
+        plt.close(fig)
         return f'inta/src/front/resource/{plot_name}.png'
 
     
