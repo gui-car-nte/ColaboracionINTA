@@ -192,10 +192,8 @@ class GuiServices:
         
         y_offset = 100
         
-        for i, (eje, momento_magnetico) in enumerate(zip(tipos, self.results)):
-            # imagen = generar_grafico(eje)
-            imagen = 'src/front/resource/imagen.png'
-            
+        for i, (eje, momento_magnetico, imagen) in enumerate(zip(tipos, self.results, config.IMAGES)):
+                        
             c.setFont("Helvetica-Bold", 12)
             c.drawString(275, 660, f"Eje {eje}")
             
@@ -211,9 +209,8 @@ class GuiServices:
         print('pdf creado')
         
 
-        # os.startfile(pdf_path)
-        os.system(f"xdg-open {pdf_path}")
+        # os.startfile(pdf_path) # Windows
+        # os.system(f"xdg-open {pdf_path}") # linux
         
     def log_error(self, error):
-        # self.create_labe, error, tk.TOP)
         pass
