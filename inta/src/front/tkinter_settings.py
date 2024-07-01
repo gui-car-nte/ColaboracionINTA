@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
+from src import config
 
 COLOR_PRIMARY = "#E7EFE7"  # Blanco
 COLOR_SECUNDARY = "#1F62B1"  # Azul
@@ -119,20 +120,31 @@ class GuiServices:
         c = Calculations()
 
         results = c.calculate_magnetic_moment(self.sensor_data, distances)
-        for result in results:
-            self.create_image_canvas(frame_main, RUTA_IMAGEN)
+        for result, image_path in zip(results, config.IMAGES):
+            self.create_image_canvas(frame_main, image_path)
             self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(padx=10, pady=10)
 
-    def create_image_canvas(self, frame, image_path):
-        image = Image.open(image_path)
-        photo = ImageTk.PhotoImage(image)
-        
-        canvas = tk.Canvas(frame, width=image.width, height=image.height)
-        canvas.pack(pady=10)
-        canvas.create_image(0, 0, anchor="nw", image=photo)
-        
-        # Keep a reference to the image to prevent garbage collection
-        canvas.image = photo
+    def create_image_canvas(self, frame, image_path=""):
+        if image_path == "":
+            image = Image.open(image)
+            photo = ImageTk.PhotoImage(image)
+            
+            canvas = tk.Canvas(frame, width=image.width, height=image.height)
+            canvas.pack(pady=10)
+            canvas.create_image(0, 0, anchor="nw", image=photo)
+            
+            # Keep a reference to the image to prevent garbage collection
+            canvas.image = photo
+        else:
+            image = Image.open(image_path)
+            photo = ImageTk.PhotoImage(image)
+            
+            canvas = tk.Canvas(frame, width=image.width, height=image.height)
+            canvas.pack(pady=10)
+            canvas.create_image(0, 0, anchor="nw", image=photo)
+            
+            # Keep a reference to the image to prevent garbage collection
+            canvas.image = photo
         return canvas
 
     def create_scroll(self, frame_main):
