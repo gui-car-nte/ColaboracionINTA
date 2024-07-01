@@ -1,10 +1,15 @@
 import tkinter as tk
+import os
+
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
 from src import config
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 
 COLOR_PRIMARY = "#E7EFE7"  # Blanco
 COLOR_SECUNDARY = "#1F62B1"  # Azul
@@ -119,8 +124,8 @@ class GuiServices:
     def create_result(self, frame_main, distances):
         c = Calculations()
 
-        results = c.calculate_magnetic_moment(self.sensor_data, distances)
-        for result, image_path in zip(results, config.IMAGES):
+        self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
+        for result, image_path in zip(self.results, config.IMAGES):
             self.create_image_canvas(frame_main, image_path)
             self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(padx=10, pady=10)
 
@@ -173,3 +178,42 @@ class GuiServices:
         canvas.bind_all("<MouseWheel>", lambda event: self._on_mouse_wheel(event, canvas))
 
         return inner_frame
+    
+    def export_to_pdf(self):
+        tipos = ['x', 'y', 'z']
+        pdf_path = "momento_magnetico.pdf"
+        
+        c = canvas.Canvas(pdf_path, pagesize=letter)
+        width, height = letter
+        
+        c.setFont("Helvetica-Bold", 18)
+        titulo = "Momento Magnético"
+        c.drawCentredString(width / 2.0, height - 50, titulo)
+        
+        y_offset = 100
+        
+        for i, (eje, momento_magnetico) in enumerate(zip(tipos, self.results)):
+            # imagen = generar_grafico(eje)
+            imagen = 'src/front/resource/imagen.png'
+            
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(275, 660, f"Eje {eje}")
+            
+            c.drawImage(ImageReader(imagen), 100, 450, width=400, height=200)
+            
+            c.setFont("Helvetica", 12)
+            c.drawString(200, 425, f"Momento Magnético: {momento_magnetico}")
+            
+            y_offset += 300
+            c.showPage()
+        
+        c.save()
+        print('pdf creado')
+        
+
+        # os.startfile(pdf_path)
+        os.system(f"xdg-open {pdf_path}")
+        
+    def log_error(self, error):
+        # self.create_labe, error, tk.TOP)
+        pass
