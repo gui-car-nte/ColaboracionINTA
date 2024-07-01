@@ -1,16 +1,18 @@
 import pandas as pd
 import os
 
+
+# TODO data typing in methods
 class FileHandler:
     def __init__(self, filepaths=None):
         self.data = {}
         if filepaths:
             self.load_csv_files(filepaths)
 
+
     def load_csv_files(self, filepaths):
             try:
                 for path in filepaths:
-                    print(path)
                     df = pd.read_csv(path)
                     filename = self._extract_filename(path)
                     self.data[filename] = df
@@ -23,7 +25,8 @@ class FileHandler:
             except Exception as e:
                 raise e
     
-    def count_sensors(self):
+    
+    def count_sensors(self) -> int:
         keys = self.data.keys()
         sensors = []
         for key in keys:
@@ -37,6 +40,7 @@ class FileHandler:
                 print('Diferentes cantidades de sensores')
 
         return int(prv)
-
+    
+    
     def _extract_filename(self, filepath):
         return os.path.basename(filepath).split('.')[0]
