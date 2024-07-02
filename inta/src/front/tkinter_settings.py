@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+import logging
 
 from tkinter import filedialog
 from PIL import Image, ImageTk
@@ -11,9 +12,16 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 
-COLOR_PRIMARY = "#E7EFE7"  # Blanco
-COLOR_SECUNDARY = "#1F62B1"  # Azul
-RUTA_IMAGEN = "src/front/resource/imagen.png"
+# Configura el logger al inicio de tu aplicación
+logging.basicConfig(
+    filename='error_log.txt',
+    filemode='a',
+    format='%(asctime)s,%(name)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.ERROR
+)
+
+logger = logging.getLogger('urbanGUI')
 
 # TODO
 # poner icono en el center_frame para no estar vacio
@@ -22,12 +30,12 @@ RUTA_IMAGEN = "src/front/resource/imagen.png"
 
 class GuiServices:
 
-    # TODO move to class constructor
-    numbers_sensors = 0
-    sensor_data = ""
-
     def __init__(self, frame_main) -> None:
         self.window = frame_main
+        self.numbers_sensors = 0
+        self.sensor_data = ""
+        self.message_label = tk.Label(frame_main, text="", bg=config.PRIMARY_COLOR)
+        self.message_label.pack(pady=10)
 
     def load_files(self, next_frame):
         f = FileHandler()
@@ -41,10 +49,10 @@ class GuiServices:
 
     def create_frame(self, frame_in, side_in, complete=False, scrollable=False):
         frame = tk.Frame(frame_in)
-        frame.configure(background=COLOR_PRIMARY)
+        frame.configure(background=config.PRIMARY_COLOR)
 
         if complete:
-            frame.pack(side=side_in, fill=tk.BOTH, expand=True, pady=10)
+            frame.pack(side = side_in, fill =  tk.BOTH, expand = True, pady = 10)
         else:
             frame.pack(side=side_in, pady=10)
 
@@ -66,7 +74,7 @@ class GuiServices:
             button = tk.Button(
                 frame_in,
                 text=text_in,
-                background=COLOR_SECUNDARY,
+                background=config.SECONDARY_COLOR,
                 name=name_in,
                 command=lambda: command_in(parameter_in),
             )
@@ -79,7 +87,7 @@ class GuiServices:
             button = tk.Button(
                 frame_in,
                 text=text_in,
-                background=COLOR_SECUNDARY,
+                background=config.SECONDARY_COLOR,
                 name=name_in,
                 command=command_in,
             )
@@ -99,7 +107,7 @@ class GuiServices:
             result_label.pack(pady=20)
         else:
             label = tk.Label(frame_in, text=text_in)
-            label.configure(background=COLOR_PRIMARY)
+            label.configure(background=config.PRIMARY_COLOR)
             if side_in == "":
                 label.pack()
             else:
@@ -114,11 +122,11 @@ class GuiServices:
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
             frame_input = self.create_frame(next_frame, tk.TOP, False)
-            self.create_label(frame_input, f"Distancia sensor {sensor + 1} ", tk.LEFT)
+            self.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
             self.create_input(frame_input)
 
         self.create_button(
-            "calculate", next_frame, "Calcular", "", self.send_distance, next_frame
+            "calculate", next_frame, "Calculate", "", self.send_distance, next_frame
         )
 
     def send_distance(self, frame_main: tk.Frame):
@@ -150,13 +158,13 @@ class GuiServices:
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result, image_path in zip(self.results, config.IMAGES):
             self.create_image_canvas(frame_main, image_path)
-            self.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(
+            self.create_label(frame_main, f"Magentic Moment: {result}", "").configure(
                 padx=10, pady=10
             )
 
     def create_image_canvas(self, frame, image_path=""):
         if image_path == "":
-            image = Image.open(image)
+            image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
 
             canvas = tk.Canvas(frame, width=image.width, height=image.height)
@@ -182,7 +190,7 @@ class GuiServices:
     # TODO '=' spacing
     def create_scroll(self, frame_main):
         # Crear el lienzo
-        canvas = tk.Canvas(frame_main, bg = COLOR_PRIMARY)
+        canvas = tk.Canvas(frame_main, bg = config.PRIMARY_COLOR)
         canvas.pack(side=tk.LEFT, fill = tk.BOTH, expand = True)
 
         # Crear la barra de desplazamiento
@@ -191,8 +199,8 @@ class GuiServices:
         canvas.configure(yscrollcommand = scrollbar_y.set)
 
         # Crear un marco dentro del lienzo
-        inner_frame = tk.Frame(canvas, bg = COLOR_PRIMARY)
-        window = canvas.create_window((0, 0), window=inner_frame, anchor="n")
+        inner_frame = tk.Frame(canvas, bg = config.PRIMARY_COLOR)
+        window = canvas.create_window((0, 0), window=inner_frame, anchor = "n")
 
         def center_frame(event):
             canvas_width = event.width
@@ -213,29 +221,29 @@ class GuiServices:
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
-        tipos = ["x", "y", "z"]
-        pdf_path = "momento_magnetico.pdf"
+        types = ["x", "y", "z"]
+        pdf_path = "magnetic_moment.pdf"
 
-        c = canvas.Canvas(pdf_path, pagesize=letter)
+        c = canvas.Canvas(pdf_path, pagesize = letter)
         width, height = letter
 
         c.setFont("Helvetica-Bold", 18)
-        titulo = "Momento Magnético"
-        c.drawCentredString(width / 2.0, height - 50, titulo)
+        title = "Magnetic Moment"
+        c.drawCentredString(width / 2.0, height - 50, title)
 
         y_offset = 100
 
-        for i, (eje, momento_magnetico, imagen) in enumerate(
-            zip(tipos, self.results, config.IMAGES)
+        for i, (axis, moment_magnetic, image) in enumerate(
+            zip(types, self.results, config.IMAGES)
         ):
 
             c.setFont("Helvetica-Bold", 12)
-            c.drawString(275, 660, f"Eje {eje}")
+            c.drawString(275, 660, f"Axis {axis}")
 
-            c.drawImage(ImageReader(imagen), 100, 450, width=400, height=200)
+            c.drawImage(ImageReader(image), 100, 450, width = 400, height = 200)
 
             c.setFont("Helvetica", 12)
-            c.drawString(200, 425, f"Momento Magnético: {momento_magnetico}")
+            c.drawString(200, 425, f"Magnetic Moment {moment_magnetic}")
 
             y_offset += 300
             c.showPage()
@@ -246,5 +254,28 @@ class GuiServices:
         # os.startfile(pdf_path) # Windows
         # os.system(f"xdg-open {pdf_path}") # linux
 
-    def log_error(self, error):
-        pass
+    def show_message(self, msg, color):
+        if self.message_label:
+            self.message_label.config(text=msg, fg=color, background=config.PRIMARY_COLOR)
+            self.window.after(5000, self.clear_message)
+        else:
+            print("Message label not defined.")
+
+    def clear_message(self):
+        if self.message_label:
+            self.message_label.config(text="")
+
+    def log_error(self, error_type, error_message):
+        logger.error(f'{error_type}: {error_message}')
+        self.show_message(f'{error_type}: {error_message}', 'red')
+        
+    def some_function(self):
+        try:
+            # Código que puede generar una excepción
+            raise ValueError("This is a value error example")
+        except ValueError as e:
+            self.log_error('ValueError', str(e))
+        except TypeError as e:
+            self.log_error('TypeError', str(e))
+        except Exception as e:
+            self.log_error('Exception', str(e))
