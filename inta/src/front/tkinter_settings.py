@@ -14,26 +14,27 @@ from src.front.utils import Utils
 
 # Configura el logger al inicio de tu aplicación
 logging.basicConfig(
-    filename='error_log.txt',
-    filemode='a',
-    format='%(asctime)s,%(name)s %(levelname)s %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    level=logging.ERROR
+    filename="error_log.txt",
+    filemode="a",
+    format="%(asctime)s,%(name)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.ERROR,
 )
 
-logger = logging.getLogger('urbanGUI')
+logger = logging.getLogger("urbanGUI")
 
 # TODO
 # poner icono en el center_frame para no estar vacio
 # poner iconos en el programa
 # fix data types
 
+
 class GuiServices:
 
     def __init__(self, frame_main) -> None:
         self.window = frame_main
         self.numbers_sensors = 0
-        self.sensor_data = ""
+        self.sensor_data = {}
         self.message_label = tk.Label(frame_main, text="", bg=config.PRIMARY_COLOR)
         self.message_label.pack(pady=10)
         self.utils = Utils()
@@ -41,7 +42,7 @@ class GuiServices:
     def load_files(self, next_frame):
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(filepaths)
-        self.sensor_data = f.load_csv_files(filepaths)
+        self.sensor_data = f.load_csv_files(list(filepaths))
         # numero sensores
         self.numbers_sensors = f.count_sensors()
         self.drop_frame(next_frame)
@@ -50,7 +51,9 @@ class GuiServices:
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
             frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
-            self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
+            self.utils.create_label(
+                frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT
+            )
             self.utils.create_input(frame_input)
 
         self.utils.create_button(
@@ -77,7 +80,7 @@ class GuiServices:
                 valores.append(widget.get())
             elif isinstance(widget, tk.Frame):
                 valores.extend(self.get_values(widget))
-                
+
         return valores
 
     def create_result(self, frame_main, distances):
@@ -86,16 +89,16 @@ class GuiServices:
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
-            self.utils.create_label(frame_main, f"Magentic Moment: {result}", "").configure(
-                padx=10, pady=10
-            )
+            self.utils.create_label(
+                frame_main, f"Magentic Moment: {result}", ""
+            ).configure(padx=10, pady=10)
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
 
-        c = canvas.Canvas(pdf_path, pagesize = letter)
+        c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
 
         c.setFont("Helvetica-Bold", 18)
@@ -111,7 +114,7 @@ class GuiServices:
             c.setFont("Helvetica-Bold", 12)
             c.drawString(275, 660, f"Axis {axis}")
 
-            c.drawImage(ImageReader(image), 100, 450, width = 400, height = 200)
+            c.drawImage(ImageReader(image), 100, 450, width=400, height=200)
 
             c.setFont("Helvetica", 12)
             c.drawString(200, 425, f"Magnetic Moment {moment_magnetic}")
@@ -120,14 +123,16 @@ class GuiServices:
             c.showPage()
 
         c.save()
-        
+
         # TODO condicional para detectar sistema operativo y sacar archivo exe correcto
         # os.startfile(pdf_path) # Windows
         # os.system(f"xdg-open {pdf_path}") # linux
 
     def show_message(self, msg, color):
         if self.message_label:
-            self.message_label.config(text = msg, fg = color, background = config.PRIMARY_COLOR)
+            self.message_label.config(
+                text=msg, fg=color, background=config.PRIMARY_COLOR
+            )
             self.window.after(5000, self.clear_message)
         else:
             print("Message label not defined.")
@@ -137,6 +142,5 @@ class GuiServices:
             self.message_label.config(text="")
 
     def log_error(self, error_type, error_message):
-        logger.error(f'{error_type}: {error_message}')
-        self.show_message(f'{error_type}: {error_message}', 'red')
-    
+        logger.error(f"{error_type}: {error_message}")
+        self.show_message(f"{error_type}: {error_message}", "red")

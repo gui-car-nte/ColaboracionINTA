@@ -74,7 +74,10 @@ class Utils():
         return label
 
     def create_input(self, frame_in):
-        entry = tk.Entry(frame_in)
+        # Aqui tendremos que llamar a la clase de check y poner la funcion en ella
+        vcmd = (frame_in.register(self._validate_numeric), '%P')
+
+        entry = tk.Entry(frame_in, validate="key", validatecommand=vcmd)
         entry.pack()
 
     def create_image_canvas(self, frame, image_path = ""):
@@ -87,7 +90,7 @@ class Utils():
             canvas.create_image(0, 0, anchor = "nw", image = photo)
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
-            # canvas.image = photo
+            canvas.image = photo
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -97,7 +100,7 @@ class Utils():
             canvas.create_image(0, 0, anchor = "nw", image = photo)
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
-            # canvas.image = photo
+            canvas.image = photo
             
         return canvas
 
@@ -133,3 +136,12 @@ class Utils():
         )
 
         return inner_frame
+    
+    def _validate_numeric(self, new_value):
+        if new_value == "":
+            return True  # Permitir eliminar el contenido
+        try:
+            float(new_value)  # Intentar convertir el valor a float
+            return True  # Permitir el nuevo valor si es numérico
+        except ValueError:
+            return False  # Rechazar el nuevo valor si no es numérico
