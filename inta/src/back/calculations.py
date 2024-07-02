@@ -2,15 +2,14 @@ import numpy as np
 import math
 import decimal
 import matplotlib.pyplot as plt
-# from numpy import ndarray as arr
 from src import config
 
 decimal.getcontext().prec = config.PRECISION
 
 class Calculations:
-    
     def __init__(self, *args):
         self.args = args
+        
     
     def calculate_magnetic_moment(self, sensor_data: dict, distances: list) -> list:
         results = []
@@ -26,12 +25,13 @@ class Calculations:
                 halved_substractions.append(halved_substraction)
 
             self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
-            slope = self._slope_calculation(halved_substractions, inverted_distances)
+            slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
             
             result = (slope / config.MOMENTUM) * config.FINAL_MOMENTUM
             results.append(result)
             
         return results
+    
     
     def _invert_cube_distance(self, distances_list: list) -> list:
         result_list = []
@@ -41,22 +41,22 @@ class Calculations:
             
         return result_list
     
-    # TODO data typing in parameters and output
-    def _substraction_halving(self, minuend, subtrahend):
+    
+    def _substraction_halving(self, minuend :float, subtrahend :float) -> float:
         result = (minuend - subtrahend) / 2
         
         return result
     
-    # TODO correct data typing
-    def _slope_calculation(self, y_axis: list, x_axis: list) -> float:
+    
+    def _slope_calculation(self, y_axis: np.ndarray, x_axis: np.ndarray) -> float:
         y_axis = np.array(y_axis)
         x_axis = np.array(x_axis)
         slope, intercept = np.polyfit(x_axis, y_axis, 1)
         
         return slope
     
-    # TODO data typing in parameters and output
-    def _plot_calculation_graphs(self, x_axis, series, name_axis):
+    
+    def _plot_calculation_graphs(self, x_axis: list, series: list, name_axis: str) -> str:
         fig, ax = plt.subplots()
         ax.plot(x_axis, series)
         ax.set_title(f'{name_axis} Axis Plot')
@@ -67,9 +67,9 @@ class Calculations:
         plt.close(fig)
         
         return f'src/front/resource/{plot_name}'
+    
 
-    # TODO data typing in parameters and output
-    def _rounded_number(self, num):
+    def _rounded_number(self, num: float) -> float:
         return round(num, 15)
 
     # def _example_of_usign_decimal(self):
