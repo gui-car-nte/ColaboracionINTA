@@ -2,15 +2,14 @@ import pandas as pd
 import os
 
 
-# TODO data typing in methods
 class FileHandler:
-    def __init__(self, filepaths=None):
+    def __init__(self, filepaths):
         self.data = {}
         if filepaths:
             self.load_csv_files(filepaths)
 
 
-    def load_csv_files(self, filepaths):
+    def load_csv_files(self, filepaths: list):
             try:
                 for path in filepaths:
                     df = pd.read_csv(path)
@@ -42,5 +41,5 @@ class FileHandler:
         return int(prv)
     
     
-    def _extract_filename(self, filepath):
+    def _extract_filename(self, filepath: str) -> str:
         return os.path.basename(filepath).split('.')[0]
