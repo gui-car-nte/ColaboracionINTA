@@ -2,7 +2,6 @@ import pandas as pd
 import os
 
 
-# TODO data typing in methods
 class FileHandler:
     def __init__(self, filepaths):
         self.data = {}
