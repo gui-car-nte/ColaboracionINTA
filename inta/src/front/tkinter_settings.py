@@ -1,7 +1,7 @@
 import tkinter as tk
 import os
+import logging
 
-from logging import Logger
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
@@ -11,6 +11,17 @@ from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
+
+# Configura el logger al inicio de tu aplicación
+logging.basicConfig(
+    filename='error_log.txt',
+    filemode='a',
+    format='%(asctime)s,%(name)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.ERROR
+)
+
+logger = logging.getLogger('urbanGUI')
 
 # TODO
 # poner icono en el center_frame para no estar vacio
@@ -23,7 +34,8 @@ class GuiServices:
         self.window = frame_main
         self.numbers_sensors = 0
         self.sensor_data = ""
-        self.message_label: tk.Label
+        self.message_label = tk.Label(frame_main, text="", bg=config.PRIMARY_COLOR)
+        self.message_label.pack(pady=10)
 
     def load_files(self, next_frame):
         f = FileHandler()
@@ -40,7 +52,7 @@ class GuiServices:
         frame.configure(background=config.PRIMARY_COLOR)
 
         if complete:
-            frame.pack(side=side_in, fill=tk.BOTH, expand=True, pady=10)
+            frame.pack(side = side_in, fill =  tk.BOTH, expand = True, pady = 10)
         else:
             frame.pack(side=side_in, pady=10)
 
@@ -188,7 +200,7 @@ class GuiServices:
 
         # Crear un marco dentro del lienzo
         inner_frame = tk.Frame(canvas, bg = config.PRIMARY_COLOR)
-        window = canvas.create_window((0, 0), window=inner_frame, anchor="n")
+        window = canvas.create_window((0, 0), window=inner_frame, anchor = "n")
 
         def center_frame(event):
             canvas_width = event.width
@@ -209,29 +221,29 @@ class GuiServices:
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
-        tipos = ["x", "y", "z"]
-        pdf_path = "momento_magnetico.pdf"
+        types = ["x", "y", "z"]
+        pdf_path = "magnetic_moment.pdf"
 
-        c = canvas.Canvas(pdf_path, pagesize=letter)
+        c = canvas.Canvas(pdf_path, pagesize = letter)
         width, height = letter
 
         c.setFont("Helvetica-Bold", 18)
-        titulo = "Momento Magnético"
-        c.drawCentredString(width / 2.0, height - 50, titulo)
+        title = "Magnetic Moment"
+        c.drawCentredString(width / 2.0, height - 50, title)
 
         y_offset = 100
 
-        for i, (eje, momento_magnetico, imagen) in enumerate(
-            zip(tipos, self.results, config.IMAGES)
+        for i, (axis, moment_magnetic, image) in enumerate(
+            zip(types, self.results, config.IMAGES)
         ):
 
             c.setFont("Helvetica-Bold", 12)
-            c.drawString(275, 660, f"Eje {eje}")
+            c.drawString(275, 660, f"Axis {axis}")
 
-            c.drawImage(ImageReader(imagen), 100, 450, width=400, height=200)
+            c.drawImage(ImageReader(image), 100, 450, width = 400, height = 200)
 
             c.setFont("Helvetica", 12)
-            c.drawString(200, 425, f"Momento Magnético: {momento_magnetico}")
+            c.drawString(200, 425, f"Magnetic Moment {moment_magnetic}")
 
             y_offset += 300
             c.showPage()
@@ -254,6 +266,16 @@ class GuiServices:
             self.message_label.config(text="")
 
     def log_error(self, error_type, error_message):
-        logger = Logger('logger')
         logger.error(f'{error_type}: {error_message}')
         self.show_message(f'{error_type}: {error_message}', 'red')
+        
+    def some_function(self):
+        try:
+            # Código que puede generar una excepción
+            raise ValueError("This is a value error example")
+        except ValueError as e:
+            self.log_error('ValueError', str(e))
+        except TypeError as e:
+            self.log_error('TypeError', str(e))
+        except Exception as e:
+            self.log_error('Exception', str(e))

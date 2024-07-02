@@ -6,7 +6,6 @@ import logging
 from src import config
 from src.front.tkinter_settings import GuiServices
 
-
 def start_gui():
 
     # Configure the logger at the start of your application
