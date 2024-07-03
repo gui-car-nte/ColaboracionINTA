@@ -5,6 +5,7 @@ import logging
 # TODO english translation
 from src import config
 from src.front.tkinter_settings import GuiServices
+from src.front.utils import Utils
 
 def start_gui():
 
@@ -24,16 +25,19 @@ def start_gui():
     root.minsize(600, 400)
     root.configure(background=config.PRIMARY_COLOR)
 
-    settings = GuiServices(root)
+    utils = Utils(root)
 
-    top_frame = settings.create_frame(root, tk.TOP)
-    center_frame = settings.create_frame(root, tk.TOP, complete=True, scrollable=True)
-    settings.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
+    top_frame = utils.create_frame(root, tk.TOP)
+    center_frame = utils.create_frame(root, tk.TOP, complete=True, scrollable=True)
+    utils.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
         background=config.PRIMARY_COLOR
     )
-    bottom_frame = settings.create_frame(root, tk.BOTTOM)
+    bottom_frame = utils.create_frame(root, tk.BOTTOM)
+    message_label = utils.create_label(bottom_frame, "", tk.TOP)
+    
+    settings = GuiServices(root, message_label)
 
-    settings.create_button(
+    utils.create_button(
         "csv_button",
         top_frame,
         "Upload CSV files",
@@ -41,13 +45,13 @@ def start_gui():
         settings.load_files,
         center_frame,
     )
-    settings.create_button(
+    utils.create_button(
         "export_button",
         top_frame,
         "Export to PDF",
         tk.LEFT,
         settings.export_to_pdf,
         "",
-    )
+    ).config(state=tk.DISABLED)
 
     root.mainloop()

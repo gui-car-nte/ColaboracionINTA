@@ -9,7 +9,7 @@ class FileHandler:
             self.load_csv_files(filepaths)
 
 
-    def load_csv_files(self, filepaths: list):
+    def load_csv_files(self, filepaths: list) -> dict:
             try:
                 for path in filepaths:
                     df = pd.read_csv(path)
@@ -19,8 +19,10 @@ class FileHandler:
                 return self.data
             except FileNotFoundError:
                 print(f"File not found: {path}")
+                raise
             except pd.errors.ParserError:
                 print(f"Parse error at: {path}")
+                raise
             except Exception as e:
                 raise e
     
