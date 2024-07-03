@@ -1,5 +1,4 @@
 import tkinter as tk
-import re
 
 from src import config
 from PIL import Image, ImageTk
@@ -77,13 +76,11 @@ class Utils():
                 
         return label
 
-    # def create_input(self, frame_in):
+    def create_input(self, frame_in):
+        vcmd = (frame_in.register(self._validate_numeric), '%P')
 
-    #     # Aqui tendremos que llamar a la clase de check y poner la funcion en ella
-    #     vcmd = (frame_in.register(self._validate_value), '%P')
-
-    #     entry = tk.Entry(frame_in, validate="focusout", validatecommand=vcmd, insertwidth=6)
-    #     entry.pack()
+        entry = tk.Entry(frame_in, validate="key", validatecommand=vcmd, insertwidth=6)
+        entry.pack()
 
     def create_image_canvas(self, frame, image_path = ""):
         if image_path == "":
@@ -92,7 +89,7 @@ class Utils():
 
             canvas = tk.Canvas(frame, width = image.width, height = image.height)
             canvas.pack(pady = 10)
-            canvas.create_image(0, 0, anchor = "center", image = photo, tags='img')
+            canvas.create_image(0, 0, anchor = "nw", image = photo)
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
@@ -138,41 +135,20 @@ class Utils():
 
         return inner_frame
     
-    def create_input(self, frame_in):
-        vcmd = (frame_in.register(self._validate_value), '%P', '%W')
-
-        self.entry = tk.Entry(frame_in, validate="focusout", validatecommand=vcmd, insertwidth=6)
-        self.entry.pack()
-
-        self.error_label = tk.Label(frame_in, text="", fg="red")
-        self.error_label.pack()
-
-    def _validate_value(self, in_value, widget_name):
-        widget = self.entry.master.nametowidget(widget_name)
-
-        # Define la expresión regular para validar el valor
-        pattern = r'^(?!0$)(?!0{2,})\d{1,6}(,\d{1,6})?$'
-
-        if not in_value:
-            self._set_invalid(widget, "El campo no puede estar vacío.")
+    def _validate_numeric(self, in_value):
+        if in_value == "":
+            return True
+        
+        if len(in_value) > 7:
             return False
         
-        if not re.match(pattern, in_value):
-            self._set_invalid(widget, "Formato permitido: hasta 6 dígitos enteros y un decimal opcional. No puede ser 0.")
+        if in_value.count(",") > 1:
             return False
+
+        new_value = in_value.replace(",",".")
 
         try:
-            float(in_value.replace(",", "."))
-            self._set_valid(widget)
+            float(new_value)
             return True
         except ValueError:
-            self._set_invalid(widget, "Formato permitido: número decimal.")
             return False
-
-    def _set_valid(self, widget):
-        widget.config(highlightbackground="black", highlightcolor="black")
-        self.error_label.config(text="")
-
-    def _set_invalid(self, widget, message):
-        widget.config(highlightbackground="red", highlightcolor="red")
-        self.error_label.config(text=message)
