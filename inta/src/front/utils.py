@@ -1,5 +1,4 @@
 import tkinter as tk
-import re
 
 from src import config
 from PIL import Image, ImageTk
@@ -91,7 +90,7 @@ class Utils():
 
             canvas = tk.Canvas(frame, width = image.width, height = image.height)
             canvas.pack(pady = 10)
-            canvas.create_image(0, 0, anchor = "center", image = photo, tags='img')
+            canvas.create_image(0, 0, anchor = "nw", image = photo)
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
@@ -137,12 +136,21 @@ class Utils():
         )
 
         return inner_frame
-  
-    def _validate_numeric(self, new_value):
-        if new_value == "":
-            return True  # Permitir eliminar el contenido
+
+    def _validate_numeric(self, in_value):
+        if in_value == "":
+            return True
+        
+        if len(in_value) > 7:
+            return False
+        
+        if in_value.count(",") > 1:
+            return False
+
+        new_value = in_value.replace(",",".")
+
         try:
-            float(new_value)  # Intentar convertir el valor a float
-            return True  # Permitir el nuevo valor si es numérico
+            float(new_value)
+            return True
         except ValueError:
-            return False  # Rechazar el nuevo valor si no es numérico
+            return False
