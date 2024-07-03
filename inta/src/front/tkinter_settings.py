@@ -6,6 +6,7 @@ from tkinter import filedialog
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
+from src.front.utils import Utils
 from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -28,20 +29,19 @@ logger = logging.getLogger("urbanGUI")
 # poner iconos en el programa
 # fix data types
 
-
 class GuiServices:
 
-    def __init__(self, frame_main) -> None:
+    def __init__(self, frame_main, label) -> None:
         self.window = frame_main
         self.numbers_sensors = 0
         self.sensor_data = {}
-        self.message_label = tk.Label(frame_main, text="", bg=config.PRIMARY_COLOR)
-        self.message_label.pack(pady=10)
-        self.utils = Utils()
+        self.message_label = label
+        self.utils = Utils(self.window)
 
     def load_files(self, next_frame):
+        gui_services = GuiServices(self.window, next_frame) #TODO run test, 2nd parameter was empty, note: tests ran, nothing seemingly wrong
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-        f = FileHandler(filepaths)
+        f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
         # numero sensores
         self.numbers_sensors = f.count_sensors()
@@ -51,9 +51,7 @@ class GuiServices:
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
             frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
-            self.utils.create_label(
-                frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT
-            )
+            self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
             self.utils.create_input(frame_input)
 
         self.utils.create_button(
@@ -77,23 +75,17 @@ class GuiServices:
         valores = []
         for widget in frame.winfo_children():
             if isinstance(widget, tk.Entry):
-                valores.append(widget.get())
+                new_values = widget.get().replace(",",".")
+                valores.append(new_values)
             elif isinstance(widget, tk.Frame):
                 valores.extend(self.get_values(widget))
-
+                
         return valores
 
     def create_result(self, frame_main, distances):
-        calculations = Calculations()
+        gui_services = GuiServices(self.window, frame_main) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
+        calculations = Calculations(gui_service)
 
-<<<<<<< Updated upstream
-        self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
-        for result, image_path in zip(self.results, config.IMAGES):
-            self.utils.create_image_canvas(frame_main, image_path)
-            self.utils.create_label(
-                frame_main, f"Magentic Moment: {result}", ""
-            ).configure(padx=10, pady=10)
-=======
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
         button.config(state=tk.NORMAL)
@@ -104,7 +96,9 @@ class GuiServices:
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
->>>>>>> Stashed changes
+            self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
+                padx = 10, pady = 10
+            )
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
@@ -143,9 +137,7 @@ class GuiServices:
 
     def show_message(self, msg, color):
         if self.message_label:
-            self.message_label.config(
-                text=msg, fg=color, background=config.PRIMARY_COLOR
-            )
+            self.message_label.config(text=msg, fg=color, background=config.PRIMARY_COLOR)
             self.window.after(5000, self.clear_message)
         else:
             print("Message label not defined.")
@@ -155,5 +147,5 @@ class GuiServices:
             self.message_label.config(text="")
 
     def log_error(self, error_type, error_message):
-        logger.error(f"{error_type}: {error_message}")
-        self.show_message(f"{error_type}: {error_message}", "red")
+        logger.error(f'{error_type}: {error_message}')
+        self.show_message(f'{error_type}: {error_message}', 'red')

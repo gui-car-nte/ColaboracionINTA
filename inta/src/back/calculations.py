@@ -7,51 +7,71 @@ from src import config
 decimal.getcontext().prec = config.PRECISION
 
 class Calculations:
-    def __init__(self, *args):
+    def __init__(self, gui_services, *args):
+        self.gui_services = gui_services
         self.args = args
+        self.steps = []
         
-    
     def calculate_magnetic_moment(self, sensor_data: dict, distances: list) -> list:
-        results = []
-        inverted_distances = self._invert_cube_distance(distances)
-
-        for axis in ['X', 'Y', 'Z']:
-            halved_substractions = []
-            for sensor in range(len(distances)):
-                sensor_number = (sensor * 3)
-                plus_average = sensor_data[f'{axis}mas'].iloc[:, sensor_number].mean()
-                minus_average = sensor_data[f'{axis}menos'].iloc[:, sensor_number].mean()
-                halved_substraction = self._substraction_halving(plus_average, minus_average)
-                halved_substractions.append(halved_substraction)
-
-            self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
-            slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
+        try:
+            if sensor_data is None:
+                raise ValueError("sensor_data is None")
             
-            result = (slope / config.MOMENTUM) * config.FINAL_MOMENTUM
-            results.append(result)
+            self.steps.clear()
+            results = []
+            inverted_distances = self._invert_cube_distance(distances)
             
-        return results
-    
+            for axis in ['X', 'Y', 'Z']:
+                halved_substractions = []
+                for sensor in range(len(distances)):
+                    sensor_number = (sensor * 3)
+                    plus_average = sensor_data[f'{axis}mas'].iloc[:, sensor_number].mean()
+                    minus_average = sensor_data[f'{axis}menos'].iloc[:, sensor_number].mean()
+                    halved_substraction = self._substraction_halving(plus_average, minus_average)
+                    halved_substractions.append(halved_substraction)
+                    self.steps.append(f'{axis} axis sensor {sensor+1}: halved substraction = {halved_substraction:.15f}')
+
+                self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
+                slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
+                
+                result = (slope / config.MOMENTUM) * config.FINAL_MOMENTUM
+                self.steps.append(f'{axis} axis slope = {slope:.15f}')
+                self.steps.append(f'{axis} axis magnetic moment = {result:.15f}')
+                results.append(result)
+                
+            return results
+        except ValueError as e:
+            self.gui_services.log_error("ValueError", str(e))
+            self.steps.append(f'Error: {str(e)}')
+            raise e
+        except Exception as e: 
+            self.gui_services.log_error("Exception", str(e))
+            self.steps.append(f'Error: {str(e)}')
+            raise e
     
     def _invert_cube_distance(self, distances_list: list) -> list:
         result_list = []
         for distance in distances_list:
-            result = math.pow( 1 / float(distance), 3 )
-            result_list.append(result)
-            
+            try:
+                result = math.pow( 1 / float(distance), 3 )
+                result_list.append(result)
+                self.steps.append(f'Inverted distance^3 for {distance} = {result:.15f}')
+            except ZeroDivisionError as e:
+                self.gui_services.log_error("Distance value cannot be 0", str(e))
+                self.steps.append(f'Error: {str(e)}')
+                
         return result_list
     
     
     def _substraction_halving(self, minuend :float, subtrahend :float) -> float:
         result = (minuend - subtrahend) / 2
-        
+        self.steps.append(f'Halved substraction: ({minuend} - {subtrahend}) / 2 = {result:.15f}')
         return result
     
     
     def _slope_calculation(self, y_axis: np.ndarray, x_axis: np.ndarray) -> float:
-        y_axis = np.array(y_axis)
-        x_axis = np.array(x_axis)
         slope, intercept = np.polyfit(x_axis, y_axis, 1)
+        self.steps.append(f'Slope calculation: slope = {slope:.15f}')
         
         return slope
     
@@ -71,6 +91,9 @@ class Calculations:
 
     def _rounded_number(self, num: float) -> float:
         return round(num, 15)
+    
+    def get_calculation_steps(self) -> str:
+        return '\n'.join(self.steps)
 
     # def _example_of_usign_decimal(self):
     #     var1 = decimal.Decimal(str(1.4444))
