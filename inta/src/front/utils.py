@@ -77,9 +77,10 @@ class Utils():
         return label
 
     def create_input(self, frame_in):
+        # Aqui tendremos que llamar a la clase de check y poner la funcion en ella
         vcmd = (frame_in.register(self._validate_numeric), '%P')
 
-        entry = tk.Entry(frame_in, validate="key", validatecommand=vcmd, insertwidth=6)
+        entry = tk.Entry(frame_in, validate="key", validatecommand=vcmd)
         entry.pack()
 
     def create_image_canvas(self, frame, image_path = ""):
@@ -93,6 +94,7 @@ class Utils():
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
+      
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -134,7 +136,7 @@ class Utils():
         )
 
         return inner_frame
-    
+
     def _validate_numeric(self, in_value):
         if in_value == "":
             return True

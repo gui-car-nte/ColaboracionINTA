@@ -9,6 +9,8 @@ from src.front.utils import Utils
 
 def start_gui():
 
+    utils = Utils()
+
     # Configure the logger at the start of your application
     logging.basicConfig(
         filename='error_log.txt',
@@ -23,7 +25,7 @@ def start_gui():
     root = tk.Tk()
     root.title("Cálculo del Momento Magnético")
     root.minsize(600, 400)
-    root.configure(background=config.PRIMARY_COLOR)
+    root.configure(background = config.PRIMARY_COLOR)
 
     utils = Utils(root)
 
