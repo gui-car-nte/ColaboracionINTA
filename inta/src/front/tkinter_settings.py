@@ -39,7 +39,7 @@ class GuiServices:
         self.utils = Utils(self.window)
 
     def load_files(self, next_frame):
-        gui_services = GuiServices(self.window)
+        gui_services = GuiServices(self.window, next_frame) #TODO run test, 2nd parameter was empty, note: tests ran, nothing seemingly wrong
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
@@ -83,7 +83,7 @@ class GuiServices:
         return valores
 
     def create_result(self, frame_main, distances):
-        gui_services = GuiServices(self.window)
+        gui_services = GuiServices(self.window, frame_main) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
         c = Calculations(gui_services)
 
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
