@@ -40,7 +40,7 @@ class FileHandler:
         except Exception as e:
             self.checker.gui_services.log_error("Exception", str(e))
             raise
-
+            
     def count_sensors(self) -> int:
         keys = self.data.keys()
         sensors = []
