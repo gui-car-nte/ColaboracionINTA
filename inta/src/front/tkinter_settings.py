@@ -84,14 +84,15 @@ class GuiServices:
 
     def create_result(self, frame_main, distances):
         gui_services = GuiServices(self.window, frame_main) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
-        c = Calculations(gui_services)
+        calculations = Calculations(gui_service)
 
-        self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
+        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
         button.config(state=tk.NORMAL)
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             # TODO aqui iria la operacion completa
+            self.utils.create_label(frame_main, calculations.get_calculation_steps(), tk.TOP)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
