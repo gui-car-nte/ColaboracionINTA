@@ -31,15 +31,15 @@ logger = logging.getLogger("urbanGUI")
 
 class GuiServices:
 
-    def __init__(self, frame_main, label) -> None:
+    def __init__(self, frame_main) -> None:
         self.window = frame_main
         self.numbers_sensors = 0
         self.sensor_data = {}
-        self.message_label = label
         self.utils = Utils(self.window)
+        self.operations_steps: str
 
     def load_files(self, next_frame):
-        gui_services = GuiServices(self.window, next_frame) #TODO run test, 2nd parameter was empty, note: tests ran, nothing seemingly wrong
+        gui_services = GuiServices(self.window) #TODO run test, 2nd parameter was empty, note: tests ran, nothing seemingly wrong
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
@@ -83,16 +83,16 @@ class GuiServices:
         return valores
 
     def create_result(self, frame_main, distances):
-        gui_services = GuiServices(self.window, frame_main) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
+        gui_services = GuiServices(self.window) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
         calculations = Calculations(gui_services)
 
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
         button.config(state=tk.NORMAL)
+        self.operations_steps = calculations.get_calculation_steps()
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             # TODO aqui iria la operacion completa
-            self.utils.create_label(frame_main, calculations.get_calculation_steps(), tk.TOP)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
@@ -101,47 +101,75 @@ class GuiServices:
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
+        txt_path = "calculation_steps.txt"
 
         c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
 
+        # Add title
         c.setFont("Helvetica-Bold", 18)
         title = "Magnetic Moment"
         c.drawCentredString(width / 2.0, height - 50, title)
 
-        y_offset = 100
+        y_offset = height - 100
 
-        for i, (axis, moment_magnetic, image) in enumerate(
-            zip(types, self.results, config.IMAGES)
-        ):
+        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, config.IMAGES)):
+            if y_offset < 300:
+                c.showPage()
+                y_offset = height - 100
 
+            # Add axis label
             c.setFont("Helvetica-Bold", 12)
-            c.drawString(275, 660, f"Axis {axis}")
+            c.drawString(100, y_offset, f"Axis {axis}")
 
-            c.drawImage(ImageReader(image), 100, 450, width=400, height=200)
+            y_offset -= 20
 
+            # Add image
+            c.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=200)
+
+            y_offset -= 220
+
+            # Add magnetic moment
             c.setFont("Helvetica", 12)
-            c.drawString(200, 425, f"Magnetic Moment {moment_magnetic}")
+            c.drawString(100, y_offset, f"Magnetic Moment {moment_magnetic}")
 
-            y_offset += 300
-            c.showPage()
+            y_offset -= 40
+
+        # Add a new page for calculation steps
+        c.showPage()
+
+        c.setFont("Helvetica-Bold", 18)
+        title = "Detailed Calculation Steps"
+        c.drawCentredString(width / 2.0, height - 50, title)
+
+        calculations = Calculations(GuiServices(self.window))
+        c.setFont("Helvetica", 8)
+        calculation_steps = self.operations_steps.split('\n')
+        y_offset = height - 100
+
+        for line in calculation_steps:
+            if y_offset < 40:
+                c.showPage()
+                y_offset = height - 100
+            c.drawString(100, y_offset, line)
+            y_offset -= 20
+
+        print(calculations.get_calculation_steps())
 
         c.save()
 
-        # TODO condicional para detectar sistema operativo y sacar archivo exe correcto
+        # TODO: Conditional to detect operating system and open the correct file
         # os.startfile(pdf_path) # Windows
-        # os.system(f"xdg-open {pdf_path}") # linux
+        # os.system(f"xdg-open {pdf_path}") # Linux
+
 
     def show_message(self, msg, color):
-        if self.message_label:
-            self.message_label.config(text=msg, fg=color, background=config.PRIMARY_COLOR)
-            self.window.after(5000, self.clear_message)
-        else:
-            print("Message label not defined.")
+        popup_root = tk.Tk()
+        popup_root.minsize(400,50)
+        frame_popup = self.utils.create_frame(popup_root, tk.TOP)
+        self.utils.create_label(frame_popup, msg, tk.TOP)
 
-    def clear_message(self):
-        if self.message_label:
-            self.message_label.config(text="")
+        popup_root.mainloop()
 
     def log_error(self, error_type, error_message):
         logger.error(f'{error_type}: {error_message}')

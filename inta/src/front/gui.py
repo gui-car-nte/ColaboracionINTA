@@ -35,7 +35,7 @@ def start_gui():
     bottom_frame = utils.create_frame(root, tk.BOTTOM)
     message_label = utils.create_label(bottom_frame, "", tk.TOP)
     
-    settings = GuiServices(root, message_label)
+    settings = GuiServices(root)
 
     utils.create_button(
         "csv_button",
