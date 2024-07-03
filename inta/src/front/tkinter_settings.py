@@ -84,14 +84,27 @@ class GuiServices:
         return valores
 
     def create_result(self, frame_main, distances):
-        c = Calculations()
+        calculations = Calculations()
 
+<<<<<<< Updated upstream
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             self.utils.create_label(
                 frame_main, f"Magentic Moment: {result}", ""
             ).configure(padx=10, pady=10)
+=======
+        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
+        button = self.window.nametowidget(".!frame.export_button")
+        button.config(state=tk.NORMAL)
+        for result, image_path in zip(self.results, config.IMAGES):
+            self.utils.create_image_canvas(frame_main, image_path)
+            # TODO aqui iria la operacion completa
+            self.utils.create_label(frame_main, calculations.get_calculation_steps(), tk.TOP)
+            self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
+                padx = 10, pady = 10
+            )
+>>>>>>> Stashed changes
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
