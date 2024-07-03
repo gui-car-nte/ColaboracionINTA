@@ -166,6 +166,7 @@ class GuiServices:
     def show_message(self, msg, color):
         popup_root = tk.Tk()
         popup_root.minsize(400,50)
+        popup_root.title("ERROR")
         frame_popup = self.utils.create_frame(popup_root, tk.TOP)
         self.utils.create_label(frame_popup, msg, tk.TOP)
 
