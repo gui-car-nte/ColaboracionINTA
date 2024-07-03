@@ -2,3 +2,4 @@
 **/__pycache__/
 **/resource/*.png
 **/prueba
+**/error_log.txt
