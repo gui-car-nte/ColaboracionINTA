@@ -7,7 +7,7 @@ from src import config
 decimal.getcontext().prec = config.PRECISION
 
 class Calculations:
-    def __init__(self,gui_services , *args):
+    def __init__(self, gui_services, *args):
         self.gui_services = gui_services
         self.args = args
         
