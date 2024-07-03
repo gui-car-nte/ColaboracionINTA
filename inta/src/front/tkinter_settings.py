@@ -3,7 +3,6 @@ import os
 import logging
 
 from tkinter import filedialog
-from PIL import Image, ImageTk
 
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
@@ -12,22 +11,24 @@ from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
+from src.front.utils import Utils
 
 # Configura el logger al inicio de tu aplicación
 logging.basicConfig(
-    filename='error_log.txt',
-    filemode='a',
-    format='%(asctime)s,%(name)s %(levelname)s %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    level=logging.ERROR
+    filename="error_log.txt",
+    filemode="a",
+    format="%(asctime)s,%(name)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.ERROR,
 )
 
-logger = logging.getLogger('urbanGUI')
+logger = logging.getLogger("urbanGUI")
 
 # TODO
 # poner icono en el center_frame para no estar vacio
 # poner iconos en el programa
 # fix data types
+
 
 class GuiServices:
 
@@ -98,7 +99,7 @@ class GuiServices:
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
 
-        c = canvas.Canvas(pdf_path, pagesize = letter)
+        c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
 
         c.setFont("Helvetica-Bold", 18)
@@ -114,7 +115,7 @@ class GuiServices:
             c.setFont("Helvetica-Bold", 12)
             c.drawString(275, 660, f"Axis {axis}")
 
-            c.drawImage(ImageReader(image), 100, 450, width = 400, height = 200)
+            c.drawImage(ImageReader(image), 100, 450, width=400, height=200)
 
             c.setFont("Helvetica", 12)
             c.drawString(200, 425, f"Magnetic Moment {moment_magnetic}")
@@ -123,14 +124,16 @@ class GuiServices:
             c.showPage()
 
         c.save()
-        
+
         # TODO condicional para detectar sistema operativo y sacar archivo exe correcto
         # os.startfile(pdf_path) # Windows
         # os.system(f"xdg-open {pdf_path}") # linux
 
     def show_message(self, msg, color):
         if self.message_label:
-            self.message_label.config(text=msg, fg=color, background=config.PRIMARY_COLOR)
+            self.message_label.config(
+                text=msg, fg=color, background=config.PRIMARY_COLOR
+            )
             self.window.after(5000, self.clear_message)
         else:
             print("Message label not defined.")
