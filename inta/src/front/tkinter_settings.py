@@ -84,7 +84,7 @@ class GuiServices:
 
     def create_result(self, frame_main, distances):
         gui_services = GuiServices(self.window, frame_main) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
-        calculations = Calculations(gui_service)
+        calculations = Calculations(gui_services)
 
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
