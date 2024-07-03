@@ -27,7 +27,7 @@ def start_gui():
     root.minsize(600, 400)
     root.configure(background = config.PRIMARY_COLOR)
 
-    settings = GuiServices(root)
+    utils = Utils(root)
 
     top_frame = utils.create_frame(root, tk.TOP)
     center_frame = utils.create_frame(root, tk.TOP, complete=True, scrollable=True)
@@ -35,6 +35,9 @@ def start_gui():
         background=config.PRIMARY_COLOR
     )
     bottom_frame = utils.create_frame(root, tk.BOTTOM)
+    message_label = utils.create_label(bottom_frame, "", tk.TOP)
+    
+    settings = GuiServices(root, message_label)
 
     utils.create_button(
         "csv_button",
@@ -51,6 +54,6 @@ def start_gui():
         tk.LEFT,
         settings.export_to_pdf,
         "",
-    )
+    ).config(state=tk.DISABLED)
 
     root.mainloop()

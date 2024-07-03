@@ -1,10 +1,14 @@
 import tkinter as tk
+import re
 
 from src import config
 from PIL import Image, ImageTk
 
 
 class Utils():
+    def __init__(self, windows) -> None:
+        self.root = windows
+
     def create_frame(self, frame_in, side_in, complete = False, scrollable = False):
         frame = tk.Frame(frame_in)
         frame.configure(background = config.PRIMARY_COLOR)
@@ -87,10 +91,11 @@ class Utils():
 
             canvas = tk.Canvas(frame, width = image.width, height = image.height)
             canvas.pack(pady = 10)
-            canvas.create_image(0, 0, anchor = "nw", image = photo)
+            canvas.create_image(0, 0, anchor = "center", image = photo, tags='img')
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
-            canvas.image = photo
+            canvas.image = photo # type: ignore
+      
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -100,23 +105,20 @@ class Utils():
             canvas.create_image(0, 0, anchor = "nw", image = photo)
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
-            canvas.image = photo
+            canvas.image = photo # type: ignore
             
         return canvas
 
     # TODO could be moved to utils folder or another file to shorten code, go case by case
     # TODO '=' spacing
     def create_scroll(self, frame_main):
-        # Crear el lienzo
         canvas = tk.Canvas(frame_main, bg = config.PRIMARY_COLOR)
         canvas.pack(side=tk.LEFT, fill = tk.BOTH, expand = True)
 
-        # Crear la barra de desplazamiento
         scrollbar_y = tk.Scrollbar(frame_main, orient = tk.VERTICAL, command = canvas.yview)
         scrollbar_y.pack(side = tk.RIGHT, fill = tk.Y)
         canvas.configure(yscrollcommand = scrollbar_y.set)
 
-        # Crear un marco dentro del lienzo
         inner_frame = tk.Frame(canvas, bg = config.PRIMARY_COLOR)
         window = canvas.create_window((0, 0), window = inner_frame, anchor = "n")
 
@@ -130,13 +132,12 @@ class Utils():
             "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
 
-        # Evento de rueda del ratón para desplazar
         canvas.bind_all(
             "<MouseWheel>", lambda event: self._on_mouse_wheel(event, canvas)
         )
 
         return inner_frame
-    
+  
     def _validate_numeric(self, new_value):
         if new_value == "":
             return True  # Permitir eliminar el contenido

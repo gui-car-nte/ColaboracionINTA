@@ -10,7 +10,6 @@ class FileHandler:
         if filepaths:
             self.load_csv_files(filepaths)
 
-
     def load_csv_files(self, filepaths: list):
         if len(filepaths) != 6:
             raise ValueError(f"Expected 6 files, but got {len(filepaths)}")
@@ -66,8 +65,7 @@ class FileHandler:
                 prv = sensor
             if sensor != prv:
                 raise ValueError('Files have different numbers of sensors')
-            
-            
+                
     def count_sensors(self) -> int:
         keys = self.data.keys()
         sensors = []
