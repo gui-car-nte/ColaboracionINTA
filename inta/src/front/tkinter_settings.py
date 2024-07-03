@@ -96,9 +96,6 @@ class GuiServices:
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
-            self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
-                padx = 10, pady = 10
-            )
 
     # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
