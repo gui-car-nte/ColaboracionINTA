@@ -91,7 +91,8 @@ class GuiServices:
         button.config(state=tk.NORMAL)
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
-            self.utils.create_label(frame_main, f"Momento Magnetico: {result}", "").configure(
+            # TODO aqui iria la operacion completa
+            self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
 
