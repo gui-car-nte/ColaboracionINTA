@@ -36,7 +36,6 @@ class Calculations:
                 
                 result = (slope / config.MOMENTUM) * config.FINAL_MOMENTUM
                 self.steps.append(f'{axis} axis slope = {slope:.15f}')
-                self.steps.append(f'{axis} axis magnetic moment = {result:.15f}')
                 results.append(result)
                 
             return results
@@ -93,7 +92,7 @@ class Calculations:
         return round(num, 15)
     
     def get_calculation_steps(self) -> str:
-        return '\n'.join(self.steps)
+        return '\n\n'.join(self.steps)
 
     # def _example_of_usign_decimal(self):
     #     var1 = decimal.Decimal(str(1.4444))
