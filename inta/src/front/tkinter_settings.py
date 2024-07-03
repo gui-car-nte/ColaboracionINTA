@@ -29,7 +29,6 @@ logger = logging.getLogger("urbanGUI")
 # poner iconos en el programa
 # fix data types
 
-
 class GuiServices:
 
     def __init__(self, frame_main, label) -> None:
@@ -40,8 +39,9 @@ class GuiServices:
         self.utils = Utils(self.window)
 
     def load_files(self, next_frame):
+        gui_services = GuiServices(self.window)
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-        f = FileHandler(filepaths)
+        f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
         # numero sensores
         self.numbers_sensors = f.count_sensors()
@@ -83,7 +83,8 @@ class GuiServices:
         return valores
 
     def create_result(self, frame_main, distances):
-        c = Calculations()
+        gui_services = GuiServices(self.window)
+        c = Calculations(gui_services)
 
         self.results = c.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
@@ -131,9 +132,7 @@ class GuiServices:
 
     def show_message(self, msg, color):
         if self.message_label:
-            self.message_label.config(
-                text=msg, fg=color, background=config.PRIMARY_COLOR
-            )
+            self.message_label.config(text=msg, fg=color, background=config.PRIMARY_COLOR)
             self.window.after(5000, self.clear_message)
         else:
             print("Message label not defined.")
