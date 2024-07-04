@@ -4,7 +4,7 @@ import logging
 # TODO review non-used variables
 # TODO english translation
 from src import config
-from src.front.tkinter_settings import GuiServices
+from src.front.gui_service import GuiServices
 from src.front.utils import Utils
 
 def start_gui():

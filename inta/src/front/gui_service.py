@@ -1,6 +1,7 @@
 import tkinter as tk
 import os
 import logging
+import platform
 
 from tkinter import filedialog
 
@@ -13,11 +14,11 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from src.front.utils import Utils
 
-# Configura el logger al inicio de tu aplicación
+os.remove(path = 'error_log.txt')
 logging.basicConfig(
     filename="error_log.txt",
     filemode="a",
-    format="%(asctime)s,%(name)s %(levelname)s %(message)s",
+    format="[%(asctime)s] - [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     level=logging.ERROR,
 )
@@ -43,7 +44,6 @@ class GuiServices:
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
-        # numero sensores
         self.numbers_sensors = f.count_sensors()
         self.drop_frame(next_frame)
         self.input_distance(next_frame)
@@ -101,7 +101,6 @@ class GuiServices:
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
-        txt_path = "calculation_steps.txt"
 
         c = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
@@ -150,17 +149,18 @@ class GuiServices:
         for line in calculation_steps:
             if y_offset < 40:
                 c.showPage()
+                c.setFont("Helvetica", 8)
                 y_offset = height - 100
             c.drawString(100, y_offset, line)
             y_offset -= 20
 
-        print(calculations.get_calculation_steps())
-
         c.save()
 
         # TODO: Conditional to detect operating system and open the correct file
-        # os.startfile(pdf_path) # Windows
-        # os.system(f"xdg-open {pdf_path}") # Linux
+        if platform.system() == 'Windows':
+            os.startfile(pdf_path) # Windows
+        elif platform.system() == 'Linux':
+            os.system(f"xdg-open {pdf_path}") # Linux
 
 
     def show_message(self, msg, color):
