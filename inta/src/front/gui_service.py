@@ -12,7 +12,6 @@ from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from src.front.utils import Utils
 
 os.remove(path = 'error_log.txt')
 logging.basicConfig(
@@ -124,7 +123,7 @@ class GuiServices:
             y_offset -= 20
 
             # Add image
-            c.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=200)
+            c.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
 
             y_offset -= 220
 
@@ -141,7 +140,6 @@ class GuiServices:
         title = "Detailed Calculation Steps"
         c.drawCentredString(width / 2.0, height - 50, title)
 
-        calculations = Calculations(GuiServices(self.window))
         c.setFont("Helvetica", 8)
         calculation_steps = self.operations_steps.split('\n')
         y_offset = height - 100
