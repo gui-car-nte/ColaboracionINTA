@@ -2,9 +2,9 @@
 
 <!-- poner en ingles -->
 
-## Iniciar entorno virtual
+## Start virtual environment
 
-Para crear un entorno virtual debmos ejecutar el siguiente comando en la terminal
+To create a virtual environment we must execute the following command in the terminal
 
 Linux:
 
@@ -18,7 +18,8 @@ Windows:
 python -m venv mi_entorno
 ```
 
-Para activar el entorno ha de introducir lo siguiente en la termina
+## Activate virtual environment  
+To activate the virtual environment you must enter the following in the terminal
 
 Linux:
 
@@ -32,9 +33,28 @@ Windows:
 mi_entorno\Scripts\activate.bat
 ```
 
-----
+## Start program
 
-<!-- 
-    punto de entrada ejecucion
-    ejecutable
- -->
+To start the program you must enter the following in the terminal
+
+Linux:
+
+```bash
+python3 main.py
+```
+
+Windows:
+```cmd
+python main.py
+```
+
+## Create executable file
+
+To create executable file you must enter the following in the terminal
+
+```python
+pip install pyinstaller
+
+pyinstaller main.py --onefile --name=your_app_name --icon=youricon.ico
+pyinstaller your_app_name.spec
+```
