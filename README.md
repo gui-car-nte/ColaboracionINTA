@@ -35,6 +35,12 @@ mi_entorno\Scripts\activate.bat
 
 ## Start program
 
+In order to start the program we must first install the dependencies, to do this we must execute the following command
+
+```python
+pip install -r requirements.txt
+```
+
 To start the program you must enter the following in the terminal
 
 Linux:
