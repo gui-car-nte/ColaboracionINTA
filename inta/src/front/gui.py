@@ -23,6 +23,8 @@ def start_gui():
     root = tk.Tk()
     root.title("Magnetic Moment Calculation")
     root.minsize(600, 400)
+    icon = tk.PhotoImage(file='src/front/resource/logo.png')
+    root.iconphoto(True, icon)
     root.configure(background = config.PRIMARY_COLOR)
 
     utils = Utils(root)

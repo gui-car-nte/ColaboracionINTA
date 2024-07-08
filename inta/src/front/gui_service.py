@@ -24,11 +24,6 @@ logging.basicConfig(
 
 logger = logging.getLogger("urbanGUI")
 
-# TODO
-# poner icono en el center_frame para no estar vacio
-# poner iconos en el programa
-# fix data types
-
 class GuiServices:
 
     def __init__(self, frame_main) -> None:
@@ -39,7 +34,7 @@ class GuiServices:
         self.operations_steps: str
 
     def load_files(self, next_frame):
-        gui_services = GuiServices(self.window) #TODO run test, 2nd parameter was empty, note: tests ran, nothing seemingly wrong
+        gui_services = GuiServices(self.window)
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
@@ -69,20 +64,19 @@ class GuiServices:
                 self.drop_frame(widget)
             widget.destroy()
 
-    # TODO change name & var names
     def get_values(self, frame):
-        valores = []
+        values = []
         for widget in frame.winfo_children():
             if isinstance(widget, tk.Entry):
                 new_values = widget.get().replace(",",".")
-                valores.append(new_values)
+                values.append(new_values)
             elif isinstance(widget, tk.Frame):
-                valores.extend(self.get_values(widget))
+                values.extend(self.get_values(widget))
                 
-        return valores
+        return values
 
     def create_result(self, frame_main, distances):
-        gui_services = GuiServices(self.window) #TODO run test, 2nd parameter was empty note: tests ran, nothing seemingly wrong
+        gui_services = GuiServices(self.window)
         calculations = Calculations(gui_services)
 
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
@@ -91,75 +85,67 @@ class GuiServices:
         self.operations_steps = calculations.get_calculation_steps()
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
-            # TODO aqui iria la operacion completa
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
 
-    # TODO make 'c' variable more descriptive & english tl
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
 
-        c = canvas.Canvas(pdf_path, pagesize=letter)
+        canva = canvas.Canvas(pdf_path, pagesize=letter)
         width, height = letter
 
-        # Add title
-        c.setFont("Helvetica-Bold", 18)
+        canva.setFont("Helvetica-Bold", 18)
         title = "Magnetic Moment"
-        c.drawCentredString(width / 2.0, height - 50, title)
+        canva.drawCentredString(width / 2.0, height - 50, title)
 
         y_offset = height - 100
 
         for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, config.IMAGES)):
             if y_offset < 300:
-                c.showPage()
+                canva.showPage()
                 y_offset = height - 100
 
-            # Add axis label
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(100, y_offset, f"Axis {axis}")
+            canva.setFont("Helvetica-Bold", 12)
+            canva.drawString(100, y_offset, f"Axis {axis}")
 
             y_offset -= 20
 
-            # Add image
-            c.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
+            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
 
             y_offset -= 220
 
-            # Add magnetic moment
-            c.setFont("Helvetica", 12)
-            c.drawString(100, y_offset, f"Magnetic Moment {moment_magnetic}")
+            canva.setFont("Helvetica", 12)
+            canva.drawString(100, y_offset, f"Magnetic Moment {moment_magnetic}")
 
             y_offset -= 40
 
-        # Add a new page for calculation steps
-        c.showPage()
+        canva.showPage()
 
-        c.setFont("Helvetica-Bold", 18)
+        canva.setFont("Helvetica-Bold", 18)
         title = "Detailed Calculation Steps"
-        c.drawCentredString(width / 2.0, height - 50, title)
+        canva.drawCentredString(width / 2.0, height - 50, title)
 
-        c.setFont("Helvetica", 8)
+        canva.setFont("Helvetica", 8)
         calculation_steps = self.operations_steps.split('\n')
         y_offset = height - 100
 
         for line in calculation_steps:
             if y_offset < 40:
-                c.showPage()
-                c.setFont("Helvetica", 8)
+                canva.showPage()
+                canva.setFont("Helvetica", 8)
                 y_offset = height - 100
-            c.drawString(100, y_offset, line)
+            canva.drawString(100, y_offset, line)
             y_offset -= 20
 
-        c.save()
+        canva.save()
 
-        # TODO: Conditional to detect operating system and open the correct file
         if platform.system() == 'Windows':
-            os.startfile(pdf_path) # Windows
+            print('windows')
+            os.startfile(pdf_path)
         elif platform.system() == 'Linux':
-            os.system(f"xdg-open {pdf_path}") # Linux
-
+            os.system(f"xdg-open {pdf_path}")
 
     def show_message(self, msg, color):
         popup_root = tk.Tk()
