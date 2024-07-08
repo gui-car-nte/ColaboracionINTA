@@ -12,7 +12,6 @@ from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from src.front.utils import Utils
 
 os.remove(path = 'error_log.txt')
 logging.basicConfig(
@@ -113,7 +112,7 @@ class GuiServices:
 
             y_offset -= 20
 
-            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=200)
+            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
 
             y_offset -= 220
 

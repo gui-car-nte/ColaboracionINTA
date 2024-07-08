@@ -21,7 +21,7 @@ def start_gui():
     logger = logging.getLogger('urbanGUI')
 
     root = tk.Tk()
-    root.title("Cálculo del Momento Magnético")
+    root.title("Magnetic Moment Calculation")
     root.minsize(600, 400)
     icon = tk.PhotoImage(file='src/front/resource/logo.png')
     root.iconphoto(True, icon)
@@ -34,8 +34,6 @@ def start_gui():
     utils.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
         background=config.PRIMARY_COLOR
     )
-    bottom_frame = utils.create_frame(root, tk.BOTTOM)
-    message_label = utils.create_label(bottom_frame, "", tk.TOP)
     
     settings = GuiServices(root)
 
