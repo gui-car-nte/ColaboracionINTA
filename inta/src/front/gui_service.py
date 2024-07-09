@@ -13,7 +13,9 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 
-os.remove(path = 'error_log.txt')
+if os.path.exists('error_log.txt'):
+    os.remove(path = 'error_log.txt')
+
 logging.basicConfig(
     filename="error_log.txt",
     filemode="a",
