@@ -4,26 +4,41 @@
 
 ## Table of Contents
 1. Introduction
-2. Input Data
-3. Algorithm Steps
-    1. Invert Cube Distance
-    2. Halved Subtraction Calculation
-    3. Slope Calculation
-    4. Magnetic Moment Calculation
-4. Plotting and Visualization
-5. Error Handling
-6. Output
+2. Dependencies
+3. Input Data
+4. Algorithm Steps
+    - Invert Cube Distance
+    - Halved Subtraction Calculation
+    - Slope Calculation
+    - Magnetic Moment Calculation
+5. Plotting and Visualization
+6. Error Handling
+7. Output
 
 ## 1. Introduction
 The magnetic moment calculation algorithm is designed to analyze sensor data from multiple sensors positioned at known distances from a magnetic source. The algorithm computes the magnetic moment by following a series of mathematical operations and transformations on the sensor data.
 
-## 2. Input Data
+## 2. Dependencies
+- pandas
+
+        Handles the sensor data input and manipulation. Provides data structures such as DataFrames, to efficiently load, process, and manipulate CSV files containing sensor readings.
+- numpy
+
+        Performs numerical operations and calculations. Provides support for arrays and matrices, and includes mathematical functions for performing calculations on these data structures, such as computing the slope of a linear regression line.
+- matplotlib
+
+        Generates plots and visualizations of the calculation, visual representations of the data. Plotting the halved subtractions against the inverted cube distances, which aids in understanding and analyzing the results.
+- tkinter
+
+        Implements the graphical user interface (GUI) Provides a framework to create and manage the GUI, allowing users to interact with the program, input data, and view results.
+
+## 3. Input Data
 The algorithm requires the following inputs:
 
 Sensor Data: A dictionary containing DataFrames for sensor readings along the X, Y, and Z axes. Each DataFrame contains readings from multiple sensors.
 
 Distances: A list of distances from each sensor to the magnetic source.
-## 3. Algorithm Steps
+## 4. Algorithm Steps
 **The algorithm performs the following steps to compute the magnetic moment:**
 
 ### A. Invert Cube Distance
@@ -52,7 +67,7 @@ This function computes the halved difference between two values. The mathematica
 ### halved_subtraction = ($minuend−subtrahend \over 2 $)
 
 
-## C. Slope Calculation
+### C. Slope Calculation
 
 `Function: _slope_calculation(y_axis: np.ndarray, x_axis: np.ndarray) -> float`
 
@@ -65,7 +80,7 @@ This function computes the slope of the linear regression line fitted to the dat
     - Extract the slope from the result.
     - Return the slope.
 
-## D. Magnetic Moment Calculation
+### D. Magnetic Moment Calculation
 `Main Function: calculate_magnetic_moment(sensor_data: dict, distances: list) -> list`
 
 **This function integrates the previous steps to compute the magnetic moment along each axis.**
@@ -90,7 +105,7 @@ magnetic_moment = ($ slope \over config.MOMENTUM $) $× config.FINALMOMENTUM$
     - Append the magnetic moment to the results list.
     - Return the results list.
 
-## 4. Plotting and Visualization
+## 5. Plotting and Visualization
 `Function: _plot_calculation_graphs(x_axis: list, series: list, name_axis: str) -> str`
 
 This function generates a plot for the halved subtractions against the inverted cube distances and saves the plot as an image file.
@@ -104,13 +119,13 @@ Save the plot as an image file.
 Close the plot to free resources.
 Return the file path of the saved plot.
 
-## 5. Error Handling
+## 6. Error Handling
 The algorithm includes error handling to ensure robustness. Errors are logged and reported through the gui_services interface. Common errors handled include:
 
 Value errors when sensor data is None.
 ZeroDivisionError when distances contain zero values.
 
-## 6. Output
+## 7. Output
 The main output of the algorithm is a list of magnetic moments for the X, Y, and Z axes. Additionally, the detailed calculation steps are logged and can be retrieved for debugging or review purposes.
 
 Example:
