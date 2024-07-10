@@ -137,7 +137,7 @@ class GuiServices:
                 canva.showPage()
                 canva.setFont("Helvetica", 8)
                 y_offset = height - 100
-            canva.drawString(100, y_offset, line)
+            canva.drawString(20, y_offset, line)
             y_offset -= 20
 
         canva.save()

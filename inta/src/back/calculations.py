@@ -70,7 +70,13 @@ class Calculations:
     
     def _slope_calculation(self, y_axis: np.ndarray, x_axis: np.ndarray) -> float:
         slope, intercept = np.polyfit(x_axis, y_axis, 1)
-        self.steps.append(f'Slope calculation: slope = {slope:.15f}')
+        x_list = [round(x, config.PRECISION) for x in x_axis.tolist()]
+        y_list = [round(y, config.PRECISION) for y in y_axis.tolist()]
+        self.steps.append(
+            f'Slope for {[f"{x:.{config.PRECISION}f}" for x in x_list]} \n'
+            f'and {[f"{y:.{config.PRECISION}f}" for y in y_list]} \n'
+            f'slope = {slope:.15f}'
+    )
         
         return slope
     
