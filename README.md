@@ -1,107 +1,66 @@
 # ColaboracionINTA
 
-1. Planificación y Preparación
-*Comprender los Requisitos:*
+<!-- poner en ingles -->
 
-Revisión detallada del documento proporcionado para entender todos los requisitos funcionales y no funcionales.
+## Start virtual environment
 
-Investigar la norma ECSS-E-ST-20-07C Rev.1 para asegurarse de cumplir con las especificaciones.
+To create a virtual environment we must execute the following command in the terminal
 
-*Definición del Alcance:*
+Linux:
 
-Establecer los límites y objetivos específicos del proyecto.
+```bash
+python3 -m venv mi_entorno
+```
 
-Crear un diagrama de flujo para el programa y la interfaz gráfica.
+Windows:
 
-2. Configuración del Entorno de Desarrollo
-*Instalación de Herramientas:*
+```cmd
+python -m venv mi_entorno
+```
 
-Instalar Python 3.
+## Activate virtual environment  
+To activate the virtual environment you must enter the following in the terminal
 
-Instalar un entorno de desarrollo integrado (IDE) como PyCharm, Visual Studio Code, etc.
+Linux:
 
-Instalar bibliotecas necesarias (Tkinter para GUI, pandas para manejo de CSV, matplotlib para gráficos).
+```bash
+source mi_entorno/bin/activate
+```
 
-3. Diseño de la Interfaz Gráfica
-*Especificar los Elementos de la Interfaz:*
+Windows:
 
-Botones para cargar archivos CSV.
+```cmd
+mi_entorno\Scripts\activate.bat
+```
 
-Campos de texto o spinners para ingresar distancias de los sensores.
+## Start program
 
-Área de salida para mostrar resultados y gráficos.
+In order to start the program we must first install the dependencies, to do this we must execute the following command
 
-*Mockups y Prototipos:*
+```python
+pip install -r requirements.txt
+```
 
-Crear bocetos o prototipos utilizando herramientas de diseño de interfaz como Figma o Adobe XD.
+To start the program you must enter the following in the terminal
 
-4. Desarrollo del Programa
-*Estructura del Proyecto:*
+Linux:
 
-Crear la estructura básica del proyecto (directorios para el código fuente, pruebas, documentación, etc.).
+```bash
+python3 main.py
+```
 
-*Implementación de la Carga de Archivos CSV:*
+Windows:
+```cmd
+python main.py
+```
 
-Desarrollar funciones para cargar y verificar la integridad de los archivos CSV.
+## Create executable file
 
-Validar el formato y los datos de los archivos.
+To create executable file you must enter the following in the terminal
 
-*Implementación del Algoritmo de Cálculo del Momento Magnético:*
+```python
+pip install pyinstaller
 
-Escribir el algoritmo para calcular el momento magnético utilizando los datos de los archivos CSV.
-
-*Desarrollo de la Interfaz Gráfica:*
-
-Implementar la GUI utilizando Tkinter (o cualquier otro framework de GUI en Python).
-
-Integrar las funciones de carga de archivos y cálculo en la interfaz gráfica.
-
-*Visualización de Resultados:*
-
-Mostrar los resultados del cálculo en la interfaz gráfica.
-
-Generar y mostrar gráficos de linealidad para cada eje.
-
-5. Pruebas y Validación
-*Pruebas Unitarias:*
-
-Escribir y ejecutar pruebas unitarias para las funciones individuales del programa.
-
-*Pruebas de Integración:
-
-Verificar que los componentes del programa funcionen correctamente juntos.
-
-*Pruebas de Usuario:*
-
-Realizar pruebas con usuarios para asegurar que la interfaz gráfica es intuitiva y funcional.
-
-6. Documentación
-*Documentación del Código:*
-
-Documentar el código fuente con comentarios y explicaciones claras.
-
-*Guía de Uso:*
-
-Crear una guía de usuario que explique cómo utilizar la interfaz gráfica, cargar archivos CSV, y entender los resultados.
-
-*Documentación Técnica:*
-
-Incluir una descripción detallada del algoritmo utilizado para el cálculo del momento magnético.
-
-7. Optimización y Mejora
-*Optimización del Rendimiento:*
-
-Mejorar la eficiencia del programa para reducir el tiempo de respuesta durante la carga y procesamiento de archivos CSV.
-
-*Gestión de Errores:*
-
-Implementar manejo de errores y validación de datos de entrada para evitar resultados incorrectos.
-
-8. Entrega del Proyecto
-*Preparación de los Entregables:*
-
-Código fuente del programa.
-
-Documentación completa.
-
-Archivos de pruebas y ejemplos.
+pyinstaller main.py --onefile --name=your_app_name --icon=youricon.ico
+pyinstaller your_app_name.spec
+```
