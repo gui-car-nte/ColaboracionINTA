@@ -87,6 +87,7 @@ class Calculations:
         ax.set_title(f'{name_axis} Axis Plot')
         ax.set_xlabel('Inverted Distance Cubed')
         ax.set_ylabel('Halved Substraction Average')
+        ax.grid()
         plot_name = f'{name_axis}_axis_graph.png'
         fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
