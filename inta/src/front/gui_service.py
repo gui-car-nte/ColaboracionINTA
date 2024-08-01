@@ -112,7 +112,8 @@ class GuiServices:
             canva.setFont("Helvetica-Bold", 12)
             canva.drawString(100, y_offset, f"Axis {axis}")
 
-            y_offset -= 20
+
+            y_offset -= 80
 
             canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
 
