@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from src.config import *
+from inta.src.front.settings import *
 
 decimal.getcontext().prec = PRECISION
 
