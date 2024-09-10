@@ -12,14 +12,14 @@ class FileHandler:
             self.load_csv_files(filepaths)
 
     def load_csv_files(self, filepaths: list):
-        if len(filepaths) < 2 | len(filepaths) > 6:
-            self.checker.gui_services.log_error("File Count Error", f"Expected 2 to 6 files, but got {len(filepaths)}")
-            raise ValueError(f"Expected 2 to 6 files, but got {len(filepaths)}")
+        if len(filepaths) != 6:
+            self.checker.gui_services.log_error("File Count Error", f"Expected 6 files, but got {len(filepaths)}")
+            raise ValueError(f"Expected 6 files, but got {len(filepaths)}")
 
         filenames = [self._extract_filename(path) for path in filepaths]
-        if not set(filenames).issubset(set(CSV_NAMES)):
-            self.checker.gui_services.log_error("Filename Error", f"Some filenames do not match the expected names: {CSV_NAMES}")
-            raise ValueError(f"Some filenames do not match the expected names: {CSV_NAMES}")
+        if set(filenames) != set(CSV_NAMES):
+            self.checker.gui_services.log_error("Filename Error", f"Filenames do not match the expected names: {CSV_NAMES}")
+            raise ValueError(f"Filenames do not match the expected names: {CSV_NAMES}")
 
         try:
             for path in filepaths:
