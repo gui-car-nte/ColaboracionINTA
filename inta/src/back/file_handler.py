@@ -1,7 +1,8 @@
 import pandas as pd
 import os
-from src.config import CSV_NAMES
-from src.back.checker import Checker
+# from inta.src.config import CSV_NAMES
+from inta.src.front.settings import *
+from inta.src.back.checker import Checker
 
 class FileHandler:
     def __init__(self, filepaths: list, gui_services):
