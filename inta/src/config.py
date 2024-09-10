@@ -5,7 +5,7 @@ PRIMARY_COLOR = "#E7EFE7"
 # File handler
 START_ROW = 46
 END_ROW = 396
-CSV_NAMES = ["Xmas","Xmenos","Ymas","Ymenos","Zmas","Zmenos"]
+CSV_NAMES = ["Xmas","Xmenos","Ymas","Ymenos","Zmas","Zmenos","masX","menosX","masY","menosY","masZ","menosZ"]
 IMAGES = ['src/front/resource/X_axis_graph.png','src/front/resource/Y_axis_graph.png','src/front/resource/Z_axis_graph.png']
 
 # Calculations

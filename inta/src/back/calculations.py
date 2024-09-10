@@ -1,6 +1,9 @@
 import numpy as np
 import math
 import decimal
+from decimal import Decimal
+import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from src.config import *
 
@@ -21,17 +24,29 @@ class Calculations:
             results = []
             inverted_distances = self._invert_cube_distance(distances)
             
-            for axis in ['X', 'Y', 'Z']:
+            available_axes = ['X', 'Y', 'Z']
+            axes_in_data = []
+            for axis in available_axes:
+                if (f'{axis}mas' in sensor_data and f'{axis}menos' in sensor_data) or (f'mas{axis}' in sensor_data and f'menos{axis}' in sensor_data):
+                    axes_in_data.append(axis)
+            
+            if not axes_in_data:
+                raise ValueError('No valid axis data found in sensor files')
+            
+            for axis in axes_in_data:
                 halved_substractions = []
                 
                 for sensor in range(len(distances)):
                     sensor_number = (sensor * 3)
                     
                     try:
-                        plus_col_name = f'{axis}mas' 
-                        minus_col_name = f'{axis}menos'
-                        
-                        if plus_col_name not in sensor_data or minus_col_name not in sensor_data:
+                        if f'{axis}mas' in sensor_data and f'{axis}menos' in sensor_data:
+                            plus_col_name = f'{axis}mas'
+                            minus_col_name = f'{axis}menos'
+                        elif f'mas{axis}' in sensor_data and f'menos{axis}' in sensor_data:
+                            plus_col_name = f'mas{axis}'
+                            minus_col_name = f'menos{axis}'
+                        else:
                             self.steps.append(f'Skipping sensor {sensor + 1} for {axis} axis: Data not available')
                             continue
                         
@@ -51,8 +66,8 @@ class Calculations:
                     self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
                     
-                    momentum_decimal = decimal.Decimal(str(MOMENTUM))
-                    final_momentum_decimal = decimal.Decimal(str(FINAL_MOMENTUM))
+                    momentum_decimal = Decimal(str(MOMENTUM))
+                    final_momentum_decimal = Decimal(str(FINAL_MOMENTUM))
 
                     result = (slope / momentum_decimal) * final_momentum_decimal
                     self.steps.append(f'{axis} axis slope = {slope:.15f}')
@@ -83,36 +98,57 @@ class Calculations:
         return result_list
     
     
-    def _substraction_halving(self, minuend :float, subtrahend :float) -> decimal.Decimal:
-        minuend_decimal = decimal.Decimal(str(minuend))
-        subtrahend_decimal = decimal.Decimal(str(subtrahend))
+    def _substraction_halving(self, minuend :float, subtrahend :float) -> Decimal:
+        minuend_decimal = Decimal(str(minuend))
+        subtrahend_decimal = Decimal(str(subtrahend))
         result = (minuend_decimal - subtrahend_decimal) / 2
         self.steps.append(f'Halved substraction: ({minuend} - {subtrahend}) / 2 = {result}')
         return result
     
     
-    def _slope_calculation(self, y_axis: np.ndarray, x_axis: np.ndarray) -> decimal.Decimal:
-        x_axis_decimal = [decimal.Decimal(str(x)) for x in x_axis]
-        y_axis_decimal = [decimal.Decimal(str(y)) for y in y_axis]
+    def _slope_calculation(self, y_axis: np.ndarray, x_axis: np.ndarray) -> Decimal:
+        x_axis_decimal = [Decimal(str(x)) for x in x_axis]
+        y_axis_decimal = [Decimal(str(y)) for y in y_axis]
 
-        slope, intercept = np.polyfit(np.array(x_axis_decimal, dtype=np.float64), np.array(y_axis_decimal, dtype=np.float64), 1)
-        slope_decimal = decimal.Decimal(str(slope))
+        slope, intercept = np.polyfit(np.array(x_axis_decimal, dtype = np.float64), np.array(y_axis_decimal, dtype = np.float64), 1)
+        slope_decimal = Decimal(str(slope))
         return slope_decimal
     
     
     def _plot_calculation_graphs(self, x_axis: list, series: list, axis_name: str) -> str:
+        data = pd.DataFrame({'x_axis': x_axis, 'series': series})
+        sns.set_theme(style = "whitegrid")
         fig, ax = plt.subplots()
-        ax.plot(x_axis, series)
-        ax.set_title(f'{axis_name} Axis Plot')
+        
+        sns.pointplot(x = 'x_axis', y = 'series', data = data, ax = ax)
+        
+        y_ticks = self._calculate_ytick_range(series)
+        ax.set_yticks(y_ticks)
+        ax.set_xticks(range(len(x_axis)))
+        
+        ax.set_xticklabels([f'{Decimal(value):.2E}' for value in x_axis], rotation = 45, ha = 'right')
+        ax.set_yticklabels([f'{Decimal(value):.2E}' for value in y_ticks])
+        
+        ax.set_title(f'{axis_name} axis plot')
         ax.set_xlabel('d^(-3)(m^-3)')
         ax.set_ylabel('B(T)')
-        ax.grid()
+        
+        plt.tight_layout()
+        
         plot_name = f'{axis_name}_axis_graph.png'
         fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
         
         return f'src/front/resource/{plot_name}'
     
+    def _calculate_ytick_range(self, data: list, ticks: int = 5) -> np.ndarray:
+        min_value = Decimal(min(data))
+        max_value = Decimal(max(data))
+        margin = (max_value - min_value) * Decimal('0.1')
+        
+        tick_range = np.linspace(float(min_value - margin), float(max_value + margin), ticks)
+        
+        return tick_range
 
     def _rounded_number(self, num: float) -> float:
         return round(num, 15)
