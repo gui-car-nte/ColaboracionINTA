@@ -63,7 +63,7 @@ class Calculations:
                         continue
                 
                 if len(halved_substractions) > 0:
-                    self._plot_calculation_graphs(inverted_distances, halved_substractions, axis)
+                    self._plot_calculation_graphs(inverted_distances, halved_substractions[::-1], axis)
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
                     
                     momentum_decimal = Decimal(str(MOMENTUM))
