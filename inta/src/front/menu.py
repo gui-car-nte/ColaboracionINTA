@@ -2,6 +2,7 @@ import customtkinter as ctk
 from inta.src.front.image_widget import *
 from inta.src.front.gui_service import GuiServices
 from inta.src.front.panels import *
+from inta.src.back.file_handler import FileHandler
 
 
 class Menu(ctk.CTkTabview):
@@ -18,24 +19,28 @@ class Menu(ctk.CTkTabview):
     def enabled(self, files):
         # Tabs
         self.add('Files')
-        self.add('Distances')
-        self.add('Calculates')
-        self.add('Export')
 
         # Widgets
         # Add files and show files
         self.files_frame = FilesFrame(self.tab('Files'), self.service.load_files, self)
-        # Show distance input
-        DistanceFrame(self.tab('Distances'))
-        # Show calculate
+
+    def show_all_tabs(self):
+        """ Muestra los tabs adicionales después de cargar archivos """
+        self.add('Distances')
+        self.add('Calculates')
+        self.add('Export')
+
+        # Widgets adicionales
+        DistanceFrame(self.tab('Distances'), self.files)
         CalculateFrame(self.tab('Calculates'))
-        # Export
         ExportFrame(self.tab('Export'))
 
     def update_files(self, filepaths):
         """ Actualizar la lista de archivos en el marco de archivos """
         self.files = filepaths
         self.files_frame.update_files(self.files)
+
+        self.show_all_tabs()
 
         # Cambiar a la pestaña de Distances automáticamente
         self.set("Distances")
@@ -77,13 +82,24 @@ class FilesFrame(ctk.CTkFrame):
 
 
 class DistanceFrame(ctk.CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, files):
         super().__init__(master=parent, fg_color='transparent')
         self.pack(expand=True, fill='both')
+        self.files = files
 
-        service = GuiServices(self)
+        self.service = GuiServices(self)
+        f = FileHandler(list(files), self)
+        sensors = f.count_sensors()
 
-        EntryPanel(parent)
+        for index, sensor in enumerate(range(sensors)):
+            EntryPanel(self, index)
+
+        ctk.CTkButton(self, text = 'Calculate', command = self.send_data).pack()
+
+    def send_data(self):
+        print('Calcular')
+        print(self.files)
+        self.service.send_distance(self)
 
 
 class CalculateFrame(ctk.CTkFrame):

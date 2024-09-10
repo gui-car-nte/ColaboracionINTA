@@ -91,7 +91,6 @@ class GuiServices:
 
     def send_distance(self, frame_main: tk.Frame):
         distances = self.get_values(frame_main)
-        self.drop_frame(frame_main)
         new_frame = self.utils.create_frame(frame_main, tk.TOP, False)
         self.create_result(new_frame, distances)
 
