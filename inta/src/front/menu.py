@@ -99,7 +99,8 @@ class DistanceFrame(ctk.CTkFrame):
     def send_data(self):
         print('Calcular')
         print(self.files)
-        self.service.send_distance(self)
+        # self.service.send_distance(self)
+        ScrollFrame(self, )
 
 
 class CalculateFrame(ctk.CTkFrame):
