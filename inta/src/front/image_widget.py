@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import filedialog, Canvas
 from inta.src.front.settings import *
+from PIL import Image, ImageTk
 
 class ImageImport(ctk.CTkFrame):
     def __init__(self, parent, import_func):
@@ -16,15 +17,23 @@ class ImageImport(ctk.CTkFrame):
 
 
 class ScrollFrame(ctk.CTkScrollableFrame):
-    def __init__(self, parent):
-        super().__init__(master = parent)
+    def __init__(self, parent, image):
+        super().__init__(master=parent)
+        self.grid(row=0, column=1, sticky='nsew')
+        # self.resize = resize_image
+
+        self.add_canvas(image)
+
+    def add_canvas(self, path_image):
+        ImageOutput(self)
 
 
 class ImageOutput(Canvas):
-    def __init__(self, parent, resize_image):
+    def __init__(self, parent, path_image):
         super().__init__(master = parent, background = BACKCGROUND_COLOR, bd = 0, highlightthickness = 0, relief = 'ridge')
         self.grid(row = 0, column = 1, sticky = 'nsew')
-        self.bind('<Configure>', resize_image)
+        # self.bind('<Configure>', resize_image)
+
 
 class CloseOutput(ctk.CTkButton):
     def __init__(self, parent, close_func):
