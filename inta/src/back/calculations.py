@@ -146,7 +146,10 @@ class Calculations:
         max_value = Decimal(max(data))
         margin = (max_value - min_value) * Decimal('0.1')
         
-        tick_range = np.linspace(float(min_value - margin), float(max_value + margin), ticks)
+        ceiling = float(max_value + margin)
+        floor = float(min_value - margin)
+        
+        tick_range = np.linspace(floor, ceiling, ticks)
         
         return tick_range
 

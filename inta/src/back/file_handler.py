@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from src.config import CSV_NAMES
+from src.config import *
 from src.back.checker import Checker
 
 class FileHandler:
@@ -16,9 +16,9 @@ class FileHandler:
             raise ValueError(f"Expected 2 to 6 files, but got {len(filepaths)}")
 
         filenames = [self._extract_filename(path) for path in filepaths]
-        if not set(filenames).issubset(set(CSV_NAMES)):
-            self.checker.gui_services.log_error("Filename Error", f"Some filenames do not match the expected names: {CSV_NAMES}")
-            raise ValueError(f"Some filenames do not match the expected names: {CSV_NAMES}")
+        if not set(filenames).issubset(set(FILE_NAMES)):
+            self.checker.gui_services.log_error("Filename Error", f"Some filenames do not match the expected names: {FILE_NAMES}")
+            raise ValueError(f"Some filenames do not match the expected names: {FILE_NAMES}")
 
         try:
             for path in filepaths:
@@ -52,8 +52,8 @@ class FileHandler:
             if prv == 0:
                 prv = sensor
             if sensor != prv:
-                self.checker.gui_services.log_error("Sensor Count Error", 'Files have different numbers of sensors')
-                raise ValueError('Files have different numbers of sensors')
+                self.checker.gui_services.log_error("Sensor Count Error", 'Files have different number of sensors')
+                raise ValueError('Files have different number of sensors')
 
         return int(prv)
 
