@@ -4,17 +4,17 @@ import logging
 import platform
 
 from tkinter import filedialog, messagebox
-from inta.src.back.calculations import Calculations
-from inta.src.back.file_handler import FileHandler
-from inta.src.front.utils import Utils
-from inta.src import config
-from inta.src.front.panels import *
+
+from src.back.calculations import Calculations
+from src.back.file_handler import FileHandler
+from src.front.utils import Utils
+from src import config
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 
 if os.path.exists('error_log.txt'):
-    os.remove(path='error_log.txt')
+    os.remove(path = 'error_log.txt')
 
 logging.basicConfig(
     filename="error_log.txt",
@@ -26,7 +26,6 @@ logging.basicConfig(
 
 logger = logging.getLogger("urbanGUI")
 
-
 class GuiServices:
 
     def __init__(self, frame_main) -> None:
@@ -35,55 +34,21 @@ class GuiServices:
         self.sensor_data = {}
         self.utils = Utils(self.window)
         self.operations_steps: str
-        self.files_frame = None  # Referencia al frame de archivos para actualizar la interfaz
 
-    def set_files_frame(self, frame):
-        """ Establecer el marco donde se muestran los archivos cargados. """
-        self.files_frame = frame
-
-    def load_files(self):
-        # No necesitamos crear otra instancia de GuiServices
+    def load_files(self, next_frame):
+        gui_services = GuiServices(self.window)
         filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
-
-        if filepaths:
-            # Procesar los archivos utilizando FileHandler
-            f = FileHandler(list(filepaths), self)
-            self.sensor_data = f.load_csv_files(list(filepaths))
-            self.numbers_sensors = f.count_sensors()
-
-            # Ocultar el botón de selección de archivos y mostrar los nombres de los archivos
-            self.update_files_ui(filepaths)
-
-            # Cambiar automáticamente a la pestaña de entrada de distancias
-            self.change_to_distances_tab()
-
-    def update_files_ui(self, filepaths):
-        """ Actualizar la UI para ocultar el botón de selección de archivos y mostrar los nombres. """
-        if self.files_frame:
-            # Eliminar el botón de cargar archivos
-            for widget in self.files_frame.winfo_children():
-                widget.destroy()
-
-            # Mostrar los nombres de los archivos cargados
-            for filepath in filepaths:
-                filename = os.path.basename(filepath)  # Extraer solo el nombre del archivo
-                label = tk.Label(self.files_frame, text=filename, bg="white")
-                label.pack(pady=5)
-
-    def change_to_distances_tab(self):
-        """ Cambiar a la pestaña de entrada de distancias (asumiendo que tienes un TabView). """
-        try:
-            # Cambiar a la pestaña 'Distances'. Asumiendo que el método se llama así en el TabView
-            self.window.set("Distances")
-        except Exception as e:
-            logger.error(f"Error al cambiar de pestaña: {e}")
-            messagebox.showerror("Error", "No se pudo cambiar a la pestaña de distancias.")
+        f = FileHandler(list(filepaths), gui_services)
+        self.sensor_data = f.load_csv_files(list(filepaths))
+        self.numbers_sensors = f.count_sensors()
+        self.drop_frame(next_frame)
+        self.input_distance(next_frame)
 
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
             frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
             self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
-            EntryPanel(frame_input)
+            self.utils.create_input(frame_input)
 
         self.utils.create_button(
             "calculate", next_frame, "Calculate", "", self.send_distance, next_frame
@@ -91,6 +56,7 @@ class GuiServices:
 
     def send_distance(self, frame_main: tk.Frame):
         distances = self.get_values(frame_main)
+        self.drop_frame(frame_main)
         new_frame = self.utils.create_frame(frame_main, tk.TOP, False)
         self.create_result(new_frame, distances)
 
@@ -104,28 +70,25 @@ class GuiServices:
         values = []
         for widget in frame.winfo_children():
             if isinstance(widget, tk.Entry):
-                new_values = widget.get().replace(",", ".")
+                new_values = widget.get().replace(",",".")
                 values.append(new_values)
             elif isinstance(widget, tk.Frame):
                 values.extend(self.get_values(widget))
-
+                
         return values
 
     def create_result(self, frame_main, distances):
-        # No crear una nueva instancia de GuiServices, usa la existente (self)
-        calculations = Calculations(self)
-        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
+        gui_services = GuiServices(self.window)
+        calculations = Calculations(gui_services)
 
-        # Habilitar botón de exportación
+        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
         button = self.window.nametowidget(".!frame.export_button")
         button.config(state=tk.NORMAL)
-
-        # Obtener y mostrar los resultados
         self.operations_steps = calculations.get_calculation_steps()
         for result, image_path in zip(self.results, config.IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
-                padx=10, pady=10
+                padx = 10, pady = 10
             )
 
     def export_to_pdf(self):
@@ -148,6 +111,7 @@ class GuiServices:
 
             canva.setFont("Helvetica-Bold", 12)
             canva.drawString(100, y_offset, f"Axis {axis}")
+
 
             y_offset -= 80
 
@@ -181,7 +145,8 @@ class GuiServices:
         canva.save()
 
         if platform.system() == 'Windows':
-            os.startfile(pdf_path)  # type: ignore
+            print('windows')
+            os.startfile(pdf_path) #type: ignore
         elif platform.system() == 'Linux':
             os.system(f"xdg-open {pdf_path}")
 
