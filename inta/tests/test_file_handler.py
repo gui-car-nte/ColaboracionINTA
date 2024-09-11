@@ -2,7 +2,7 @@ import unittest
 import pandas as pd
 import os
 from unittest.mock import MagicMock, patch
-from src.config import CSV_NAMES
+from src.config import FILE_NAMES
 from src.back.checker import Checker
 from src.back.file_handler import FileHandler  # Asumiendo que la clase FileHandler está en un archivo llamado file_handler.py
 
@@ -12,7 +12,7 @@ class TestFileHandler(unittest.TestCase):
     def setUp(self, MockChecker):
         self.mock_checker = MockChecker()
         self.mock_checker.gui_services = MagicMock()
-        self.filepaths = [f"{name}.csv" for name in CSV_NAMES]
+        self.filepaths = [f"{name}.csv" for name in FILE_NAMES]
         
         # Mocking the content of the CSV files
         self.mock_data = {name: pd.DataFrame({
@@ -22,7 +22,7 @@ class TestFileHandler(unittest.TestCase):
             'sensor_2_x': [3, 4, 5],
             'sensor_2_y': [3, 4, 5],
             'sensor_2_z': [3, 4, 5],
-        }) for name in CSV_NAMES}
+        }) for name in FILE_NAMES}
 
         for path, df in zip(self.filepaths, self.mock_data.values()):
             df.to_csv(path, index=False)
@@ -37,7 +37,7 @@ class TestFileHandler(unittest.TestCase):
     def test_load_csv_files_success(self):
         data = self.file_handler.load_csv_files(self.filepaths)
         self.assertEqual(len(data), 6)
-        for name in CSV_NAMES:
+        for name in FILE_NAMES:
             self.assertTrue(name in data)
             pd.testing.assert_frame_equal(data[name], self.mock_data[name])
 
@@ -67,7 +67,7 @@ class TestFileHandler(unittest.TestCase):
         self.assertEqual(count, 2)
 
     def test_count_sensors_inconsistent_sensor_count(self):
-        self.mock_data[CSV_NAMES[0]] = pd.DataFrame({
+        self.mock_data[FILE_NAMES[0]] = pd.DataFrame({
             'sensor_1_x': [0, 1, 2],
             'sensor_1_y': [0, 1, 2],
             'sensor_1_z': [0, 1, 2],
