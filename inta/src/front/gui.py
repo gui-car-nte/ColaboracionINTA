@@ -15,6 +15,7 @@ class GuiApp(ctk.CTk):
         self.geometry('1000x600')
         self.title('Magnetic Moment Calculation')
         self.minsize(800, 500)
+        self.iconbitmap('src/front/resource/inta_icon.ico')
 
         # Configuración del layout
         self.rowconfigure(0, weight=1)
@@ -51,7 +52,7 @@ class GuiApp(ctk.CTk):
         self.canvas.config(width=image.width,
                            height=image.height)
 
-        self.label = ctk.CTkLabel(self, text = 'Magnetic Moment Calculation', font = ('Calibri', 40, 'bold'))
+        self.label = ctk.CTkLabel(self, text = '\nMagnetic Moment Calculation', font = ('Calibri', 40, 'bold'))
         self.label.grid(row = 1, column = 1, sticky = 'n')
 
     def close_edit(self):
