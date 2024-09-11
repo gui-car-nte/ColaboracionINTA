@@ -105,3 +105,5 @@ class Calculations:
     #     var1 = decimal.Decimal(str(1.4444))
     #     var2 = decimal.Decimal(str(2.2333))
     #     pass
+
+
