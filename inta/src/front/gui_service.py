@@ -37,7 +37,7 @@ class GuiServices:
 
     def load_files(self, next_frame):
         gui_services = GuiServices(self.window)
-        filepaths = filedialog.askopenfilenames(filetypes=[("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt*")])
+        filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
         f = FileHandler(list(filepaths), gui_services)
         self.sensor_data = f.load_csv_files(list(filepaths))
         self.numbers_sensors = f.count_sensors()
