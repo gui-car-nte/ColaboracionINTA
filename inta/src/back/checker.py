@@ -14,7 +14,7 @@ class Checker:
             if not all(second_row.apply(lambda x: self.is_numeric(x))):
                 raise ValueError(f"Non-numeric data found in the second row of file: {filepath}")
         except ValueError as e:
-            self.gui_services.log_error("CSV Format Error", str(e))
+            self.gui_services.log_error("File Format Error", str(e))
             raise
 
     def is_numeric(self, value):
@@ -38,5 +38,5 @@ class Checker:
                 if sensor != prv:
                     raise ValueError('Files have different numbers of sensors')
         except ValueError as e:
-            self.gui_services.log_error("CSV Format Error", str(e))
+            self.gui_services.log_error("File Format Error", str(e))
             raise
