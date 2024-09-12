@@ -1,10 +1,9 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from inta.src.front.image_widget import *
+from inta.src.front.image_widget import InitialFrame, ScrollFrame
 from inta.src.front.menu import Menu
 from tkinter import Canvas
 from inta.src.front.settings import *
-
 
 class GuiApp(ctk.CTk):
     def __init__(self):
@@ -25,12 +24,19 @@ class GuiApp(ctk.CTk):
         self.frame_col1 = InitialFrame(self)
 
         # Crear los widgets
-        self.menu = Menu(self, self.frame_col1)
-        self.menu.grid(row=0, column=0, rowspan = 2, sticky='nswe')
-
+        self.menu = Menu(self, self.replace_frame_col1)
+        self.menu.grid(row=0, column=0, rowspan=2, sticky='nswe')
 
         self.mainloop()
 
-
     def close_edit(self):
         self.destroy()
+
+    def replace_frame_col1(self, image_path):
+        # Destroy the existing frame_col1
+        if hasattr(self, 'frame_col1'):
+            self.frame_col1.destroy()
+
+        # Create and place the new ScrollFrame
+        self.frame_col1 = ScrollFrame(self, image_path)
+        self.frame_col1.grid(column=1, row=0, rowspan=2, sticky='nsew')

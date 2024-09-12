@@ -55,7 +55,8 @@ class GuiServices:
             self.update_files_ui(filepaths)
 
             # Cambiar automáticamente a la pestaña de entrada de distancias
-            self.change_to_distances_tab()
+            # self.change_to_distances_tab()
+            return True
 
     def update_files_ui(self, filepaths):
         """ Actualizar la UI para ocultar el botón de selección de archivos y mostrar los nombres. """
@@ -70,14 +71,14 @@ class GuiServices:
                 label = tk.Label(self.files_frame, text=filename, bg="white")
                 label.pack(pady=5)
 
-    def change_to_distances_tab(self):
-        """ Cambiar a la pestaña de entrada de distancias (asumiendo que tienes un TabView). """
-        try:
-            # Cambiar a la pestaña 'Distances'. Asumiendo que el método se llama así en el TabView
-            self.window.set("Distances")
-        except Exception as e:
-            logger.error(f"Error al cambiar de pestaña: {e}")
-            messagebox.showerror("Error", "No se pudo cambiar a la pestaña de distancias.")
+    # def change_to_distances_tab(self):
+    #     """ Cambiar a la pestaña de entrada de distancias (asumiendo que tienes un TabView). """
+    #     try:
+    #         # Cambiar a la pestaña 'Distances'. Asumiendo que el método se llama así en el TabView
+    #         self.window.set("Distances")
+    #     except Exception as e:
+    #         logger.error(f"Error al cambiar de pestaña: {e}")
+    #         messagebox.showerror("Error", "No se pudo cambiar a la pestaña de distancias.")
 
     def input_distance(self, next_frame):
         for sensor in range(self.numbers_sensors):
@@ -127,15 +128,6 @@ class GuiServices:
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx=10, pady=10
             )
-
-    def clear_and_add(self, parent, row = 0, column = 1, sticky='nsew'):
-        # Eliminar los widgets en la posición especificada (misma columna y fila)
-        for widget in parent.grid_slaves(row=row, column=column):
-            widget.destroy()
-
-        # Añadir el nuevo widget usando grid
-        new_widget = (parent)
-        new_widget.grid(row=row, column=column, sticky=sticky)
 
     def export_to_pdf(self):
         types = ["x", "y", "z"]
