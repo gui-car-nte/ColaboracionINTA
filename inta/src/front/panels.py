@@ -22,5 +22,5 @@ class EntryPanel(Panel):
     def __init__(self, parent, index):
         super().__init__(parent = parent)
 
-        ctk.CTkLabel(self, text = f'Sensor {index}').pack(side = 'left', fill = 'both', padx = 10)
+        ctk.CTkLabel(self, text = f'Sensor {index}').pack(side = 'left', fill = 'both', padx = 20)
         ctk.CTkEntry(self).pack(expand = True, fill = 'both', padx = 20)

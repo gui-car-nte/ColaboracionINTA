@@ -15,24 +15,59 @@ class ImageImport(ctk.CTkFrame):
         path = filedialog.askopenfile()
         self.import_func(path)
 
+class InitialFrame(ctk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(master = parent)
+        self.grid(column=1, columnspan=2, row=0, sticky='nsew')
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+
+        self.configure(fg_color=BACKCGROUND_COLOR)
+
+        # Crear canvas para la imagen
+        self.canvas = Canvas(self, bg=BACKCGROUND_COLOR, bd=0, highlightthickness=0)
+        self.canvas.grid(row=1, column=1, sticky='s')
+        # Cargar la imagen
+        image = Image.open('src/front/resource/logo.png')
+        self.photo = ImageTk.PhotoImage(image)  # Usar ImageTk.PhotoImage
+
+        # Mostrar la imagen en el canvas
+        self.canvas.create_image(0, 0, anchor='nw', image=self.photo)
+        self.canvas.config(width=image.width,
+                           height=image.height)
+
+        self.label = ctk.CTkLabel(self, text='\nMagnetic Moment Calculation', font=('Calibri', 40, 'bold'))
+        self.label.grid(row=2, column=1, sticky='n')
+
+    # def
 
 class ScrollFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent, image):
         super().__init__(master=parent)
         self.grid(row=0, column=1, sticky='nsew')
-        # self.resize = resize_image
-
         self.add_canvas(image)
 
     def add_canvas(self, path_image):
-        ImageOutput(self)
+        ImageOutput(self, path_image)
 
 
 class ImageOutput(Canvas):
     def __init__(self, parent, path_image):
-        super().__init__(master = parent, background = BACKCGROUND_COLOR, bd = 0, highlightthickness = 0, relief = 'ridge')
-        self.grid(row = 0, column = 1, sticky = 'nsew')
-        # self.bind('<Configure>', resize_image)
+        super().__init__(master=parent, background=BACKCGROUND_COLOR, bd=0, highlightthickness=0, relief='ridge')
+        self.create_image(path_image)
+        self.grid(row=0, column=0, sticky='nsew')
+
+    def create_image(self, path_image):
+        # Cargar la imagen usando PIL
+        image = Image.open(path_image)
+        self.photo = ImageTk.PhotoImage(image)
+        self.create_image(0, 0, anchor='nw', image=self.photo)
+        self.config(width=image.width, height=image.height)
 
 
 class CloseOutput(ctk.CTkButton):

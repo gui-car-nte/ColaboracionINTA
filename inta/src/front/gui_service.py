@@ -128,6 +128,15 @@ class GuiServices:
                 padx=10, pady=10
             )
 
+    def clear_and_add(self, parent, row = 0, column = 1, sticky='nsew'):
+        # Eliminar los widgets en la posición especificada (misma columna y fila)
+        for widget in parent.grid_slaves(row=row, column=column):
+            widget.destroy()
+
+        # Añadir el nuevo widget usando grid
+        new_widget = (parent)
+        new_widget.grid(row=row, column=column, sticky=sticky)
+
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"

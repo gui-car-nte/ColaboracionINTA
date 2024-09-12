@@ -6,13 +6,14 @@ from inta.src.back.file_handler import FileHandler
 
 
 class Menu(ctk.CTkTabview):
-    def __init__(self, parent):
+    def __init__(self, parent, next_frame):
         super().__init__(master=parent)
         self.grid(row=0, column=0, sticky='nsew')
         self.service = GuiServices(self)
 
         # Lista para almacenar los nombres de los archivos cargados
         self.files = []
+        self.next_frame = next_frame
 
         self.enabled(self.files)
 
@@ -31,7 +32,7 @@ class Menu(ctk.CTkTabview):
         self.add('Export')
 
         # Widgets adicionales
-        DistanceFrame(self.tab('Distances'), self.files)
+        DistanceFrame(self.tab('Distances'), self.files, self.next_frame)
         CalculateFrame(self.tab('Calculates'))
         ExportFrame(self.tab('Export'))
 
@@ -82,7 +83,7 @@ class FilesFrame(ctk.CTkFrame):
 
 
 class DistanceFrame(ctk.CTkFrame):
-    def __init__(self, parent, files):
+    def __init__(self, parent, files, next_frame):
         super().__init__(master=parent, fg_color='transparent')
         self.pack(expand=True, fill='both')
         self.files = files
@@ -94,13 +95,11 @@ class DistanceFrame(ctk.CTkFrame):
         for index, sensor in enumerate(range(sensors)):
             EntryPanel(self, index)
 
-        ctk.CTkButton(self, text = 'Calculate', command = self.send_data).pack()
+        ctk.CTkButton(self, text = 'Calculate', command = lambda : self.send_data(next_frame)).pack()
 
-    def send_data(self):
-        print('Calcular')
-        print(self.files)
-        # self.service.send_distance(self)
-        ScrollFrame(self, )
+    def send_data(self, parent):
+        print('calculate')
+        self.service.clear_and_add(parent)
 
 
 class CalculateFrame(ctk.CTkFrame):
