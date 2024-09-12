@@ -24,7 +24,6 @@ class Calculations:
             results = []
             inverted_distances = self._invert_cube_distance(distances)
             
-            # iterate over the axes
             available_axes = ['X', 'Y', 'Z']
             axes_in_data = []
             for axis in available_axes:
