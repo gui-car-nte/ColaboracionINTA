@@ -5,6 +5,7 @@ from inta.src.front.gui_service import GuiServices
 from inta.src.front.panels import EntryPanel
 from inta.src.back.file_handler import FileHandler
 
+
 class Menu(ctk.CTkTabview):
     def __init__(self, parent, replace_frame_func):
         super().__init__(master=parent)
@@ -46,6 +47,7 @@ class Menu(ctk.CTkTabview):
         # Cambiar a la pestaña de Distances automáticamente
         self.set("Distances")
 
+
 class FilesFrame(ctk.CTkFrame):
     def __init__(self, parent, import_func, menu_instance):
         super().__init__(master=parent, fg_color='transparent')
@@ -76,6 +78,7 @@ class FilesFrame(ctk.CTkFrame):
             label.pack(pady=5)
             self.file_labels.append(label)
 
+
 class DistanceFrame(ctk.CTkFrame):
     def __init__(self, parent, files, replace_frame_func):
         super().__init__(master=parent, fg_color='transparent')
@@ -94,14 +97,20 @@ class DistanceFrame(ctk.CTkFrame):
 
     def send_data(self):
         print('calculate')
-        # Assuming you have an image path to pass to the ScrollFrame
-        image_path = 'src/front/resource/X_axis_graph.png'  # Replace with actual image path
-        self.replace_frame_func(image_path)
+        # Example image data (replace with your actual data)
+        image_data = [
+            ('src/front/resource/X_axis_graph.png', 'Eje X'),
+            ('src/front/resource/Y_axis_graph.png', 'Eje Y'),
+            ('src/front/resource/Z_axis_graph.png', 'Eje Z'),
+        ]
+        self.replace_frame_func(image_data)
+
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent, fg_color='transparent')
         self.pack(expand=True, fill='both')
+
 
 class ExportFrame(ctk.CTkFrame):
     def __init__(self, parent):

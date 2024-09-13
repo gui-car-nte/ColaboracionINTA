@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from inta.src.front.image_widget import InitialFrame, ScrollFrame
+from inta.src.front.image_widget import InitialFrame, ResultFrame
 from inta.src.front.menu import Menu
 from tkinter import Canvas
 from inta.src.front.settings import *
@@ -38,5 +38,5 @@ class GuiApp(ctk.CTk):
             self.frame_col1.destroy()
 
         # Create and place the new ScrollFrame
-        self.frame_col1 = ScrollFrame(self, image_path)
+        self.frame_col1 = ResultFrame(self, image_path)
         self.frame_col1.grid(column=1, row=0, rowspan=2, sticky='nsew')
