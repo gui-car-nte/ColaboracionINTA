@@ -1,113 +1,141 @@
 import customtkinter as ctk
+from tkinter import filedialog
 from inta.src.front.image_widget import *
 from inta.src.front.gui_service import GuiServices
-from inta.src.front.panels import *
+from inta.src.front.panels import EntryPanel
 from inta.src.back.file_handler import FileHandler
 
-
-class Menu(ctk.CTkTabview):
-    def __init__(self, parent, next_frame):
+class Menu(ctk.CTkFrame):
+    def __init__(self, parent, replace_frame_func):
         super().__init__(master=parent)
         self.grid(row=0, column=0, sticky='nsew')
         self.service = GuiServices(self)
+        self.replace_frame_func = replace_frame_func
 
         # Lista para almacenar los nombres de los archivos cargados
         self.files = []
-        self.next_frame = next_frame
 
+        self.tabview = None
         self.enabled(self.files)
 
     def enabled(self, files):
-        # Tabs
-        self.add('Files')
+        # Create a container frame for the button
+        self.button_container = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_container.grid(row=0, column=0, sticky="nsew")
+        self.button_container.grid_columnconfigure(0, weight=1)
+        self.button_container.grid_rowconfigure(0, weight=1)
 
-        # Widgets
-        # Add files and show files
-        self.files_frame = FilesFrame(self.tab('Files'), self.service.load_files, self)
+        # Create the select files button
+        self.select_files_button = ctk.CTkButton(
+            self.button_container,
+            text="Select Files",
+            command=self.import_files,
+            width=120,  # Set a fixed width
+            height=40   # Set a fixed height
+        )
+        self.select_files_button.grid(row=0, column=0)
+
+        # Configure grid for the main frame
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+    def import_files(self):
+        filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
+        if filepaths:
+            self.files = filepaths
+            self.show_all_tabs()
 
     def show_all_tabs(self):
-        """ Muestra los tabs adicionales después de cargar archivos """
-        self.add('Distances')
-        self.add('Calculates')
-        self.add('Export')
+        # Remove the button container
+        self.button_container.destroy()
 
-        # Widgets adicionales
-        DistanceFrame(self.tab('Distances'), self.files, self.next_frame)
-        CalculateFrame(self.tab('Calculates'))
-        ExportFrame(self.tab('Export'))
+        # Create the tabview
+        self.tabview = ctk.CTkTabview(self)
+        self.tabview.grid(row=0, column=0, sticky="nsew")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
-    def update_files(self, filepaths):
-        """ Actualizar la lista de archivos en el marco de archivos """
-        self.files = filepaths
+        # Add tabs
+        self.tabview.add("Files")
+        self.tabview.add("Distances")
+        self.tabview.add("Calculates")
+        self.tabview.add("Export")
+
+        # Add content to tabs
+        self.files_frame = FilesFrame(self.tabview.tab("Files"), self.service.load_files, self)
+        self.files_frame.grid(row=0, column=0, sticky="nsew")
+        self.tabview.tab("Files").grid_columnconfigure(0, weight=1)
+        self.tabview.tab("Files").grid_rowconfigure(0, weight=1)
+
+        DistanceFrame(self.tabview.tab("Distances"), self.files, self.replace_frame_func)
+        CalculateFrame(self.tabview.tab("Calculates"))
+        ExportFrame(self.tabview.tab("Export"))
+
+        # Update files in FilesFrame
         self.files_frame.update_files(self.files)
 
-        self.show_all_tabs()
+        # Switch to the Distances tab
+        self.tabview.set("Distances")
 
-        # Cambiar a la pestaña de Distances automáticamente
-        self.set("Distances")
-
+# The rest of the classes (FilesFrame, DistanceFrame, CalculateFrame, ExportFrame) remain unchanged
 
 class FilesFrame(ctk.CTkFrame):
     def __init__(self, parent, import_func, menu_instance):
         super().__init__(master=parent, fg_color='transparent')
-        self.pack(expand=True, fill='both')
         self.import_func = import_func
-        self.menu_instance = menu_instance  # Para poder acceder a update_files
+        self.menu_instance = menu_instance
         self.file_labels = []
 
-        # Botón para seleccionar archivos
-        self.button = ctk.CTkButton(self, text = 'Select files', command = self.import_files)
-        self.button.pack(expand=True)
-
-    def import_files(self):
-        # Llamar a la función import_func para cargar archivos
-        filepaths = filedialog.askopenfilenames(filetypes = [("CSV files", "*.csv")])
-
-        # Si se seleccionaron archivos
-        if filepaths:
-            self.button.pack_forget()  # Ocultar el botón una vez que se seleccionaron archivos
-            self.menu_instance.update_files(filepaths)  # Actualizar los archivos en el menú
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
     def update_files(self, files):
-        """ Actualizar los labels con los nombres de los archivos seleccionados """
         for label in self.file_labels:
-            label.destroy()  # Destruir los labels previos
+            label.destroy()
 
-        self.file_labels = []  # Reiniciar la lista de labels
+        self.file_labels = []
 
-        # Crear un label por cada archivo cargado
-        for file in files:
+        for i, file in enumerate(files):
             label = ctk.CTkLabel(master=self, text=file)
-            label.pack(pady=5)
+            label.grid(row=i, column=0, pady=5, sticky="w")
             self.file_labels.append(label)
 
-
 class DistanceFrame(ctk.CTkFrame):
-    def __init__(self, parent, files, next_frame):
+    def __init__(self, parent, files, replace_frame_func):
         super().__init__(master=parent, fg_color='transparent')
-        self.pack(expand=True, fill='both')
+        self.grid(row=0, column=0, sticky="nsew")
         self.files = files
+        self.replace_frame_func = replace_frame_func
 
         self.service = GuiServices(self)
         f = FileHandler(list(files), self)
         sensors = f.count_sensors()
 
-        for index, sensor in enumerate(range(sensors)):
-            EntryPanel(self, index)
+        for index in range(sensors):
+            EntryPanel(self, index).grid(row=index, column=0, sticky="ew", padx=10, pady=5)
 
-        ctk.CTkButton(self, text = 'Calculate', command = lambda : self.send_data(next_frame)).pack()
+        ctk.CTkButton(self, text='Calculate', command=self.send_data).grid(row=sensors, column=0, pady=10, padx=10, sticky="ew")
 
-    def send_data(self, parent):
+        self.grid_columnconfigure(0, weight=1)
+        for i in range(sensors + 1):
+            self.grid_rowconfigure(i, weight=1)
+
+    def send_data(self):
         print('calculate')
-        self.service.clear_and_add(parent)
-
+        # Example image data (replace with your actual data)
+        image_data = [
+            ('src/front/resource/X_axis_graph.png', 'Eje X'),
+            ('src/front/resource/Y_axis_graph.png', 'Eje Y'),
+            ('src/front/resource/Z_axis_graph.png', 'Eje Z'),
+        ]
+        self.replace_frame_func(image_data)
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent, fg_color='transparent')
-        self.pack(expand=True, fill='both')
-
+        self.grid(row=0, column=0, sticky="nsew")
 
 class ExportFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master=parent, fg_color='transparent')
+        self.grid(row=0, column=0, sticky="nsew")
