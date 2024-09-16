@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import filedialog, Canvas
-from inta.src.front.settings import *
+from src.front.settings import BACKCGROUND_COLOR, WHITE, CLOSE_RED
 from PIL import Image, ImageTk
 from typing import List, Tuple
 

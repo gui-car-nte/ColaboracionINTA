@@ -3,7 +3,7 @@ import math
 import decimal
 import matplotlib.pyplot as plt
 # from inta.src import config
-from inta.src.front.settings import *
+from src.front.settings import *
 
 decimal.getcontext().prec = PRECISION
 

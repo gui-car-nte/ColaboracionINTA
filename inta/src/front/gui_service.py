@@ -4,11 +4,11 @@ import logging
 import platform
 
 from tkinter import filedialog, messagebox
-from inta.src.back.calculations import Calculations
-from inta.src.back.file_handler import FileHandler
-from inta.src.front.utils import Utils
-from inta.src import config
-from inta.src.front.panels import *
+from src.back.calculations import Calculations
+from src.back.file_handler import FileHandler
+from src.front.utils import Utils
+from src import config
+from src.front.panels import *
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader

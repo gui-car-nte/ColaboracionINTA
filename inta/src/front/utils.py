@@ -1,6 +1,6 @@
 import tkinter as tk
-from inta.src.front.panels import *
-from inta.src.front.settings import *
+from src.front.panels import *
+from src.front.settings import *
 from PIL import Image, ImageTk
 
 
