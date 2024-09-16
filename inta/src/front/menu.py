@@ -1,9 +1,8 @@
 import customtkinter as ctk
 from tkinter import filedialog
-from inta.src.front.image_widget import *
-from inta.src.front.gui_service import GuiServices
-from inta.src.front.panels import EntryPanel
-from inta.src.back.file_handler import FileHandler
+from src.front.gui_service import GuiServices
+from src.front.panels import EntryPanel
+from src.back.file_handler import FileHandler
 
 class Menu(ctk.CTkFrame):
     def __init__(self, parent, replace_frame_func):

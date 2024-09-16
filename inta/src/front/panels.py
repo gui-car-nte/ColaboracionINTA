@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from inta.src.front.settings import *
+from src.front.settings import BACKCGROUND_COLOR
 
 class Panel(ctk.CTkFrame):
     def __init__(self, parent):

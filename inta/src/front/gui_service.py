@@ -4,11 +4,11 @@ import logging
 import platform
 
 from tkinter import filedialog, messagebox
-from inta.src.back.calculations import Calculations
-from inta.src.back.file_handler import FileHandler
-from inta.src.front.utils import Utils
-from inta.src import config
-from inta.src.front.panels import *
+from src.back.calculations import Calculations
+from src.back.file_handler import FileHandler
+from src.front.utils import Utils
+from src.front.settings import IMAGES
+from src.front.panels import EntryPanel
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -123,7 +123,7 @@ class GuiServices:
 
         # Obtener y mostrar los resultados
         self.operations_steps = calculations.get_calculation_steps()
-        for result, image_path in zip(self.results, config.IMAGES):
+        for result, image_path in zip(self.results, IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx=10, pady=10
@@ -142,7 +142,7 @@ class GuiServices:
 
         y_offset = height - 100
 
-        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, config.IMAGES)):
+        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, IMAGES)):
             if y_offset < 300:
                 canva.showPage()
                 y_offset = height - 100

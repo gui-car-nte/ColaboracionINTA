@@ -1,4 +1,4 @@
-from inta.src.front.gui import GuiApp
+from src.front.gui import GuiApp
 
 
 def main():
