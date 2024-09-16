@@ -36,7 +36,7 @@ class InitialFrame(ctk.CTkFrame):
         self.canvas = Canvas(self, bg=BACKCGROUND_COLOR, bd=0, highlightthickness=0)
         self.canvas.grid(row=1, column=1, sticky='s')
         # Cargar la imagen
-        image = Image.open('src/front/resource/logo.png')
+        image = Image.open('src/front/resource/inta_logo.png')
         self.photo = ImageTk.PhotoImage(image)
 
         # Mostrar la imagen en el canvas

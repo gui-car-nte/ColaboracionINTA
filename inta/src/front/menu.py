@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import filedialog
-from src.front.image_widget import *
 from src.front.gui_service import GuiServices
 from src.front.panels import EntryPanel
 from src.back.file_handler import FileHandler
@@ -94,10 +93,16 @@ class FilesFrame(ctk.CTkFrame):
             label.destroy()
 
         self.file_labels = []
-
-        for i, file in enumerate(files):
-            label = ctk.CTkLabel(master=self, text=file)
-            label.grid(row=i, column=0, pady=5, sticky="w")
+        
+        y_margin = 0.4
+        for file in files:
+            reversed_filepath = file[::-1]
+            sliced_index = reversed_filepath.find("/")
+            file_string = reversed_filepath[:sliced_index]
+            label = ctk.CTkLabel(master = self, text = file_string[::-1])
+            
+            label.place(relx = 0.25, rely = y_margin, anchor = "w")
+            y_margin += 0.04
             self.file_labels.append(label)
 
 class DistanceFrame(ctk.CTkFrame):

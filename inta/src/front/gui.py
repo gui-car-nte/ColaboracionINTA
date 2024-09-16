@@ -1,9 +1,6 @@
 import customtkinter as ctk
-from PIL import Image, ImageTk
 from src.front.image_widget import InitialFrame, ResultFrame
 from src.front.menu import Menu
-from tkinter import Canvas
-from src.front.settings import *
 
 class GuiApp(ctk.CTk):
     def __init__(self):

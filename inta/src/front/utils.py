@@ -1,6 +1,6 @@
 import tkinter as tk
-from src.front.panels import *
-from src.front.settings import *
+from src.front.panels import EntryPanel
+from src.front.settings import PRIMARY_COLOR, SECONDARY_COLOR
 from PIL import Image, ImageTk
 
 
