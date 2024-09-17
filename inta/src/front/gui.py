@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from src.front.image_widget import InitialFrame, ResultFrame
-from src.front.menu import Menu
+from src.front.menu import LeftFrame
 
 class GuiApp(ctk.CTk):
     def __init__(self):
@@ -16,12 +16,12 @@ class GuiApp(ctk.CTk):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1, uniform='a')
-        self.columnconfigure(1, weight=3, uniform='a')
+        self.columnconfigure(1, weight=4, uniform='a')
 
         self.frame_col1 = InitialFrame(self)
 
         # Crear los widgets
-        self.menu = Menu(self, self.replace_frame_col1)
+        self.menu = LeftFrame(self, self.replace_frame_col1)
         self.menu.grid(row=0, column=0, rowspan=2, sticky='nswe')
 
         self.mainloop()
