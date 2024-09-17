@@ -31,7 +31,7 @@ class GuiServices:
 
     def __init__(self, frame_main) -> None:
         self.window = frame_main
-        self.numbers_sensors = 0
+        self.sensor_number = 0
         self.sensor_data = {}
         self.utils = Utils(self.window)
         self.operations_steps: str
@@ -42,21 +42,23 @@ class GuiServices:
         self.files_frame = frame
 
     def load_files(self):
-        # No necesitamos crear otra instancia de GuiServices
-        filepaths = filedialog.askopenfilenames(filetypes=[("CSV files", "*.csv")])
+        filepaths = filedialog.askopenfilenames(filetypes=[("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt")])
 
         if filepaths:
-            # Procesar los archivos utilizando FileHandler
-            f = FileHandler(list(filepaths), self)
-            self.sensor_data = f.load_csv_files(list(filepaths))
-            self.numbers_sensors = f.count_sensors()
+            try:
+                f = FileHandler(self)
+                self.sensor_data = f.load_csv_files(list(filepaths))
+                self.sensor_number = f.count_sensors()
 
-            # Ocultar el botón de selección de archivos y mostrar los nombres de los archivos
-            self.update_files_ui(filepaths)
-
-            # Cambiar automáticamente a la pestaña de entrada de distancias
-            # self.change_to_distances_tab()
-            return True
+                self.update_files_ui(filepaths)
+                
+                return self.sensor_data
+            
+            except Exception as e: # TODO don't gotta catch em all
+                return None
+        
+        else:
+            return None
 
     def update_files_ui(self, filepaths):
         """ Actualizar la UI para ocultar el botón de selección de archivos y mostrar los nombres. """
@@ -70,25 +72,6 @@ class GuiServices:
                 filename = os.path.basename(filepath)  # Extraer solo el nombre del archivo
                 label = tk.Label(self.files_frame, text=filename, bg="white")
                 label.pack(pady=5)
-
-    # def change_to_distances_tab(self):
-    #     """ Cambiar a la pestaña de entrada de distancias (asumiendo que tienes un TabView). """
-    #     try:
-    #         # Cambiar a la pestaña 'Distances'. Asumiendo que el método se llama así en el TabView
-    #         self.window.set("Distances")
-    #     except Exception as e:
-    #         logger.error(f"Error al cambiar de pestaña: {e}")
-    #         messagebox.showerror("Error", "No se pudo cambiar a la pestaña de distancias.")
-
-    def input_distance(self, next_frame):
-        for sensor in range(self.numbers_sensors):
-            frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
-            self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
-            EntryPanel(frame_input)
-
-        self.utils.create_button(
-            "calculate", next_frame, "Calculate", "", self.send_distance, next_frame
-        )
 
     def send_distance(self, frame_main: tk.Frame):
         distances = self.get_values(frame_main)

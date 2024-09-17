@@ -1,15 +1,12 @@
 import pandas as pd
 import os
-# from inta.src.config import CSV_NAMES
 from src.front.settings import CSV_NAMES
 from src.back.checker import Checker
 
 class FileHandler:
-    def __init__(self, filepaths: list, gui_services):
+    def __init__(self, gui_services):
         self.data = {}
         self.checker = Checker(gui_services)
-        if filepaths:
-            self.load_csv_files(filepaths)
 
     def load_csv_files(self, filepaths: list):
         if len(filepaths) != 6:
@@ -46,7 +43,8 @@ class FileHandler:
         keys = self.data.keys()
         sensors = []
         for key in keys:
-            sensors.append(self.data[key].shape[1] / 3)
+            df = self.data[key]
+            sensors.append(df.shape[1] / 3)
 
         prv = 0
         for sensor in sensors:
