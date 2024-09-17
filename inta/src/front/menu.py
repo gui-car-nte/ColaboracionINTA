@@ -2,23 +2,23 @@ import customtkinter as ctk
 from src.front.gui_service import GuiServices
 from src.front.panels import EntryPanel
 
-class Menu(ctk.CTkFrame):
+class LeftFrame(ctk.CTkFrame):
     def __init__(self, parent, replace_frame_func):
-        super().__init__(master=parent)
+        super().__init__(master=parent, width=100)
         self.grid(row=0, column=0, sticky='nsew')
         self.service = GuiServices(self)
         self.replace_frame_func = replace_frame_func
         
-        self.tabview = ctk.CTkTabview(self)
+        self.tabview = ctk.CTkTabview(self, width = 100)
         self.tabview.add("Files")
         self.files_frame = FilesFrame(self.tabview.tab("Files"), self)
 
         # Lista para almacenar los nombres de los archivos cargados
         self.files = {}
 
-        self.enabled(self.files)
+        self.fileSelectionButtonEnabled()
 
-    def enabled(self, files):
+    def fileSelectionButtonEnabled(self):
         # Create a container frame for the button
         self.button_container = ctk.CTkFrame(self, fg_color="transparent")
         self.button_container.grid(row=0, column=0, sticky="nsew")
@@ -98,10 +98,9 @@ class DistanceFrame(ctk.CTkFrame):
         self.files = files
         self.replace_frame_func = replace_frame_func
 
-        
-
+    
         for index in range(sensors):
-            EntryPanel(self, index).grid(row=index, column=0, sticky="ew", padx=10, pady=5)
+            EntryPanel(self, index).grid(row=index, column=0, sticky="ew", padx=2, pady=4)
 
         ctk.CTkButton(self, text='Calculate', command=self.send_data).grid(row=sensors, column=0, pady=10, padx=10, sticky="ew")
 

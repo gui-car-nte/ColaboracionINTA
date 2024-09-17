@@ -3,7 +3,7 @@ from src.front.settings import BACKCGROUND_COLOR
 
 class Panel(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(master = parent, fg_color = BACKCGROUND_COLOR)
+        super().__init__(master = parent, fg_color = 'red') #, fg_color = 'BACKCGROUND_COLOR'
         self.grid(sticky="ew", padx=4, pady=4)
         self.grid_columnconfigure(0, weight=1)
 
