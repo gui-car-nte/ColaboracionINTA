@@ -1,17 +1,18 @@
 import customtkinter as ctk
 from tkinter import filedialog, Canvas
-from src.front.settings import BACKCGROUND_COLOR, WHITE, CLOSE_RED
+from src.front.settings import BACKGROUND_COLOR, WHITE, CLOSE_RED
 from PIL import Image, ImageTk
 from typing import List, Tuple
 
 
 class ImageImport(ctk.CTkFrame):
     def __init__(self, parent, import_func):
-        super().__init__(master=parent)
-        self.grid(column=0, columnspan=2, row=0, sticky='ns')
+        super().__init__(master = parent)
+        self.grid(column = 0, columnspan = 2, row = 0, sticky = 'ns')
         self.import_func = import_func
 
-        ctk.CTkButton(self, text='select files', command=self.open_dialog).pack(expand=True)
+        ctk.CTkButton(self, text = 'select files', command = self.open_dialog).pack(expand = True)
+
 
     def open_dialog(self):
         path = filedialog.askopenfile()
@@ -30,20 +31,20 @@ class InitialFrame(ctk.CTkFrame):
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
 
-        self.configure(fg_color = BACKCGROUND_COLOR)
+        self.configure(fg_color = BACKGROUND_COLOR)
 
         # Crear canvas para la imagen
-        self.canvas = Canvas(self, bg = BACKCGROUND_COLOR, bd = 0, highlightthickness = 0)
+        self.canvas = Canvas(self, bg = BACKGROUND_COLOR, bd = 0, highlightthickness = 0)
         self.canvas.grid(row = 1, column = 1, sticky = 's')
-        
         # Cargar la imagen
         image = Image.open('src/front/resource/inta_logo.png')
         self.photo = ImageTk.PhotoImage(image)
 
         # Mostrar la imagen en el canvas
         self.canvas.create_image(0, 0, anchor = 'nw', image = self.photo)
-        self.canvas.config(width = image.width,
-                           height = image.height)
+        self.canvas.config(
+            width = image.width,
+            height = image.height)
 
         self.label = ctk.CTkLabel(self, text = '\nMagnetic Moment Calculation', font = ('Calibri', 40, 'bold'))
         self.label.grid(row = 2, column = 1, sticky = 'n')
@@ -57,6 +58,7 @@ class ResultFrame(ctk.CTkFrame):
         self.current_index = 0
 
         self.create_widgets()
+
 
     def create_widgets(self):
         # Image label (using CTkLabel instead of Canvas)
@@ -82,6 +84,7 @@ class ResultFrame(ctk.CTkFrame):
 
         self.update_image()
 
+
     def update_image(self):
         image_path, label_text = self.image_data[self.current_index]
         image = Image.open(image_path)
@@ -95,11 +98,11 @@ class ResultFrame(ctk.CTkFrame):
         max_size = (max_width, max_height)
 
         # Resize image to fit the frame while maintaining aspect ratio
-        image.thumbnail(max_size, Image.LANCZOS)
+        image.thumbnail(max_size, Image.LANCZOS) # type: ignore
 
         # Ensure the image is at least the minimum size
         if image.width < MIN_WIDTH or image.height < MIN_HEIGHT:
-            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS)
+            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS) # type: ignore
 
         ctk_image = ctk.CTkImage(light_image = image, dark_image = image, size = (image.width, image.height))
 
@@ -109,16 +112,19 @@ class ResultFrame(ctk.CTkFrame):
         # Update button states
         self.prev_button.configure(state = "normal" if self.current_index > 0 else "disabled")
         self.next_button.configure(state = "normal" if self.current_index < len(self.image_data) - 1 else "disabled")
-
+        
+        
     def next_image(self):
         if self.current_index < len(self.image_data) - 1:
             self.current_index += 1
             self.update_image()
 
+
     def prev_image(self):
         if self.current_index > 0:
             self.current_index -= 1
             self.update_image()
+
 
     def on_resize(self, event):
         self.update_image()
@@ -126,9 +132,10 @@ class ResultFrame(ctk.CTkFrame):
 
 class ImageOutput(Canvas):
     def __init__(self, parent, path_image):
-        super().__init__(master = parent, background = BACKCGROUND_COLOR, bd = 0, highlightthickness = 0, relief = 'ridge')
+        super().__init__(master = parent, background = BACKGROUND_COLOR, bd = 0, highlightthickness = 0, relief = 'ridge')
         self.display_image(path_image)
         self.grid(row = 0, column = 0, sticky = 'nsew')
+
 
     def display_image(self, path_image):
         # Cargar la imagen usando PIL
@@ -141,13 +148,13 @@ class ImageOutput(Canvas):
 class CloseOutput(ctk.CTkButton):
     def __init__(self, parent, close_func):
         super().__init__(
-            master=parent,
-            command=close_func,
-            text='X',
-            text_color=WHITE,
-            fg_color='transparent',
-            width=40, height=40,
-            corner_radius=0,
-            hover_color=CLOSE_RED
+            master = parent,
+            command = close_func,
+            text = 'X',
+            text_color = WHITE,
+            fg_color = 'transparent',
+            width = 40, height = 40,
+            corner_radius = 0,
+            hover_color = CLOSE_RED
         )
-        self.place(relx=0.99, rely=0.01, anchor='ne')
+        self.place(relx = 0.99, rely = 0.01, anchor = 'ne')

@@ -93,7 +93,7 @@ class Utils():
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
-      
+            
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -108,7 +108,6 @@ class Utils():
         return canvas
 
     # TODO could be moved to utils folder or another file to shorten code, go case by case
-    # TODO ' = ' spacing
     def create_scroll(self, frame_main):
         canvas = tk.Canvas(frame_main, bg = PRIMARY_COLOR)
         canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
