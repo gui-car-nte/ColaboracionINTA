@@ -8,20 +8,21 @@ from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
 from src.front.utils import Utils
 from src.front.settings import IMAGES
-from src.front.panels import EntryPanel
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 
 if os.path.exists('error_log.txt'):
-    os.remove(path='error_log.txt')
+    os.remove(path = 'error_log.txt')
 
 logging.basicConfig(
-    filename="error_log.txt",
-    filemode="a",
-    format="[%(asctime)s] - [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.ERROR,
+    filename = "error_log.txt",
+    filemode = "a",
+    format = "[%(asctime)s] - [%(levelname)s] %(message)s",
+    datefmt = "%Y-%m-%d %H:%M:%S",
+    level = logging.ERROR,
 )
 
 logger = logging.getLogger("urbanGUI")
@@ -42,7 +43,7 @@ class GuiServices:
         self.files_frame = frame
 
     def load_files(self):
-        filepaths = filedialog.askopenfilenames(filetypes=[("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt")])
+        filepaths = filedialog.askopenfilenames(filetypes = [("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt")])
 
         if filepaths:
             try:
@@ -70,8 +71,8 @@ class GuiServices:
             # Mostrar los nombres de los archivos cargados
             for filepath in filepaths:
                 filename = os.path.basename(filepath)  # Extraer solo el nombre del archivo
-                label = tk.Label(self.files_frame, text=filename, bg="white")
-                label.pack(pady=5)
+                label = tk.Label(self.files_frame, text = filename, bg = "white")
+                label.pack(pady = 5)
 
     def send_distance(self, frame_main: tk.Frame):
         distances = self.get_values(frame_main)
@@ -102,14 +103,14 @@ class GuiServices:
 
         # Habilitar botón de exportación
         button = self.window.nametowidget(".!frame.export_button")
-        button.config(state=tk.NORMAL)
+        button.config(state = tk.NORMAL)
 
         # Obtener y mostrar los resultados
         self.operations_steps = calculations.get_calculation_steps()
         for result, image_path in zip(self.results, IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
-                padx=10, pady=10
+                padx = 10, pady = 10
             )
 
     def export_to_pdf(self):
@@ -164,10 +165,6 @@ class GuiServices:
 
         canva.save()
 
-        if platform.system() == 'Windows':
-            os.startfile(pdf_path)  # type: ignore
-        elif platform.system() == 'Linux':
-            os.system(f"xdg-open {pdf_path}")
 
     def show_message(self, msg, color):
         messagebox.showerror('Error', msg)

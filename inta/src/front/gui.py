@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from src.front.image_widget import InitialFrame, ResultFrame
 from src.front.menu import LeftFrame
+import pyautogui
+
 
 class GuiApp(ctk.CTk):
     def __init__(self):
@@ -12,17 +14,23 @@ class GuiApp(ctk.CTk):
         self.minsize(800, 500)
         self.iconbitmap('src/front/resource/inta_icon.ico')
 
+        self.update()
+        self.lift()
+        self.attributes('-topmost', True)
+        self.after_idle(self.attributes, '-topmost', False)
+        pyautogui.hotkey('winleft', 'up')
+
         # Configuración del layout
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1, uniform='a')
-        self.columnconfigure(1, weight=4, uniform='a')
+        self.rowconfigure(0, weight = 1)
+        self.rowconfigure(1, weight = 1)
+        self.columnconfigure(0, weight = 1, uniform = 'a')
+        self.columnconfigure(1, weight = 4, uniform = 'a')
 
         self.frame_col1 = InitialFrame(self)
 
         # Crear los widgets
         self.menu = LeftFrame(self, self.replace_frame_col1)
-        self.menu.grid(row=0, column=0, rowspan=2, sticky='nswe')
+        self.menu.grid(row = 0, column = 0, rowspan = 2, sticky = 'nswe')
 
         self.mainloop()
 
@@ -36,4 +44,4 @@ class GuiApp(ctk.CTk):
 
         # Create and place the new ScrollFrame
         self.frame_col1 = ResultFrame(self, image_path)
-        self.frame_col1.grid(column=1, row=0, rowspan=2, sticky='nsew')
+        self.frame_col1.grid(column = 1, row = 0, rowspan = 2, sticky = 'nsew')

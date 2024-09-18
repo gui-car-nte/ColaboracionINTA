@@ -4,8 +4,9 @@ from src.front.panels import EntryPanel
 
 class LeftFrame(ctk.CTkFrame):
     def __init__(self, parent, replace_frame_func):
-        super().__init__(master=parent, width=100)
-        self.grid(row=0, column=0, sticky='nsew')
+        super().__init__(master = parent, width = 100)
+        self.grid(row = 0, column = 0, sticky = 'nsew')
+
         self.service = GuiServices(self)
         self.replace_frame_func = replace_frame_func
         
@@ -20,23 +21,23 @@ class LeftFrame(ctk.CTkFrame):
 
     def fileSelectionButtonEnabled(self):
         # Create a container frame for the button
-        self.button_container = ctk.CTkFrame(self, fg_color="transparent")
-        self.button_container.grid(row=0, column=0, sticky="nsew")
-        self.button_container.grid_columnconfigure(0, weight=1)
-        self.button_container.grid_rowconfigure(0, weight=1)
+        self.button_container = ctk.CTkFrame(self, fg_color = "transparent")
+        self.button_container.grid(row = 0, column = 0, sticky = "nsew")
+        self.button_container.grid_columnconfigure(0, weight = 1)
+        self.button_container.grid_rowconfigure(0, weight = 1)
 
         # Create the select files button
         self.select_files_button = ctk.CTkButton(
             self.button_container,
-            text="Select Files",
-            command=self.import_files,
-            width=120,  # Set a fixed width
-            height=40   # Set a fixed height
+            text = "Select Files",
+            command = self.import_files,
+            width = 120,  # Set a fixed width
+            height = 40   # Set a fixed height
         )
-        self.select_files_button.grid(row=0, column=0)
+        self.select_files_button.grid(row = 0, column = 0)
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
 
     def import_files(self):
         self.files = self.service.load_files()
@@ -50,17 +51,17 @@ class LeftFrame(ctk.CTkFrame):
     def show_all_tabs(self):
         self.button_container.destroy()
 
-        self.tabview.grid(row=0, column=0, sticky="nsew")
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.tabview.grid(row = 0, column = 0, sticky = "nsew")
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
 
         self.tabview.add("Distances")
         self.tabview.add("Calculates")
         self.tabview.add("Export")
 
-        self.files_frame.grid(row=0, column=0, sticky="nsew")
-        self.tabview.tab("Files").grid_columnconfigure(0, weight=1)
-        self.tabview.tab("Files").grid_rowconfigure(0, weight=1)
+        self.files_frame.grid(row = 0, column = 0, sticky = "nsew")
+        self.tabview.tab("Files").grid_columnconfigure(0, weight = 1)
+        self.tabview.tab("Files").grid_rowconfigure(0, weight = 1)
 
         DistanceFrame(self.tabview.tab("Distances"), self.files, self.replace_frame_func, self.service.sensor_number)
         CalculateFrame(self.tabview.tab("Calculates"))
@@ -70,12 +71,12 @@ class LeftFrame(ctk.CTkFrame):
 
 class FilesFrame(ctk.CTkFrame):
     def __init__(self, parent, menu_instance):
-        super().__init__(master=parent, fg_color='transparent')
+        super().__init__(master = parent, fg_color = 'transparent')
         self.menu_instance = menu_instance
         self.file_labels = []
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
 
     def update_files(self, files):
         for label in self.file_labels:
@@ -93,20 +94,26 @@ class FilesFrame(ctk.CTkFrame):
 
 class DistanceFrame(ctk.CTkFrame):
     def __init__(self, parent, files, replace_frame_func, sensors):
-        super().__init__(master=parent, fg_color='transparent')
-        self.grid(row=0, column=0, sticky="nsew")
+        super().__init__(master = parent, fg_color = 'transparent')
+        
+        # Centro el frame dentro del tab "Distances"
+        self.grid(row = 0, column = 0, sticky = "nsew")
+        parent.grid_columnconfigure(0, weight = 1)  # Columna del contenedor ajustable
+        # parent.grid_rowconfigure(0, weight = 1, minsize = 5)    # Fila del contenedor ajustable
+
         self.files = files
         self.replace_frame_func = replace_frame_func
 
-    
         for index in range(sensors):
-            EntryPanel(self, index).grid(row=index, column=0, sticky="ew", padx=2, pady=4)
+            EntryPanel(self, index).grid(row = index, column = 0, sticky = "ew", padx = 4, pady = 8)
 
-        ctk.CTkButton(self, text='Calculate', command=self.send_data).grid(row=sensors, column=0, pady=10, padx=10, sticky="ew")
+        ctk.CTkButton(self, text = 'Calculate', command = self.send_data, width = 120, height = 40).grid(row = sensors, column = 0, pady = 10, padx = 10)
 
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
         for i in range(sensors):
-            self.grid_rowconfigure(i, weight=1)
+            self.grid_rowconfigure(i, weight = 1)
+
+        self.grid_rowconfigure(sensors + 1, weight = 1)
 
     def send_data(self):
         image_data = [
@@ -115,13 +122,14 @@ class DistanceFrame(ctk.CTkFrame):
             ('src/front/resource/Z_axis_graph.png', 'Eje Z'),
         ]
         self.replace_frame_func(image_data)
+        
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(master=parent, fg_color='transparent')
-        self.grid(row=0, column=0, sticky="nsew")
+        super().__init__(master = parent, fg_color = 'transparent')
+        self.grid(row = 0, column = 0, sticky = "nsew")
 
 class ExportFrame(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(master=parent, fg_color='transparent')
-        self.grid(row=0, column=0, sticky="nsew")
+        super().__init__(master = parent, fg_color = 'transparent')
+        self.grid(row = 0, column = 0, sticky = "nsew")
