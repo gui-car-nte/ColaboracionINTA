@@ -149,10 +149,6 @@ class GuiServices:
 
         canva.save()
 
-        if platform.system() == 'Windows':
-            os.startfile(pdf_path)  # type: ignore
-        elif platform.system() == 'Linux':
-            os.system(f"xdg-open {pdf_path}")
 
 
     def show_message(self, msg, color):

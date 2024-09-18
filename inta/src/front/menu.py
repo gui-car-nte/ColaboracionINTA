@@ -17,7 +17,7 @@ class LeftFrame(ctk.CTkFrame):
         self.files = {}
 
         self.enable_file_selection_button()
-
+        
 
     def enable_file_selection_button(self):
         self.button_container = ctk.CTkFrame(self, fg_color = "transparent")
@@ -123,6 +123,7 @@ class DistanceFrame(ctk.CTkFrame):
             (str(IMAGES[2]), str(f'Magnetic moment (mAm^2): {round(final_calculation[2], 4)} (J/T)')),
         ]
         self.replace_frame_func(image_data)
+        
 
 
 class CalculateFrame(ctk.CTkFrame):

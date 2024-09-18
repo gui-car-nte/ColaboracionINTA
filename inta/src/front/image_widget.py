@@ -112,8 +112,8 @@ class ResultFrame(ctk.CTkFrame):
         # Update button states
         self.prev_button.configure(state = "normal" if self.current_index > 0 else "disabled")
         self.next_button.configure(state = "normal" if self.current_index < len(self.image_data) - 1 else "disabled")
-
-
+        
+        
     def next_image(self):
         if self.current_index < len(self.image_data) - 1:
             self.current_index += 1

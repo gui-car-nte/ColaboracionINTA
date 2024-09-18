@@ -25,7 +25,7 @@ class TestFileHandler(unittest.TestCase):
         }) for name in CSV_NAMES}
 
         for path, df in zip(self.filepaths, self.mock_data.values()):
-            df.to_csv(path, index=False)
+            df.to_csv(path, index = False)
 
         self.file_handler = FileHandler(self.filepaths, self.mock_checker.gui_services)
 

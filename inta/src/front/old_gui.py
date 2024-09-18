@@ -11,11 +11,11 @@ def start_gui():
 
     # Configure the logger at the start of your application
     logging.basicConfig(
-        filename='error_log.txt',
-        filemode='a',
-        format='%(asctime)s,%(name)s %(levelname)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        level=logging.ERROR
+        filename = 'error_log.txt',
+        filemode = 'a',
+        format = '%(asctime)s,%(name)s %(levelname)s %(message)s',
+        datefmt = '%Y-%m-%d %H:%M:%S',
+        level = logging.ERROR
     )
 
     logger = logging.getLogger('urbanGUI')
@@ -23,14 +23,14 @@ def start_gui():
     root = tk.Tk()
     root.title("Magnetic Moment Calculation")
     root.minsize(600, 400)
-    icon = tk.PhotoImage(file='src/front/resource/logo.png')
+    icon = tk.PhotoImage(file = 'src/front/resource/logo.png')
     root.iconphoto(True, icon)
     root.configure(background = PRIMARY_COLOR)
 
     utils = Utils(root)
 
     top_frame = utils.create_frame(root, tk.TOP)
-    center_frame = utils.create_frame(root, tk.TOP, complete=True, scrollable=True)
+    center_frame = utils.create_frame(root, tk.TOP, complete = True, scrollable = True)
     utils.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
         background = PRIMARY_COLOR
     )
@@ -52,6 +52,6 @@ def start_gui():
         tk.LEFT,
         settings.export_to_pdf,
         "",
-    ).config(state=tk.DISABLED)
+    ).config(state = tk.DISABLED)
 
     root.mainloop()
