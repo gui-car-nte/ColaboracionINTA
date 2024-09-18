@@ -98,11 +98,11 @@ class ResultFrame(ctk.CTkFrame):
         max_size = (max_width, max_height)
 
         # Resize image to fit the frame while maintaining aspect ratio
-        image.thumbnail(max_size, Image.LANCZOS)
+        image.thumbnail(max_size, Image.LANCZOS) # type: ignore
 
         # Ensure the image is at least the minimum size
         if image.width < MIN_WIDTH or image.height < MIN_HEIGHT:
-            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS)
+            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS) # type: ignore
 
         ctk_image = ctk.CTkImage(light_image = image, dark_image = image, size = (image.width, image.height))
 

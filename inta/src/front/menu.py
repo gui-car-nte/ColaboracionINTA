@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from src.front.gui_service import GuiServices
 from src.front.panels import EntryPanel
+from src.front.settings import IMAGES
 
 class LeftFrame(ctk.CTkFrame):
     def __init__(self, parent, replace_frame_func):
@@ -113,13 +114,14 @@ class DistanceFrame(ctk.CTkFrame):
 
 
     def send_data(self):
+        distances_list = self.service.get_values(self)
+        final_calculation = self.service.create_result(distances_list)
+        
         image_data = [
-            ('src/front/resource/X_axis_graph.png', 'Eje X'),
-            ('src/front/resource/Y_axis_graph.png', 'Eje Y'),
-            ('src/front/resource/Z_axis_graph.png', 'Eje Z'),
+            (str(IMAGES[0]), str(f'Magnetic moment (mAm^2): {round(final_calculation[0], 4)} (J/T)')),
+            (str(IMAGES[1]), str(f'Magnetic moment (mAm^2): {round(final_calculation[1], 4)} (J/T)')),
+            (str(IMAGES[2]), str(f'Magnetic moment (mAm^2): {round(final_calculation[2], 4)} (J/T)')),
         ]
-        test_distances = self.service.get_values(self)
-        self.service.create_result(test_distances)
         self.replace_frame_func(image_data)
 
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from src.front.settings import CSV_NAMES
+from src.front.settings import FILE_NAMES
 from src.back.checker import Checker
 
 class FileHandler:
@@ -8,15 +8,16 @@ class FileHandler:
         self.data = {}
         self.checker = Checker(gui_services)
 
+
     def load_csv_files(self, filepaths: list):
-        if len(filepaths) != 6:
-            self.checker.gui_services.log_error("File Count Error", f"Expected 6 files, but got {len(filepaths)}")
-            raise ValueError(f"Expected 6 files, but got {len(filepaths)}")
+        if len(filepaths) < 2 | len(filepaths) > 6:
+            self.checker.services.log_error("File Count Error", f"Expected 2 to 6 files, but got {len(filepaths)}")
+            raise ValueError(f"Expected 2 to 6 files, but got {len(filepaths)}")
 
         filenames = [self._extract_filename(path) for path in filepaths]
-        if set(filenames) != set(CSV_NAMES):
-            self.checker.gui_services.log_error("Filename Error", f"Filenames do not match the expected names: {CSV_NAMES}")
-            raise ValueError(f"Filenames do not match the expected names: {CSV_NAMES}")
+        if not set(filenames).issubset(set(FILE_NAMES)):
+            self.checker.services.log_error("Filename Error", f"Some filenames do not match the expected names: {FILE_NAMES}")
+            raise ValueError(f"Some filenames do not match the expected names: {FILE_NAMES}")
 
         try:
             for path in filepaths:
@@ -30,31 +31,32 @@ class FileHandler:
             return self.data
 
         except FileNotFoundError as e:
-            self.checker.gui_services.log_error("File Not Found", f"File not found: {path}")
+            self.checker.services.log_error("File Not Found", f"File not found: {path}")
             raise FileNotFoundError(f"File not found: {path}") from e
         except pd.errors.ParserError as e:
-            self.checker.gui_services.log_error("Parse Error", f"Parse error at: {path}")
+            self.checker.services.log_error("Parse Error", f"Parse error at: {path}")
             raise ValueError(f"Parse error at: {path}") from e
         except Exception as e:
-            self.checker.gui_services.log_error("Exception", str(e))
+            self.checker.services.log_error("Exception", str(e))
             raise
-            
+
+
     def count_sensors(self) -> int:
         keys = self.data.keys()
         sensors = []
         for key in keys:
-            df = self.data[key]
-            sensors.append(df.shape[1] / 3)
+            sensors.append(self.data[key].shape[1] / 3)
 
         prv = 0
         for sensor in sensors:
             if prv == 0:
                 prv = sensor
             if sensor != prv:
-                self.checker.gui_services.log_error("Sensor Count Error", 'Files have different numbers of sensors')
-                raise ValueError('Files have different numbers of sensors')
+                self.checker.services.log_error("Sensor Count Error", 'Files have different number of sensors')
+                raise ValueError('Files have different number of sensors')
 
         return int(prv)
+
 
     def _extract_filename(self, filepath: str) -> str:
         return os.path.basename(filepath).split('.')[0]

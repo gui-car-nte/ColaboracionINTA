@@ -72,12 +72,6 @@ class GuiServices:
                 label.pack(pady = 5)
 
 
-    def send_distance(self, frame_main: tk.Frame):
-        distances = self.get_values(frame_main)
-        new_frame = self.utils.create_frame(frame_main, tk.TOP, False)
-        self.create_result(distances)
-
-
     def drop_frame(self, frame_main):
         for widget in frame_main.winfo_children():
             if isinstance(widget, tk.Frame):
@@ -100,6 +94,7 @@ class GuiServices:
     def create_result(self, distances):
         calculations = Calculations(self)
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
+        return self.results
 
 
     def export_to_pdf(self):

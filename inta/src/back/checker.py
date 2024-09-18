@@ -2,8 +2,9 @@ import pandas as pd
 
 class Checker:
     def __init__(self, gui_services):
-        self.gui_services = gui_services
-    
+        self.services = gui_services
+
+
     def check_csv_format(self, filepath: str):
         try:
             df = pd.read_csv(filepath)
@@ -14,8 +15,9 @@ class Checker:
             if not all(second_row.apply(lambda x: self._is_numeric(x))):
                 raise ValueError(f"Non-numeric data found in the second row of file: {filepath}")
         except ValueError as e:
-            self.gui_services.log_error("CSV Format Error", str(e))
+            self.services.log_error("CSV Format Error", str(e))
             raise
+
 
     def _is_numeric(self, value):
         try:
@@ -23,6 +25,7 @@ class Checker:
             return True
         except ValueError as e:
             return False
+
 
     def check_consistent_sensor_count(self, data: dict):
         try:
@@ -38,5 +41,5 @@ class Checker:
                 if sensor != prv:
                     raise ValueError('Files have different numbers of sensors')
         except ValueError as e:
-            self.gui_services.log_error("CSV Format Error", str(e))
+            self.services.log_error("CSV Format Error", str(e))
             raise
