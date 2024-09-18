@@ -1,57 +1,46 @@
-import tkinter as tk
-import logging
+import customtkinter as ctk
+from src.front.image_widget import InitialFrame, ResultFrame
+from src.front.menu import LeftFrame
+import pyautogui
 
-# TODO review non-used variables
-# TODO english translation
-from src import config
-from src.front.gui_service import GuiServices
-from src.front.utils import Utils
+class GuiApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        # Configuración de la ventana
+        ctk.set_appearance_mode('dark')
+        self.geometry('1000x600')
+        self.title('Magnetic Moment Calculation')
+        self.minsize(800, 500)
+        self.iconbitmap('src/front/resource/inta_icon.ico')
 
-def start_gui():
+        self.update()
+        self.lift()
+        self.attributes('-topmost', True)
+        self.after_idle(self.attributes, '-topmost', False)
+        pyautogui.hotkey('winleft', 'up')
 
-    # Configure the logger at the start of your application
-    logging.basicConfig(
-        filename='error_log.txt',
-        filemode='a',
-        format='%(asctime)s,%(name)s %(levelname)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        level=logging.ERROR
-    )
+        # Configuración del layout
+        self.rowconfigure(0, weight = 1)
+        self.rowconfigure(1, weight = 1)
+        self.columnconfigure(0, weight = 1, uniform = 'a')
+        self.columnconfigure(1, weight = 4, uniform = 'a')
 
-    logger = logging.getLogger('urbanGUI')
+        self.frame_col1 = InitialFrame(self)
 
-    root = tk.Tk()
-    root.title("Magnetic Moment Calculation")
-    root.minsize(600, 400)
-    icon = tk.PhotoImage(file='src/front/resource/logo.png')
-    root.iconphoto(True, icon)
-    root.configure(background = config.PRIMARY_COLOR)
+        # Crear los widgets
+        self.menu = LeftFrame(self, self.replace_frame_col1)
+        self.menu.grid(row = 0, column = 0, rowspan = 2, sticky = 'nswe')
 
-    utils = Utils(root)
+        self.mainloop()
 
-    top_frame = utils.create_frame(root, tk.TOP)
-    center_frame = utils.create_frame(root, tk.TOP, complete=True, scrollable=True)
-    utils.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
-        background=config.PRIMARY_COLOR
-    )
-    
-    settings = GuiServices(root)
+    def close_edit(self):
+        self.destroy()
 
-    utils.create_button(
-        "csv_button",
-        top_frame,
-        "Upload CSV files",
-        tk.LEFT,
-        settings.load_files,
-        center_frame,
-    )
-    utils.create_button(
-        "export_button",
-        top_frame,
-        "Export to PDF",
-        tk.LEFT,
-        settings.export_to_pdf,
-        "",
-    ).config(state=tk.DISABLED)
+    def replace_frame_col1(self, image_path):
+        # Destroy the existing frame_col1
+        if hasattr(self, 'frame_col1'):
+            self.frame_col1.destroy()
 
-    root.mainloop()
+        # Create and place the new ScrollFrame
+        self.frame_col1 = ResultFrame(self, image_path)
+        self.frame_col1.grid(column = 1, row = 0, rowspan = 2, sticky = 'nsew')

@@ -4,59 +4,78 @@ import logging
 import platform
 
 from tkinter import filedialog, messagebox
-
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
 from src.front.utils import Utils
-from src import config
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
+from src.front.settings import IMAGES
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 
 if os.path.exists('error_log.txt'):
     os.remove(path = 'error_log.txt')
 
 logging.basicConfig(
-    filename="error_log.txt",
-    filemode="a",
-    format="[%(asctime)s] - [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.ERROR,
+    filename = "error_log.txt",
+    filemode = "a",
+    format = "[%(asctime)s] - [%(levelname)s] %(message)s",
+    datefmt = "%Y-%m-%d %H:%M:%S",
+    level = logging.ERROR,
 )
 
 logger = logging.getLogger("urbanGUI")
+
 
 class GuiServices:
 
     def __init__(self, frame_main) -> None:
         self.window = frame_main
-        self.numbers_sensors = 0
+        self.sensor_number = 0
         self.sensor_data = {}
         self.utils = Utils(self.window)
         self.operations_steps: str
+        self.files_frame = None  # Referencia al frame de archivos para actualizar la interfaz
 
-    def load_files(self, next_frame):
-        gui_services = GuiServices(self.window)
-        filepaths = filedialog.askopenfilenames(filetypes=[("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt*")])
-        f = FileHandler(list(filepaths), gui_services)
-        self.sensor_data = f.load_csv_files(list(filepaths))
-        self.numbers_sensors = f.count_sensors()
-        self.drop_frame(next_frame)
-        self.input_distance(next_frame)
+    def set_files_frame(self, frame):
+        """ Establecer el marco donde se muestran los archivos cargados. """
+        self.files_frame = frame
 
-    def input_distance(self, next_frame):
-        for sensor in range(self.numbers_sensors):
-            frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
-            self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
-            self.utils.create_input(frame_input)
+    def load_files(self):
+        filepaths = filedialog.askopenfilenames(filetypes = [("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt")])
 
-        self.utils.create_button(
-            "calculate", next_frame, "Calculate", "", self.send_distance, next_frame
-        )
+        if filepaths:
+            try:
+                f = FileHandler(self)
+                self.sensor_data = f.load_csv_files(list(filepaths))
+                self.sensor_number = f.count_sensors()
+
+                self.update_files_ui(filepaths)
+                
+                return self.sensor_data
+            
+            except Exception as e: # TODO don't gotta catch em all
+                return None
+        
+        else:
+            return None
+
+    def update_files_ui(self, filepaths):
+        """ Actualizar la UI para ocultar el botón de selección de archivos y mostrar los nombres. """
+        if self.files_frame:
+            # Eliminar el botón de cargar archivos
+            for widget in self.files_frame.winfo_children():
+                widget.destroy()
+
+            # Mostrar los nombres de los archivos cargados
+            for filepath in filepaths:
+                filename = os.path.basename(filepath)  # Extraer solo el nombre del archivo
+                label = tk.Label(self.files_frame, text = filename, bg = "white")
+                label.pack(pady = 5)
 
     def send_distance(self, frame_main: tk.Frame):
         distances = self.get_values(frame_main)
-        self.drop_frame(frame_main)
         new_frame = self.utils.create_frame(frame_main, tk.TOP, False)
         self.create_result(new_frame, distances)
 
@@ -70,85 +89,72 @@ class GuiServices:
         values = []
         for widget in frame.winfo_children():
             if isinstance(widget, tk.Entry):
-                new_values = widget.get().replace(",",".")
+                new_values = widget.get().replace(",", ".")
                 values.append(new_values)
             elif isinstance(widget, tk.Frame):
                 values.extend(self.get_values(widget))
-                
+
         return values
 
     def create_result(self, frame_main, distances):
-        gui_services = GuiServices(self.window)
-        calculations = Calculations(gui_services)
-
+        # No crear una nueva instancia de GuiServices, usa la existente (self)
+        calculations = Calculations(self)
         self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
+
+        # Habilitar botón de exportación
         button = self.window.nametowidget(".!frame.export_button")
-        button.config(state=tk.NORMAL)
+        button.config(state = tk.NORMAL)
+
+        # Obtener y mostrar los resultados
         self.operations_steps = calculations.get_calculation_steps()
-        for result, image_path in zip(self.results, config.IMAGES):
+        for result, image_path in zip(self.results, IMAGES):
             self.utils.create_image_canvas(frame_main, image_path)
             self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
                 padx = 10, pady = 10
             )
 
     def export_to_pdf(self):
-        types = ["x", "y", "z"]
-        pdf_path = "magnetic_moment.pdf"
+        # Create a PDF document
+        pdf_file = "generated_report.pdf"
+        doc = SimpleDocTemplate(pdf_file, pagesize = A4)
 
-        canva = canvas.Canvas(pdf_path, pagesize=letter)
-        width, height = letter
+        # Create a sample stylesheet
+        styles = getSampleStyleSheet()
 
-        canva.setFont("Helvetica-Bold", 18)
-        title = "Magnetic Moment"
-        canva.drawCentredString(width / 2.0, height - 50, title)
+        # Title
+        title = Paragraph("Informe de Resultados", styles['Title'])
 
-        y_offset = height - 100
+        # Sample table data
+        data = [
+            ['Parametro', 'Resultado', 'Unidad'],
+            ['Masa', '70', 'kg'],
+            ['Altura', '1.75', 'm'],
+            ['Edad', '30', 'años']
+        ]
 
-        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, config.IMAGES)):
-            if y_offset < 300:
-                canva.showPage()
-                y_offset = height - 100
+        # Create a table
+        table = Table(data, colWidths = [6 * cm, 4 * cm, 3 * cm])
 
-            canva.setFont("Helvetica-Bold", 12)
-            canva.drawString(100, y_offset, f"Axis {axis}")
+        # Add table style
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 14),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
 
+        # Create the PDF elements list
+        elements = [title, Spacer(1, 12), table]
 
-            y_offset -= 80
+        # Build the PDF
+        doc.build(elements)
 
-            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
+        print(f"PDF '{pdf_file}' created successfully.")
 
-            y_offset -= 220
-
-            canva.setFont("Helvetica", 12)
-            canva.drawString(100, y_offset, f"Magnetic Moment {moment_magnetic}")
-
-            y_offset -= 40
-
-        canva.showPage()
-
-        canva.setFont("Helvetica-Bold", 18)
-        title = "Detailed Calculation Steps"
-        canva.drawCentredString(width / 2.0, height - 50, title)
-
-        canva.setFont("Helvetica", 8)
-        calculation_steps = self.operations_steps.split('\n')
-        y_offset = height - 100
-
-        for line in calculation_steps:
-            if y_offset < 40:
-                canva.showPage()
-                canva.setFont("Helvetica", 8)
-                y_offset = height - 100
-            canva.drawString(20, y_offset, line)
-            y_offset -= 20
-
-        canva.save()
-
-        if platform.system() == 'Windows':
-            print('windows')
-            os.startfile(pdf_path) #type: ignore
-        elif platform.system() == 'Linux':
-            os.system(f"xdg-open {pdf_path}")
 
     def show_message(self, msg, color):
         messagebox.showerror('Error', msg)

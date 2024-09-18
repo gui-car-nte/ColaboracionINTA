@@ -11,13 +11,13 @@ class Checker:
                 raise ValueError(f"File does not have enough rows for data validation: {filepath}")
 
             second_row = df.iloc[1]
-            if not all(second_row.apply(lambda x: self.is_numeric(x))):
+            if not all(second_row.apply(lambda x: self._is_numeric(x))):
                 raise ValueError(f"Non-numeric data found in the second row of file: {filepath}")
         except ValueError as e:
-            self.gui_services.log_error("File Format Error", str(e))
+            self.gui_services.log_error("CSV Format Error", str(e))
             raise
 
-    def is_numeric(self, value):
+    def _is_numeric(self, value):
         try:
             float(value)
             return True
@@ -38,5 +38,5 @@ class Checker:
                 if sensor != prv:
                     raise ValueError('Files have different numbers of sensors')
         except ValueError as e:
-            self.gui_services.log_error("File Format Error", str(e))
+            self.gui_services.log_error("CSV Format Error", str(e))
             raise
