@@ -18,6 +18,7 @@ class EntryPanel(Panel):
         ctk.CTkEntry(self, placeholder_text = f"Distance for sensor {self.index + 1}", fg_color = DARK_GREY).grid(row = 0, column = 1, sticky = "ew", padx = 5)
         self.grid_columnconfigure(1, weight = 1)
 
+
 class SliderPanel(Panel):
     def __init__(self, parent, text, data_var, min_value, max_value):
         super().__init__(parent = parent)
@@ -29,6 +30,7 @@ class SliderPanel(Panel):
         ctk.CTkSlider(self, from_ = min_value, to = max_value, variable = self.data_var).grid(row = 0, column = 1, sticky = "ew", padx = 5)
         ctk.CTkEntry(self, textvariable = self.data_var, width = 50).grid(row = 0, column = 2, padx = 5)
         self.grid_columnconfigure(1, weight = 1)
+        
 
 class SegmentedPanel(Panel):
     def __init__(self, parent, text, data_var, options):
@@ -40,6 +42,7 @@ class SegmentedPanel(Panel):
         ctk.CTkLabel(self, text = text).grid(row = 0, column = 0, sticky = "w", padx = 5)
         ctk.CTkSegmentedButton(self, variable = self.data_var, values = options).grid(row = 0, column = 1, sticky = "ew", padx = 5)
         self.grid_columnconfigure(1, weight = 1)
+      
 
 class SwitchPanel(Panel):
     def __init__(self, parent, text, data_var):

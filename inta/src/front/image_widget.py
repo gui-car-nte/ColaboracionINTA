@@ -7,11 +7,11 @@ from typing import List, Tuple
 
 class ImageImport(ctk.CTkFrame):
     def __init__(self, parent, import_func):
-        super().__init__(master = parent)
-        self.grid(column = 0, columnspan = 2, row = 0, sticky = 'ns')
+        super().__init__(master=parent)
+        self.grid(column=0, columnspan=2, row=0, sticky='ns')
         self.import_func = import_func
 
-        ctk.CTkButton(self, text = 'select files', command = self.open_dialog).pack(expand = True)
+        ctk.CTkButton(self, text='select files', command=self.open_dialog).pack(expand=True)
 
     def open_dialog(self):
         path = filedialog.askopenfile()
@@ -35,6 +35,7 @@ class InitialFrame(ctk.CTkFrame):
         # Crear canvas para la imagen
         self.canvas = Canvas(self, bg = BACKCGROUND_COLOR, bd = 0, highlightthickness = 0)
         self.canvas.grid(row = 1, column = 1, sticky = 's')
+        
         # Cargar la imagen
         image = Image.open('src/front/resource/inta_logo.png')
         self.photo = ImageTk.PhotoImage(image)
@@ -140,13 +141,13 @@ class ImageOutput(Canvas):
 class CloseOutput(ctk.CTkButton):
     def __init__(self, parent, close_func):
         super().__init__(
-            master = parent,
-            command = close_func,
-            text = 'X',
-            text_color = WHITE,
-            fg_color = 'transparent',
-            width = 40, height = 40,
-            corner_radius = 0,
-            hover_color = CLOSE_RED
+            master=parent,
+            command=close_func,
+            text='X',
+            text_color=WHITE,
+            fg_color='transparent',
+            width=40, height=40,
+            corner_radius=0,
+            hover_color=CLOSE_RED
         )
-        self.place(relx = 0.99, rely = 0.01, anchor = 'ne')
+        self.place(relx=0.99, rely=0.01, anchor='ne')

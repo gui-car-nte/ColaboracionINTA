@@ -3,6 +3,7 @@ from src.front.image_widget import InitialFrame, ResultFrame
 from src.front.menu import LeftFrame
 import pyautogui
 
+
 class GuiApp(ctk.CTk):
     def __init__(self):
         super().__init__()

@@ -6,6 +6,7 @@ class LeftFrame(ctk.CTkFrame):
     def __init__(self, parent, replace_frame_func):
         super().__init__(master = parent, width = 100)
         self.grid(row = 0, column = 0, sticky = 'nsew')
+
         self.service = GuiServices(self)
         self.replace_frame_func = replace_frame_func
         
@@ -103,19 +104,15 @@ class DistanceFrame(ctk.CTkFrame):
         self.files = files
         self.replace_frame_func = replace_frame_func
 
-        # Configuración de widgets internos
         for index in range(sensors):
             EntryPanel(self, index).grid(row = index, column = 0, sticky = "ew", padx = 4, pady = 8)
 
-        # Botón centrado con `sticky = "ew"` para que ocupe todo el ancho disponible
         ctk.CTkButton(self, text = 'Calculate', command = self.send_data, width = 120, height = 40).grid(row = sensors, column = 0, pady = 10, padx = 10)
 
-        # Ajustar las columnas y filas para que se expandan correctamente
         self.grid_columnconfigure(0, weight = 1)
         for i in range(sensors):
             self.grid_rowconfigure(i, weight = 1)
 
-        # Última fila ajustable para centrar el botón
         self.grid_rowconfigure(sensors + 1, weight = 1)
 
     def send_data(self):
@@ -125,7 +122,7 @@ class DistanceFrame(ctk.CTkFrame):
             ('src/front/resource/Z_axis_graph.png', 'Eje Z'),
         ]
         self.replace_frame_func(image_data)
-
+        
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent):

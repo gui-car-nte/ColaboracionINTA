@@ -114,46 +114,56 @@ class GuiServices:
             )
 
     def export_to_pdf(self):
-        # Create a PDF document
-        pdf_file = "generated_report.pdf"
-        doc = SimpleDocTemplate(pdf_file, pagesize = A4)
+        types = ["x", "y", "z"]
+        pdf_path = "magnetic_moment.pdf"
 
-        # Create a sample stylesheet
-        styles = getSampleStyleSheet()
+        canva = canvas.Canvas(pdf_path, pagesize=letter)
+        width, height = letter
 
-        # Title
-        title = Paragraph("Informe de Resultados", styles['Title'])
+        canva.setFont("Helvetica-Bold", 18)
+        title = "Magnetic Moment"
+        canva.drawCentredString(width / 2.0, height - 50, title)
 
-        # Sample table data
-        data = [
-            ['Parametro', 'Resultado', 'Unidad'],
-            ['Masa', '70', 'kg'],
-            ['Altura', '1.75', 'm'],
-            ['Edad', '30', 'años']
-        ]
+        y_offset = height - 100
 
-        # Create a table
-        table = Table(data, colWidths = [6 * cm, 4 * cm, 3 * cm])
+        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, IMAGES)):
+            if y_offset < 300:
+                canva.showPage()
+                y_offset = height - 100
 
-        # Add table style
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 14),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ]))
+            canva.setFont("Helvetica-Bold", 12)
+            canva.drawString(100, y_offset, f"Axis {axis}")
 
-        # Create the PDF elements list
-        elements = [title, Spacer(1, 12), table]
+            y_offset -= 80
 
-        # Build the PDF
-        doc.build(elements)
+            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
 
-        print(f"PDF '{pdf_file}' created successfully.")
+            y_offset -= 220
+
+            canva.setFont("Helvetica", 12)
+            canva.drawString(100, y_offset, f"Magnetic Moment {moment_magnetic}")
+
+            y_offset -= 40
+
+        canva.showPage()
+
+        canva.setFont("Helvetica-Bold", 18)
+        title = "Detailed Calculation Steps"
+        canva.drawCentredString(width / 2.0, height - 50, title)
+
+        canva.setFont("Helvetica", 8)
+        calculation_steps = self.operations_steps.split('\n')
+        y_offset = height - 100
+
+        for line in calculation_steps:
+            if y_offset < 40:
+                canva.showPage()
+                canva.setFont("Helvetica", 8)
+                y_offset = height - 100
+            canva.drawString(20, y_offset, line)
+            y_offset -= 20
+
+        canva.save()
 
 
     def show_message(self, msg, color):
