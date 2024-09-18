@@ -5,6 +5,7 @@ class Panel(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(master = parent, fg_color = BACKCGROUND_COLOR) #, fg_color = 'BACKCGROUND_COLOR'
         self.grid(sticky = "ew", padx = 4, pady = 20, column = 0,)
+        self.grid_rowconfigure(0, minsize=50)  # Aumentar la altura de la fila
         # self.grid_columnconfigure(0, weight = 1)
 
 class EntryPanel(Panel):
