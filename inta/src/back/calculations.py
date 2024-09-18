@@ -12,7 +12,8 @@ class Calculations:
         self.gui_services = gui_services
         self.args = args
         self.steps = []
-        
+
+
     def calculate_magnetic_moment(self, sensor_data: dict, distances: list) -> list:
         try:
             if sensor_data is None:
@@ -45,10 +46,11 @@ class Calculations:
             self.steps.append(f'Error: {str(e)}')
             raise e
         except Exception as e: 
-            self.gui_services.log_error("Exception", str(e))
+            self.gui_services.log_error("Exception in calculations", str(e))
             self.steps.append(f'Error: {str(e)}')
             raise e
-    
+
+
     def _invert_cube_distance(self, distances_list: list) -> list:
         result_list = []
         for distance in distances_list:
@@ -98,7 +100,8 @@ class Calculations:
 
     def _rounded_number(self, num: float) -> float:
         return round(num, 15)
-    
+
+
     def get_calculation_steps(self) -> str:
         return '\n\n'.join(self.steps)
 

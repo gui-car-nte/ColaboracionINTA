@@ -39,11 +39,11 @@ class Utils():
                 name = name_in,
                 command = lambda: command_in(parameter_in),
             )
-            button.configure(fg="white")
+            button.configure(fg = "white")
             if side_in == "":
                 button.pack(pady = 10, anchor = tk.NW)
             else:
-                button.pack(side=side_in, pady = 10, anchor = tk.NW)
+                button.pack(side = side_in, pady = 10, anchor = tk.NW)
         else:
             button = tk.Button(
                 frame_in,
@@ -52,7 +52,7 @@ class Utils():
                 name = name_in,
                 command = command_in,
             )
-            button.configure(fg="white")
+            button.configure(fg = "white")
             if side_in == "":
                 button.pack(pady = 10)
             else:
@@ -65,7 +65,7 @@ class Utils():
             result_label = tk.Label(
                 frame_in, text = text_in, wraplength = 300, justify = side_in
             )
-            result_label.pack(pady=20)
+            result_label.pack(pady = 20)
         else:
             label = tk.Label(frame_in, text = text_in)
             label.configure(background = PRIMARY_COLOR)
@@ -93,7 +93,7 @@ class Utils():
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
-      
+            
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -108,10 +108,9 @@ class Utils():
         return canvas
 
     # TODO could be moved to utils folder or another file to shorten code, go case by case
-    # TODO '=' spacing
     def create_scroll(self, frame_main):
         canvas = tk.Canvas(frame_main, bg = PRIMARY_COLOR)
-        canvas.pack(side=tk.LEFT, fill = tk.BOTH, expand = True)
+        canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         scrollbar_y = tk.Scrollbar(frame_main, orient = tk.VERTICAL, command = canvas.yview)
         scrollbar_y.pack(side = tk.RIGHT, fill = tk.Y)
@@ -123,11 +122,11 @@ class Utils():
         def center_frame(event):
             canvas_width = event.width
             canvas.coords(window, canvas_width // 2, 0)
-            canvas.configure(scrollregion=canvas.bbox("all"))
+            canvas.configure(scrollregion = canvas.bbox("all"))
 
         canvas.bind("<Configure>", center_frame)
         inner_frame.bind(
-            "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            "<Configure>", lambda e: canvas.configure(scrollregion = canvas.bbox("all"))
         )
 
         canvas.bind_all(
