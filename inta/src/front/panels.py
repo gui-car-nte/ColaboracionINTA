@@ -1,9 +1,9 @@
 import customtkinter as ctk
-from src.front.settings import BACKCGROUND_COLOR, DARK_GREY
+from src.front.settings import BACKGROUND_COLOR
 
 class Panel(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(master = parent, fg_color = BACKCGROUND_COLOR) #, fg_color = 'BACKCGROUND_COLOR'
+        super().__init__(master = parent, fg_color = BACKGROUND_COLOR) #, fg_color = 'BACKCGROUND_COLOR'
         self.grid(sticky = "ew", padx = 4, pady = 20, column = 0,)
         self.grid_rowconfigure(0, minsize=50)  # Aumentar la altura de la fila
         # self.grid_columnconfigure(0, weight = 1)
@@ -14,9 +14,10 @@ class EntryPanel(Panel):
         self.index = index
         self.create_widgets()
 
+
     def create_widgets(self):
         ctk.CTkLabel(self, text = f"Sensor {self.index + 1}").grid(row = 0, column = 0, sticky = "w", padx = 5)
-        ctk.CTkEntry(self, placeholder_text = f"Distance for sensor {self.index + 1}", fg_color = DARK_GREY).grid(row = 0, column = 1, sticky = "ew", padx = 5)
+        ctk.CTkEntry(self, placeholder_text = f"Distance for Sensor {self.index + 1}").grid(row = 0, column = 1, sticky = "ew", padx = 5)
         self.grid_columnconfigure(1, weight = 1)
 
 
@@ -26,12 +27,13 @@ class SliderPanel(Panel):
         self.data_var = data_var
         self.create_widgets(text, min_value, max_value)
 
+
     def create_widgets(self, text, min_value, max_value):
         ctk.CTkLabel(self, text = text).grid(row = 0, column = 0, sticky = "w", padx = 5)
         ctk.CTkSlider(self, from_ = min_value, to = max_value, variable = self.data_var).grid(row = 0, column = 1, sticky = "ew", padx = 5)
         ctk.CTkEntry(self, textvariable = self.data_var, width = 50).grid(row = 0, column = 2, padx = 5)
         self.grid_columnconfigure(1, weight = 1)
-        
+
 
 class SegmentedPanel(Panel):
     def __init__(self, parent, text, data_var, options):
@@ -39,17 +41,19 @@ class SegmentedPanel(Panel):
         self.data_var = data_var
         self.create_widgets(text, options)
 
+
     def create_widgets(self, text, options):
         ctk.CTkLabel(self, text = text).grid(row = 0, column = 0, sticky = "w", padx = 5)
         ctk.CTkSegmentedButton(self, variable = self.data_var, values = options).grid(row = 0, column = 1, sticky = "ew", padx = 5)
         self.grid_columnconfigure(1, weight = 1)
-      
+
 
 class SwitchPanel(Panel):
     def __init__(self, parent, text, data_var):
         super().__init__(parent = parent)
         self.data_var = data_var
         self.create_widgets(text)
+
 
     def create_widgets(self, text):
         ctk.CTkLabel(self, text = text).grid(row = 0, column = 0, sticky = "w", padx = 5)
