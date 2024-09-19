@@ -68,10 +68,25 @@ class ResultFrame(ctk.CTkFrame):
         self.desc_label.grid(row = 1, column = 0, columnspan = 3, pady = (0, 20))
 
         # Navigation buttons
-        self.prev_button = ctk.CTkButton(self, text = "←", command = self.prev_image, width = 40)
+        
+        # Left
+        # Cargar y ajustar la imagen
+        image_path1 = "src\\front\\resource\\hacia-atras.png"
+        image1 = Image.open(image_path1)
+        image1 = image1.resize((150, 150))  
+        photo1 = ctk.CTkImage(image1)
+
+        self.prev_button = ctk.CTkButton(self, text = '', command = self.prev_image, width = 40, image = photo1, fg_color = 'transparent')
         self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = 'w')
 
-        self.next_button = ctk.CTkButton(self, text = "→", command = self.next_image, width = 40)
+        # Right
+
+        image_path2 = "src\\front\\resource\\adelante.png"
+        image2 = Image.open(image_path2)
+        image2 = image2.resize((500, 500))  
+        photo2 = ctk.CTkImage(image2)
+
+        self.next_button = ctk.CTkButton(self, text = "", command = self.next_image, width = 160, height = 100, image = photo2, fg_color = 'transparent')
         self.next_button.grid(row = 2, column = 2, padx = 10, pady = 10, sticky = 'e')
 
         # Configure grid
