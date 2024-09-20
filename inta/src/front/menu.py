@@ -17,7 +17,7 @@ class LeftFrame(ctk.CTkFrame):
         self.files = {}
 
         self.enable_file_selection_button()
-        
+
 
     def enable_file_selection_button(self):
         self.button_container = ctk.CTkFrame(self, fg_color = "transparent")
@@ -64,7 +64,7 @@ class LeftFrame(ctk.CTkFrame):
         self.tabview.tab("Files").grid_rowconfigure(0, weight = 1)
 
         DistanceFrame(self.tabview.tab("Distances"), self.files, self.service.sensor_number, self.replace_frame_func, self.service)
-        CalculateFrame(self.tabview.tab("Calculates"))
+        CalculateFrame(self.tabview.tab("Calculates"), self.service)
         ExportFrame(self.tabview.tab("Export"))
 
         self.tabview.set("Distances")
@@ -117,19 +117,42 @@ class DistanceFrame(ctk.CTkFrame):
         distances_list = self.service.get_values(self)
         final_calculation = self.service.create_result(distances_list)
         
-        image_data = [
-            (str(IMAGES[0]), str(f'Magnetic moment (mAm^2): {round(final_calculation[0], 4)} (J/T)')),
-            (str(IMAGES[1]), str(f'Magnetic moment (mAm^2): {round(final_calculation[1], 4)} (J/T)')),
-            (str(IMAGES[2]), str(f'Magnetic moment (mAm^2): {round(final_calculation[2], 4)} (J/T)')),
-        ]
-        self.replace_frame_func(image_data)
+        image_data = []
+        for i in range(len(final_calculation)):
+            if i < len(IMAGES):
+                image_data.append((
+                    str(IMAGES[i]), 
+                    str(f'Magnetic moment (mAm^2): {final_calculation[i]} (J/T)')
+                ))
         
+        self.replace_frame_func(image_data)
 
+
+import customtkinter as ctk
 
 class CalculateFrame(ctk.CTkFrame):
-    def __init__(self, parent):
-        super().__init__(master = parent, fg_color = 'transparent')
-        self.grid(row = 0, column = 0, sticky = "nsew")
+    def __init__(self, parent, service):
+        super().__init__(master=parent, fg_color='transparent')
+        self.grid(row=0, column=0, sticky="nsew")
+        self.service = service
+
+        self.scrollable_frame = ctk.CTkScrollableFrame(self, width=400, height=300)
+        self.scrollable_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.text_widget = ctk.CTkTextbox(self.scrollable_frame, wrap='word')
+        self.text_widget.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+        self.update_calculation_details()
+
+    def update_calculation_details(self):
+        details = self.obtain_calculation_details()
+        self.text_widget.delete("1.0", "end")  
+        self.text_widget.insert("1.0", details)  
+
+    def obtain_calculation_details(self):
+        details = self.service.get_calculation_steps()
+        return details
+
 
 
 class ExportFrame(ctk.CTkFrame):
