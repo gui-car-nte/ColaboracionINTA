@@ -133,23 +133,23 @@ class DistanceFrame(ctk.CTkFrame):
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent, service):
-        super().__init__(master=parent, fg_color='transparent')
-        self.grid(row=0, column=0, sticky="nsew")
+        super().__init__(master = parent, fg_color = 'transparent')
+        #self.grid(row = 0, column = 0, sticky = "nsew") # TODO: Alberto
+        self.pack(expand = True, fill = "both") 
         self.service = service
 
-        self.scrollable_frame = ctk.CTkScrollableFrame(self, width=400, height=1200)
-        self.scrollable_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        # self.scrollable_frame = ctk.CTkScrollableFrame(self, width = 400, height = 1200)
+        # self.scrollable_frame.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = "nsew") # TODO: Alberto
+        # self.scrollable_frame.pack(expand = True, fill = "x") 
 
-        self.text_widget = ctk.CTkTextbox(self.scrollable_frame, wrap='word')
-        self.text_widget.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-
+        self.text_widget = ctk.CTkTextbox(self, wrap = 'word')
+        #self.text_widget.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = "nsew") # TODO: Alberto
+        self.text_widget.pack(expand = True, fill = "both") 
 
     def update_calculation_details(self):
-        print("CalcualteFrame update_calculation_details method accessed")
         details = self.service.obtain_calculation_details()
         self.text_widget.delete("1.0", "end")  
-        self.text_widget.insert("1.0", details)  
-        print(f"calc_details details: {details}")
+        self.text_widget.insert("1.0", details)
 
 
 class ExportFrame(ctk.CTkFrame):

@@ -15,7 +15,7 @@ class GuiApp(ctk.CTk):
         # Main layout configuration
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 1)
-        self.columnconfigure(0, weight = 1, uniform = 'a')
+        self.columnconfigure(0, weight = 2, uniform = 'a')
         self.columnconfigure(1, weight = 4, uniform = 'a')
 
         self.frame_col1 = InitialFrame(self)
