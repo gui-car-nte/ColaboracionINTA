@@ -39,30 +39,7 @@ class Calculations:
                 
                 for sensor in range(len(distances)):
                     sensor_number = (sensor * 3)
-                    try:
-                        print(f"■■■■■ 1. sensor_number: {sensor_number}")
-                    except NameError:
-                        print("■■■■■ 1. sensor_number: 666")
-                    try:
-                        print(f"■■■■■ 2. plus_col_name: {plus_col_name}")
-                    except NameError:
-                        print("■■■■■ 2. plus_col_name: 666")
-                    try:
-                        print(f"■■■■■ 3. minus_col_name: {minus_col_name}")
-                    except NameError:
-                        print("■■■■■ 3. minus_col_name: 666")
-                    try:
-                        print(f"■■■■■ 4. plus_average: {plus_average}")
-                    except NameError:
-                        print("■■■■■ 4. plus_average: 666")
-                    try:
-                        print(f"■■■■■ 5. minus_average: {minus_average}")
-                    except NameError:
-                        print("■■■■■ 5. minus_average: 666")
-                    try:
-                        print(f"■■■■■ 6. plus_average_decimal: {plus_average_decimal}")
-                    except NameError:
-                        print("■■■■■ 6. plus_average_decimal: 666")
+                    
                     try:
                         if f'{axis}mas' in sensor_data and f'{axis}menos' in sensor_data:
                             plus_col_name = f'{axis}mas'
@@ -76,18 +53,14 @@ class Calculations:
 
                         plus_average = sensor_data[plus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
                         minus_average = sensor_data[minus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
+                        print(f"plus avg before round: {plus_average}")
+                        print(f"minus avg before round: {minus_average}")
                         
-                        plus_average_decimal = self._dynamic_round(Decimal(str(plus_average)), 2, "ROUND_UP")
-                        print(f"plus avg decimal: {plus_average_decimal}")
-                        minus_average_decimal = self._dynamic_round(Decimal(str(minus_average)), 2, "ROUND_UP")
-                        print(f"minus avg decimal: {minus_average_decimal}")
-                        
-                        print(f"plus average, axis {axis}: '{plus_average}'")
-                        print(f"minus average, axis {axis}: '{minus_average}'")
-                        
-                        halved_substraction = self._substraction_halving(float(plus_average_decimal), float(minus_average_decimal))
+                        halved_substraction = self._substraction_halving(float(plus_average), float(minus_average))
+                        halved_substraction_decimal = self._dynamic_round(halved_substraction, 2, "ROUND UP")
                         print(f"axis {axis} sensor {sensor + 1} halved substracion: {halved_substraction}")
-                        halved_substractions.append(halved_substraction)
+                        print(f"halved substraction after rounding: {halved_substraction_decimal}")
+                        halved_substractions.append(halved_substraction_decimal)
                         self.steps.append(f'{axis} axis sensor {sensor + 1}: halved substraction = {halved_substraction:.15f}')
                     
                     except KeyError as e:
@@ -195,7 +168,7 @@ class Calculations:
         return tick_range
     
     
-    def _dynamic_round(self, number: Decimal, precision: int = 2, rounding_mode: str = "ROUND_UP") -> Decimal:
+    def _dynamic_round(self, number: Decimal, precision: int, rounding_mode: str = "ROUND_UP") -> Decimal:
         try:
             number_str = f"{number:.{precision}E}"
             rounded_number = Decimal(number_str)

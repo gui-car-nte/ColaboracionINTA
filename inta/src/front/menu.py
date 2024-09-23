@@ -56,15 +56,15 @@ class LeftFrame(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight = 1)
 
         self.tabview.add("Distances")
-        self.tabview.add("Calculates")
+        self.tabview.add("Calculations")
         self.tabview.add("Export")
 
         self.files_frame.grid(row = 0, column = 0, sticky = "nsew")
         self.tabview.tab("Files").grid_columnconfigure(0, weight = 1)
         self.tabview.tab("Files").grid_rowconfigure(0, weight = 1)
 
-        DistanceFrame(self.tabview.tab("Distances"), self.files, self.service.sensor_number, self.replace_frame_func, self.service)
-        CalculateFrame(self.tabview.tab("Calculates"), self.service)
+        calculate_frame_instance = CalculateFrame(self.tabview.tab("Calculations"), self.service)
+        DistanceFrame(self.tabview.tab("Distances"), self.files, self.service.sensor_number, self.replace_frame_func, self.service, calculate_frame_instance)
         ExportFrame(self.tabview.tab("Export"))
 
         self.tabview.set("Distances")
@@ -96,12 +96,13 @@ class FilesFrame(ctk.CTkFrame):
 
 
 class DistanceFrame(ctk.CTkFrame):
-    def __init__(self, parent, files, sensor_number, replace_frame_func, service):
+    def __init__(self, parent, files, sensor_number, replace_frame_func, service, calculate_frame):
         super().__init__(master = parent, fg_color = 'transparent')
         self.grid(row = 0, column = 0, sticky = "nsew")
         self.files = files
         self.replace_frame_func = replace_frame_func
         self.service = service
+        self.calculate_frame = calculate_frame
 
         for index in range(self.service.sensor_number):
             EntryPanel(self, index).grid(row = index, column = 0, sticky = "ew", padx = 2, pady = 4)
@@ -126,9 +127,9 @@ class DistanceFrame(ctk.CTkFrame):
                 ))
         
         self.replace_frame_func(image_data)
+        
+        self.calculate_frame.update_calculation_details()
 
-
-import customtkinter as ctk
 
 class CalculateFrame(ctk.CTkFrame):
     def __init__(self, parent, service):
@@ -136,23 +137,19 @@ class CalculateFrame(ctk.CTkFrame):
         self.grid(row=0, column=0, sticky="nsew")
         self.service = service
 
-        self.scrollable_frame = ctk.CTkScrollableFrame(self, width=400, height=300)
+        self.scrollable_frame = ctk.CTkScrollableFrame(self, width=400, height=1200)
         self.scrollable_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
         self.text_widget = ctk.CTkTextbox(self.scrollable_frame, wrap='word')
         self.text_widget.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.update_calculation_details()
 
     def update_calculation_details(self):
-        details = self.obtain_calculation_details()
+        print("CalcualteFrame update_calculation_details method accessed")
+        details = self.service.obtain_calculation_details()
         self.text_widget.delete("1.0", "end")  
         self.text_widget.insert("1.0", details)  
-
-    def obtain_calculation_details(self):
-        details = self.service.get_calculation_steps()
-        return details
-
+        print(f"calc_details details: {details}")
 
 
 class ExportFrame(ctk.CTkFrame):
