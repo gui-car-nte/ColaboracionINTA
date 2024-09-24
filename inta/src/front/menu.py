@@ -112,18 +112,20 @@ class DistanceFrame(ctk.CTkFrame):
         self.replace_frame_func = replace_frame_func
         self.service = service
 
-        for index in range(self.service.sensor_number):
-            EntryPanel(self, index).grid(
-                row=index, column=0, sticky="ew", padx=2, pady=4
-            )
+        calculation_button = ctk.CTkButton(self, text="Calculate", command=self.send_data)
+        calculation_button.configure(state="disabled")
 
-        ctk.CTkButton(self, text="Calculate", command=self.send_data).grid(
-            row=service.sensor_number, column=0, pady=10, padx=10, sticky="ew"
-        )
+        EntryPanel(self, self.service.sensor_number, calculation_button).pack()
+        # grid(column=0, sticky="ew", padx=2, pady=4)
+
+        calculation_button.pack(fill = 'x')
+        # grid(row=service.sensor_number, column=0, pady=10, padx=10, sticky="ew")
 
         self.grid_columnconfigure(0, weight=1)
         for i in range(service.sensor_number):
             self.grid_rowconfigure(i, weight=1)
+
+    
 
     def send_data(self):
         distances_list = self.service.get_values(self)

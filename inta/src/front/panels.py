@@ -9,16 +9,34 @@ class Panel(ctk.CTkFrame):
         # self.grid_columnconfigure(0, weight = 1)
 
 class EntryPanel(Panel):
-    def __init__(self, parent, index):
+    def __init__(self, parent, number_of_entries, calculation_button):
         super().__init__(parent = parent)
-        self.index = index
+        self.number_of_entries = number_of_entries
+        self.entries = []
         self.create_widgets()
+        self.calculation_button = calculation_button
 
 
     def create_widgets(self):
-        ctk.CTkLabel(self, text = f"Sensor {self.index + 1}").grid(row = 0, column = 0, sticky = "w", padx = 5)
-        ctk.CTkEntry(self, placeholder_text = f"Distance for Sensor {self.index + 1}").grid(row = 0, column = 1, sticky = "ew", padx = 5)
-        self.grid_columnconfigure(1, weight = 1)
+        for index in range(self.number_of_entries):
+            ctk.CTkLabel(self, text=f"Sensor {index + 1}").grid(row=index, column=0, sticky="w", padx=5)
+            
+            input_entry = ctk.CTkEntry(self, placeholder_text=f"Distance for sensor {index + 1}")
+            input_entry.bind("<KeyRelease>", self.verify_form_is_valid)
+            input_entry.grid(row=index, column=1, sticky="ew", padx=5)
+            
+            self.entries.append(input_entry)  # Añadir la entrada a la lista
+
+        self.grid_columnconfigure(1, weight=1)
+
+    def verify_form_is_valid(self, event):
+        if all(entrada.get().strip() for entrada in self.entries):
+            print("Form is valid")
+            self.calculation_button.configure(state="enabled")
+            # self.boton
+        else:
+            print("Form is not valid")
+            self.calculation_button.configure(state="disabled")
 
 
 class SliderPanel(Panel):
