@@ -101,12 +101,13 @@ class FilesFrame(ctk.CTkFrame):
             label.place(relx=0.25, rely=y_margin, anchor="w")
             y_margin += 0.04
             self.file_labels.append(label)
+            
 
 
 class DistanceFrame(ctk.CTkFrame):
     def __init__(self, parent, files, replace_frame_func, service):
         super().__init__(master=parent, fg_color="transparent")
-        self.pack(expand = True, fill = 'x')
+        self.pack( fill = 'x')
         self.files = files
         self.replace_frame_func = replace_frame_func
         self.service = service

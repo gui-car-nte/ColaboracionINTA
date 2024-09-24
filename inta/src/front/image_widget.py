@@ -7,12 +7,12 @@ from typing import List, Tuple
 
 class ImageImport(ctk.CTkFrame):
     def __init__(self, parent, import_func):
-        super().__init__(master=parent)
-        self.grid(column=0, columnspan=2, row=0, sticky="ns")
+        super().__init__(master = parent)
+        self.grid(column = 0, columnspan = 2, row = 0, sticky = "ns")
         self.import_func = import_func
 
-        ctk.CTkButton(self, text="select files", command=self.open_dialog).pack(
-            expand=True
+        ctk.CTkButton(self, text = "select files", command = self.open_dialog).pack(
+            expand = True
         )
 
     def open_dialog(self):
@@ -22,54 +22,54 @@ class ImageImport(ctk.CTkFrame):
 
 class InitialFrame(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(master=parent)
-        self.grid(column=1, columnspan=2, row=0, sticky="nsew")
+        super().__init__(master = parent, fg_color = BACKGROUND_COLOR)
+        self.grid(column = 1, columnspan = 2, row = 0, sticky = "nsew")
 
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=1)
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
-
-        self.configure(fg_color=BACKGROUND_COLOR)
+        self.rowconfigure(0, weight = 1)
+        self.rowconfigure(1, weight = 1)
+        self.rowconfigure(2, weight = 1)
+        self.columnconfigure(0, weight = 1)
+        self.columnconfigure(1, weight = 1)
+        self.columnconfigure(2, weight = 1)
 
         # Crear canvas para la imagen
-        self.canvas = Canvas(self, bg=BACKGROUND_COLOR, bd=0, highlightthickness=0)
-        self.canvas.grid(row=1, column=1, sticky="s")
+        self.canvas = Canvas(self, bg = BACKGROUND_COLOR, bd = 0, highlightthickness = 0)
+        # self.canvas.grid(row = 1, column = 1, sticky = "s")
+        self.canvas.place(relx=0.5, rely=0.45, anchor="center")
         # Cargar la imagen
         image = Image.open("src/front/resource/inta_logo.png")
         self.photo = ImageTk.PhotoImage(image)
 
         # Mostrar la imagen en el canvas
-        self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
-        self.canvas.config(width=image.width, height=image.height)
+        self.canvas.create_image(0, 0, anchor = "nw", image = self.photo)
+        self.canvas.config(width = image.width, height = image.height)
 
         self.label = ctk.CTkLabel(
-            self, text="\nMagnetic Moment Calculation", font=("Calibri", 40, "bold")
+            self, text = "\nMagnetic Moment Calculation", font = ("Calibri", 40, "bold")
         )
-        self.label.grid(row=2, column=1, sticky="n")
+        # self.label.grid(row = 2, column = 1, sticky = "n")
+        self.label.place(relx=0.5, rely=0.65, anchor="center")
 
 
 class ResultFrame(ctk.CTkFrame):
-    def __init__(self, parent, image_data: List[Tuple[str, str]], close_edit_func):
-        super().__init__(master=parent)
-        self.grid(row=0, column=1, sticky="nsew")
+    def __init__(self, parent, image_data: List[Tuple[str, str]]):
+        super().__init__(master = parent)
+        self.grid(column = 1, rowspan = 2)
         self.image_data = image_data
         self.current_index = 0
-        self.close_edit_func = close_edit_func
+        # self.close_edit_func = close_edit_func
         self.create_widgets()
 
     def create_widgets(self):
         # Image label (using CTkLabel instead of Canvas)
-        self.image_label = ctk.CTkLabel(self, text="", image=None)
+        self.image_label = ctk.CTkLabel(self, text = "", image = None)
         self.image_label.grid(
-            row=0, column=0, columnspan=3, pady=(20, 10), sticky="nsew"
+            row = 0, column = 0, columnspan = 3, pady = (20, 10), sticky = "nsew"
         )
 
         # Description label
-        self.desc_label = ctk.CTkLabel(self, text="", font=("Helvetica", 14))
-        self.desc_label.grid(row=1, column=0, columnspan=3, pady=(0, 20))
+        self.desc_label = ctk.CTkLabel(self, text = "", font = ("Helvetica", 14))
+        self.desc_label.grid(row = 1, column = 0, columnspan = 3, pady = (0, 20))
 
         # Navigation buttons
 
@@ -81,9 +81,9 @@ class ResultFrame(ctk.CTkFrame):
         photo1 = ctk.CTkImage(image1)
 
         self.prev_button = ctk.CTkButton(
-            self, text="", command=self.prev_image, width=40, image=photo1
+            self, text = "", command = self.prev_image, width = 40, image = photo1
         )
-        self.prev_button.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+        self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
 
         # Right
 
@@ -93,15 +93,15 @@ class ResultFrame(ctk.CTkFrame):
         photo2 = ctk.CTkImage(image2)
 
         self.next_button = ctk.CTkButton(
-            self, text="", command=self.next_image, width=40, image=photo2
+            self, text = "", command = self.next_image, width = 40, image = photo2
         )
-        self.next_button.grid(row=2, column=2, padx=10, pady=10, sticky="e")
+        self.next_button.grid(row = 2, column = 2, padx = 10, pady = 10, sticky = "e")
 
         # Configure grid
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(2, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
+        self.grid_columnconfigure(1, weight = 1)
+        self.grid_columnconfigure(2, weight = 1)
+        self.grid_rowconfigure(0, weight = 1)
 
         self.update_image()
 
@@ -125,18 +125,18 @@ class ResultFrame(ctk.CTkFrame):
             image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS)  # type: ignore
 
         ctk_image = ctk.CTkImage(
-            light_image=image, dark_image=image, size=(image.width, image.height)
+            light_image = image, dark_image = image, size = (image.width, image.height)
         )
 
-        self.image_label.configure(image=ctk_image)
-        self.desc_label.configure(text=label_text)
+        self.image_label.configure(image = ctk_image)
+        self.desc_label.configure(text = label_text)
 
         # Update button states
         self.prev_button.configure(
-            state="normal" if self.current_index > 0 else "disabled"
+            state = "normal" if self.current_index > 0 else "disabled"
         )
         self.next_button.configure(
-            state=(
+            state = (
                 "normal"
                 if self.current_index < len(self.image_data) - 1
                 else "disabled"
@@ -160,34 +160,34 @@ class ResultFrame(ctk.CTkFrame):
 class ImageOutput(Canvas):
     def __init__(self, parent, path_image):
         super().__init__(
-            master=parent,
-            background=BACKGROUND_COLOR,
-            bd=0,
-            highlightthickness=0,
-            relief="ridge",
+            master = parent,
+            background = BACKGROUND_COLOR,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "ridge",
         )
         self.display_image(path_image)
-        self.grid(row=0, column=0, sticky="nsew")
+        self.grid(row = 0, column = 0, sticky = "nsew")
 
     def display_image(self, path_image):
         # Cargar la imagen usando PIL
         image = Image.open(path_image)
         self.photo = ImageTk.PhotoImage(image)
-        self.create_image(0, 0, anchor="nw", image=self.photo)
-        self.config(width=image.width, height=image.height)
+        self.create_image(0, 0, anchor = "nw", image = self.photo)
+        self.config(width = image.width, height = image.height)
 
 
 class CloseOutput(ctk.CTkButton):
     def __init__(self, parent, close_func):
         super().__init__(
-            master=parent,
-            command=close_func,
-            text="X",
-            text_color=WHITE,
-            fg_color="transparent",
-            width=40,
-            height=40,
-            corner_radius=0,
-            hover_color=CLOSE_RED,
+            master = parent,
+            command = close_func,
+            text = "X",
+            text_color = WHITE,
+            fg_color = "transparent",
+            width = 40,
+            height = 40,
+            corner_radius = 0,
+            hover_color = CLOSE_RED,
         )
-        self.place(relx=0.99, rely=0.01, anchor="ne")
+        self.place(relx = 0.99, rely = 0.01, anchor = "ne")
