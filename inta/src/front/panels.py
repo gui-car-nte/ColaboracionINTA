@@ -21,13 +21,19 @@ class EntryPanel(Panel):
         for index in range(self.number_of_entries):
             ctk.CTkLabel(self, text=f"Sensor {index + 1}").grid(row=index, column=0, sticky="w", padx=5)
             
-            input_entry = ctk.CTkEntry(self, placeholder_text=f"Distance for sensor {index + 1}")
+            input_entry = ctk.CTkEntry(self, placeholder_text=f"Distance for sensor {index + 1}", validate = 'key', validatecommand = (self.register(self.verify_key_pressed_is_valid), '%P'))
             input_entry.bind("<KeyRelease>", self.verify_form_is_valid)
             input_entry.grid(row=index, column=1, sticky="ew", padx=5)
             
             self.entries.append(input_entry)  # Añadir la entrada a la lista
 
         self.grid_columnconfigure(1, weight=1)
+
+    def verify_key_pressed_is_valid(self, new_value):
+        # Permitir solo números, un solo punto decimal o vacío
+        if new_value == "" or new_value.replace(".", "", 1).isdigit():
+            return True
+        return False
 
     def verify_form_is_valid(self, event):
         if all(entrada.get().strip() for entrada in self.entries):
