@@ -78,7 +78,9 @@ class Calculations:
                     result = (slope / momentum_decimal) * final_momentum_decimal
                     print(f"final result is: {result}")
                     self.steps.append(f'\n{axis} axis slope = {slope:.2E}')
-                    results.append(result)
+                    self.steps.append(f'\n{axis} final result = {result:.6E}')
+                    rounded_result = round(result, 4)
+                    results.append(rounded_result)
                 
             return results
         
@@ -130,57 +132,63 @@ class Calculations:
         data = pd.DataFrame({'x_axis': x_axis, 'series': series})
         sns.set_theme(style = "whitegrid")
         fig, ax = plt.subplots()
-        
-        sns.pointplot(x = 'x_axis', y = 'series', data = data, ax = ax)
-        
-        min_x = int(np.floor(min(x_axis)))
-        max_x = int(np.ceil(max(x_axis)))
-        x_ticks = np.arange(min_x, max_x + 1, 1)
-        ax.set_xticks(range(len(x_ticks)))
+
+        x_numeric = np.arange(len(x_axis))
+
+        sns.pointplot(x = x_numeric, y = 'series', data = data, ax = ax)
+        sns.lineplot(x = [x_numeric[0], x_numeric[-1]], y = [series[0], series[-1]], ax = ax, color = '#7f6d85', linestyle = '-')
+
+        ax.set_xticks(x_numeric)
+        ax.set_xticklabels([f'{value:.1E}' for value in x_axis], rotation = 45, ha = 'right')
         ax.grid(True, which = 'both', axis = 'x', linestyle = '-')
-        
+
         y_ticks = self._calculate_ytick_range(series)
         ax.set_yticks(y_ticks)
-        
-        ax.set_xticklabels([f'{value:.1E}' for value in x_ticks], rotation = 45, ha = 'right')
+
         ax.set_yticklabels([f'{Decimal(value):.2E}' for value in y_ticks])
-        
+
         ax.set_title(f'{axis_name} axis plot')
         ax.set_xlabel('d^(-3)(m^-3)')
         ax.set_ylabel('B(T)')
-        
+
         for i in range(len(series)):
-            ax.text(x_axis[i], series[i], f'{x_axis[i]:.1E}; {series[i]:.2E}',
-                    fontsize = 8, ha = 'right', va = 'bottom')
-        
+            ax.text(x_numeric[i],
+                    series[i], 
+                    f'{x_axis[i]:.1E}; {series[i]:.1E}', 
+                    fontsize = 8, 
+                    ha = 'left' if i < 5 else 'right', 
+                    va = 'bottom')
+
+
         plt.tight_layout()
         plot_name = f'{axis_name}_axis_graph.png'
         fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
-        
+
         return f'src/front/resource/{plot_name}'
-    
-    
+
+
     def _calculate_ytick_range(self, data: list) -> np.ndarray:
         min_value = Decimal(min(data))
         max_value = Decimal(max(data))
-        
+
         margin = (max_value - min_value) * Decimal('0.1')
         ceiling = max_value + margin
         floor = min_value - margin
-        
-        magnitude  = Decimal(10) ** floor.adjusted()
-        
+
+        magnitude = Decimal(10) ** floor.adjusted()
+
         floor = (floor // magnitude) * magnitude
         ceiling = ((ceiling // magnitude) + 1) * magnitude
-        
+
         value_range = ceiling - floor
         num_ticks = 8
         tick_interval = (value_range / Decimal(num_ticks)).quantize(Decimal('1E-9'), rounding = 'ROUND_UP')
-        
+
         tick_range = np.arange(float(floor), float(ceiling) + float(tick_interval), float(tick_interval))
-        
+
         return tick_range
+
     
     
     def _dynamic_round(self, number: Decimal, precision: int) -> Decimal:
