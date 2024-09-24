@@ -5,7 +5,7 @@ from decimal import Decimal
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from src.front.settings import *
+from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MOMENTUM
 
 decimal.getcontext().prec = PRECISION
 
@@ -50,16 +50,16 @@ class Calculations:
                         else:
                             self.steps.append(f'Skipping sensor {sensor + 1} for {axis} axis: Data not available')
                             continue
-                        
+
                         plus_average = sensor_data[plus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
-                        print(f"plus average, axis {axis}: '{plus_average}'")
                         minus_average = sensor_data[minus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
-                        print(f"minus average, axis {axis}: '{minus_average}'")
+                        print(f"plus avg before round: {plus_average}")
+                        print(f"minus avg before round: {minus_average}")
                         
-                        halved_substraction = self._substraction_halving(plus_average, minus_average)
+                        halved_substraction = self._substraction_halving(float(plus_average), float(minus_average))
                         print(f"axis {axis} sensor {sensor + 1} halved substracion: {halved_substraction}")
                         halved_substractions.append(halved_substraction)
-                        self.steps.append(f'{axis} axis sensor {sensor + 1}: halved substraction = {halved_substraction:.15f}')
+                        self.steps.append(f'\n{axis} axis sensor {sensor + 1}: halved substraction = {halved_substraction:.2E}')
                     
                     except KeyError as e:
                         self.steps.append(f'Sensor {sensor + 1} for {axis} axis missing data: {str(e)}')
@@ -67,8 +67,8 @@ class Calculations:
                         continue
                 
                 if len(halved_substractions) > 0:
-                    self._plot_calculation_graphs(inverted_distances, halved_substractions[::-1], axis)
-                    print(f"calculating axis {axis} slope of {inverted_distances} and {halved_substractions[::-1]}")
+                    self._plot_calculation_graphs(inverted_distances[::-1], halved_substractions[::-1], axis)
+                    print(f"calculating axis {axis} slope of {inverted_distances} and {halved_substractions}")
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
                     print(f"axis {axis} slope: {slope}")
                     
@@ -77,7 +77,7 @@ class Calculations:
                     
                     result = (slope / momentum_decimal) * final_momentum_decimal
                     print(f"final result is: {result}")
-                    self.steps.append(f'{axis} axis slope = {slope:.15f}')
+                    self.steps.append(f'\n{axis} axis slope = {slope:.2E}')
                     results.append(result)
                 
             return results
@@ -98,7 +98,7 @@ class Calculations:
             try:
                 result = math.pow( 1 / float(distance), 3 )
                 result_list.append(result)
-                self.steps.append(f'Inverted distance^3 for {distance} = {result:.15f}')
+                self.steps.append(f'Inverted distance^3 for {distance} = {result:.2E}')
             except ZeroDivisionError as e:
                 self.gui_services.log_error("Distance value cannot be 0", str(e))
                 self.steps.append(f'Error: {str(e)}')
@@ -110,7 +110,7 @@ class Calculations:
         minuend_decimal = Decimal(str(minuend))
         subtrahend_decimal = Decimal(str(subtrahend))
         result = (minuend_decimal - subtrahend_decimal) / 2
-        self.steps.append(f'Halved substraction: ({minuend} - {subtrahend}) / 2 = {result}')
+        self.steps.append(f'\nHalved substraction: ({minuend:.2E} - {subtrahend:.2E}) / 2 = {result:.2E}')
         return result
     
     
@@ -118,7 +118,10 @@ class Calculations:
         x_axis_decimal = [Decimal(str(x)) for x in x_axis]
         y_axis_decimal = [Decimal(str(y)) for y in y_axis]
 
-        slope, intercept = np.polyfit(np.array(x_axis_decimal, dtype = np.float64), np.array(y_axis_decimal, dtype = np.float64), 1)
+        x_array = np.array(x_axis_decimal, dtype = np.float64)
+        y_array = np.array(y_axis_decimal, dtype = np.float64)
+
+        slope, _ = np.polyfit(x_array, y_array, 1)
         slope_decimal = Decimal(str(slope))
         return slope_decimal
     
@@ -130,19 +133,27 @@ class Calculations:
         
         sns.pointplot(x = 'x_axis', y = 'series', data = data, ax = ax)
         
+        min_x = int(np.floor(min(x_axis)))
+        max_x = int(np.ceil(max(x_axis)))
+        x_ticks = np.arange(min_x, max_x + 1, 1)
+        ax.set_xticks(range(len(x_ticks)))
+        ax.grid(True, which = 'both', axis = 'x', linestyle = '-')
+        
         y_ticks = self._calculate_ytick_range(series)
         ax.set_yticks(y_ticks)
-        ax.set_xticks(range(len(x_axis)))
         
-        ax.set_xticklabels([f'{Decimal(value):.2E}' for value in x_axis], rotation = 45, ha = 'right')
+        ax.set_xticklabels([f'{value:.1E}' for value in x_ticks], rotation = 45, ha = 'right')
         ax.set_yticklabels([f'{Decimal(value):.2E}' for value in y_ticks])
         
         ax.set_title(f'{axis_name} axis plot')
         ax.set_xlabel('d^(-3)(m^-3)')
         ax.set_ylabel('B(T)')
         
-        plt.tight_layout()
+        for i in range(len(series)):
+            ax.text(x_axis[i], series[i], f'{x_axis[i]:.1E}; {series[i]:.2E}',
+                    fontsize = 8, ha = 'right', va = 'bottom')
         
+        plt.tight_layout()
         plot_name = f'{axis_name}_axis_graph.png'
         fig.savefig(f'src/front/resource/{plot_name}')
         plt.close(fig)
@@ -150,22 +161,38 @@ class Calculations:
         return f'src/front/resource/{plot_name}'
     
     
-    def _calculate_ytick_range(self, data: list, ticks: int = 5) -> np.ndarray:
+    def _calculate_ytick_range(self, data: list) -> np.ndarray:
         min_value = Decimal(min(data))
         max_value = Decimal(max(data))
+        
         margin = (max_value - min_value) * Decimal('0.1')
+        ceiling = max_value + margin
+        floor = min_value - margin
         
-        ceiling = float(max_value + margin)
-        floor = float(min_value - margin)
+        magnitude  = Decimal(10) ** floor.adjusted()
         
-        tick_range = np.linspace(floor, ceiling, ticks)
+        floor = (floor // magnitude) * magnitude
+        ceiling = ((ceiling // magnitude) + 1) * magnitude
+        
+        value_range = ceiling - floor
+        num_ticks = 8
+        tick_interval = (value_range / Decimal(num_ticks)).quantize(Decimal('1E-9'), rounding = 'ROUND_UP')
+        
+        tick_range = np.arange(float(floor), float(ceiling) + float(tick_interval), float(tick_interval))
         
         return tick_range
     
-
-    def _rounded_number(self, num: float) -> float:
-        return round(num, 15)
+    
+    def _dynamic_round(self, number: Decimal, precision: int) -> Decimal:
+        try:
+            number_str = f"{number:.{precision}E}"
+            rounded_number = Decimal(number_str)
+            return rounded_number
+        except Exception as e:
+            self.gui_services.log_error("Rounding Error", str(e))
+            self.steps.append(f'Error during rounding: {str(e)}')
+            raise e
 
 
     def get_calculation_steps(self) -> str:
-        return '\n\n'.join(self.steps)
+        return '\n'.join(self.steps)

@@ -27,12 +27,12 @@ logger = logging.getLogger("urbanGUI")
 
 
 class GuiServices:
-
     def __init__(self, frame_main) -> None:
         self.window = frame_main
         self.sensor_number = 0
         self.sensor_data = {}
         self.utils = Utils(self.window)
+        self.calculations = Calculations(self)
         self.operations_steps: str
         self.files_frame = None
 
@@ -92,9 +92,13 @@ class GuiServices:
 
 
     def create_result(self, distances):
-        calculations = Calculations(self)
-        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
+        self.results = self.calculations.calculate_magnetic_moment(self.sensor_data, distances)
         return self.results
+    
+    
+    def obtain_calculation_details(self):
+        details = self.calculations.get_calculation_steps()
+        return details
 
 
     def export_to_pdf(self):
