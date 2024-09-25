@@ -1,4 +1,5 @@
 import os
+import sys
 import customtkinter as ctk
 from src.front.image_widget import InitialFrame, ResultFrame
 from src.front.menu import LeftFrame
@@ -8,17 +9,29 @@ from src.front.settings import CLOSE_RED
 
 
 class GuiApp(ctk.CTk):
+
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
     def __init__(self):
         super().__init__()
 
         self.services = GuiServices(self)
+
+        print(f'Ruta: {os.path.dirname(__file__)}')
 
         # Main window configuration
         ctk.set_appearance_mode("dark")
         self.geometry("1000x600")
         self.title("Magnetic Moment Calculation")
         self.minsize(800, 500)
-        self.iconbitmap("src/front/resource/inta_icon.ico")
+        icon_path = self.resource_path("resource\\inta_icon.ico")
+        self.iconbitmap(icon_path)
         self.update()
         self.lift()
         self.attributes("-topmost", True)

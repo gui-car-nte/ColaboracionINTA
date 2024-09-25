@@ -1,7 +1,7 @@
 import tkinter as tk
 import os
+import sys
 import logging
-import platform
 
 from tkinter import filedialog, messagebox
 from src.back.calculations import Calculations
@@ -124,7 +124,7 @@ class GuiServices:
 
             y_offset -= 80
 
-            canva.drawImage(ImageReader(image), 100, y_offset - 200, width = 400, height = 300)
+            canva.drawImage(ImageReader(self.resource_path(image)), 100, y_offset - 200, width = 400, height = 300)
 
             y_offset -= 220
 
@@ -153,8 +153,6 @@ class GuiServices:
 
         canva.save()
 
-
-
     def show_message(self, msg, color):
         messagebox.showerror('Error', msg)
 
@@ -162,3 +160,11 @@ class GuiServices:
     def log_error(self, error_type, error_message):
         logger.error(f'{error_type}: {error_message}')
         self.show_message(f'{error_type}: {error_message}', 'red')
+
+    def resource_path(self, relative_path):
+            try:
+                base_path = sys._MEIPASS
+            except Exception:
+                base_path = os.path.abspath(".")
+
+            return os.path.join(base_path, relative_path)

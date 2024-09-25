@@ -1,8 +1,11 @@
+import os
+import sys
 import customtkinter as ctk
 from tkinter import filedialog, Canvas
 from src.front.settings import BACKGROUND_COLOR, WHITE, CLOSE_RED
 from PIL import Image, ImageTk
 from typing import List, Tuple
+from src.front.gui_service import GuiServices
 
 
 class ImageImport(ctk.CTkFrame):
@@ -25,6 +28,8 @@ class InitialFrame(ctk.CTkFrame):
         super().__init__(master = parent, fg_color = BACKGROUND_COLOR)
         self.grid(column = 1, columnspan = 2, row = 0, sticky = "nsew")
 
+        self.service = GuiServices(self)
+
         self.rowconfigure(0, weight = 1)
         self.rowconfigure(1, weight = 1)
         self.rowconfigure(2, weight = 1)
@@ -36,8 +41,11 @@ class InitialFrame(ctk.CTkFrame):
         self.canvas = Canvas(self, bg = BACKGROUND_COLOR, bd = 0, highlightthickness = 0)
         # self.canvas.grid(row = 1, column = 1, sticky = "s")
         self.canvas.place(relx = 0.5, rely = 0.45, anchor = "center")
+        # print(self.winfo_height())
+        # self.canvas.pack(pady=(self.winfo_height(), 15), anchor="center")
         # Cargar la imagen
-        image = Image.open("src/front/resource/inta_logo.png")
+        image_path = self.service.resource_path("resource\\inta_logo.png")
+        image = Image.open(image_path)
         self.photo = ImageTk.PhotoImage(image)
 
         # Mostrar la imagen en el canvas
@@ -45,7 +53,7 @@ class InitialFrame(ctk.CTkFrame):
         self.canvas.config(width = image.width, height = image.height)
 
         self.label = ctk.CTkLabel(
-            self, text = "\nMagnetic Moment Calculation", font = ("Calibri", 40, "bold")
+            self, text = "Magnetic Moment Calculation", font = ("Calibri", 40, "bold"), fg_color='transparent'
         )
         # self.label.grid(row = 2, column = 1, sticky = "n")
         self.label.place(relx = 0.5, rely = 0.65, anchor = "center")
@@ -58,6 +66,8 @@ class ResultFrame(ctk.CTkFrame):
         self.image_data = image_data
         self.current_index = 0
         # self.close_edit_func = close_edit_func
+        self.service = GuiServices(self)
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -75,7 +85,7 @@ class ResultFrame(ctk.CTkFrame):
 
         # Left
         # Cargar y ajustar la imagen
-        image_path1 = "src\\front\\resource\\arrow_pointing_left.png"
+        image_path1 = self.service.resource_path("resource\\arrow_pointing_left.png")
         image1 = Image.open(image_path1)
         image1 = image1.resize((500, 500))
         photo1 = ctk.CTkImage(image1)
@@ -88,7 +98,7 @@ class ResultFrame(ctk.CTkFrame):
 
         # Right
 
-        image_path2 = "src\\front\\resource\\arrow_pointing_right.png"
+        image_path2 = self.service.resource_path("resource\\arrow_pointing_right.png")
         image2 = Image.open(image_path2)
         image2 = image2.resize((5000, 5000))
         photo2 = ctk.CTkImage(image2)
@@ -108,7 +118,7 @@ class ResultFrame(ctk.CTkFrame):
 
     def update_image(self):
         image_path, label_text = self.image_data[self.current_index]
-        image = Image.open(image_path)
+        image = Image.open(self.service.resource_path(image_path))
 
         # Set minimum dimensions for the image
         MIN_WIDTH, MIN_HEIGHT = 650, 480

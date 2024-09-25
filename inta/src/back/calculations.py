@@ -1,3 +1,5 @@
+import os
+import sys
 import numpy as np
 import math
 import decimal
@@ -10,6 +12,15 @@ from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MO
 decimal.getcontext().prec = PRECISION
 
 class Calculations:
+
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
     def __init__(self, gui_services, *args):
         self.gui_services = gui_services
         self.args = args
@@ -156,10 +167,11 @@ class Calculations:
 
         plt.tight_layout()
         plot_name = f'{axis_name}_axis_graph.png'
-        fig.savefig(f'src/front/resource/{plot_name}')
+        new_path = self.resource_path(f'resource/{plot_name}')
+        fig.savefig(new_path)
         plt.close(fig)
 
-        return f'src/front/resource/{plot_name}'
+        return new_path
 
 
     def _calculate_ytick_range(self, data: list) -> np.ndarray:

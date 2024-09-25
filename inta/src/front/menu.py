@@ -122,7 +122,7 @@ class DistanceFrame(ctk.CTkFrame):
         self.calculate_frame = calculate_frame
 
         calculation_button = ctk.CTkButton(
-            self, text = "Calculate", command = self.send_data, width = 120, height = 40,
+            self, text = "Calculate", command = self.send_data, width = 120, height = 40
         )
         calculation_button.configure(state = "disabled")
 
