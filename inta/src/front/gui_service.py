@@ -140,7 +140,7 @@ class GuiServices:
         canva.drawCentredString(width / 2.0, height - 50, title)
 
         canva.setFont("Helvetica", 8)
-        calculation_steps = self.operations_steps.split('\n')
+        calculation_steps = self.obtain_calculation_details().split('\n')
         y_offset = height - 100
 
         for line in calculation_steps:

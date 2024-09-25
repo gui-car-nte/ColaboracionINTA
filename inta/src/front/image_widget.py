@@ -35,7 +35,7 @@ class InitialFrame(ctk.CTkFrame):
         # Crear canvas para la imagen
         self.canvas = Canvas(self, bg = BACKGROUND_COLOR, bd = 0, highlightthickness = 0)
         # self.canvas.grid(row = 1, column = 1, sticky = "s")
-        self.canvas.place(relx=0.5, rely=0.45, anchor="center")
+        self.canvas.place(relx = 0.5, rely = 0.45, anchor = "center")
         # Cargar la imagen
         image = Image.open("src/front/resource/inta_logo.png")
         self.photo = ImageTk.PhotoImage(image)
@@ -48,7 +48,7 @@ class InitialFrame(ctk.CTkFrame):
             self, text = "\nMagnetic Moment Calculation", font = ("Calibri", 40, "bold")
         )
         # self.label.grid(row = 2, column = 1, sticky = "n")
-        self.label.place(relx=0.5, rely=0.65, anchor="center")
+        self.label.place(relx = 0.5, rely = 0.65, anchor = "center")
 
 
 class ResultFrame(ctk.CTkFrame):
@@ -83,7 +83,8 @@ class ResultFrame(ctk.CTkFrame):
         self.prev_button = ctk.CTkButton(
             self, text = "", command = self.prev_image, width = 40, image = photo1
         )
-        self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
+        # self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
+        self.prev_button.grid_remove()
 
         # Right
 
@@ -132,16 +133,15 @@ class ResultFrame(ctk.CTkFrame):
         self.desc_label.configure(text = label_text)
 
         # Update button states
-        self.prev_button.configure(
-            state = "normal" if self.current_index > 0 else "disabled"
-        )
-        self.next_button.configure(
-            state = (
-                "normal"
-                if self.current_index < len(self.image_data) - 1
-                else "disabled"
-            )
-        )
+        if self.current_index > 0:
+            self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
+        else:
+            self.prev_button.grid_remove()
+
+        if self.current_index < len(self.image_data) - 1:
+            self.next_button.grid(row = 2, column = 2, padx = 10, pady = 10, sticky = "e")
+        else:
+            self.next_button.grid_remove()
 
     def next_image(self):
         if self.current_index < len(self.image_data) - 1:

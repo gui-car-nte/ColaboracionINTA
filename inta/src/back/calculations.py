@@ -53,11 +53,8 @@ class Calculations:
 
                         plus_average = sensor_data[plus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
                         minus_average = sensor_data[minus_col_name].iloc[START_ROW:END_ROW, sensor_number].mean()
-                        print(f"plus avg before round: {plus_average}")
-                        print(f"minus avg before round: {minus_average}")
                         
                         halved_substraction = self._substraction_halving(float(plus_average), float(minus_average))
-                        print(f"axis {axis} sensor {sensor + 1} halved substracion: {halved_substraction}")
                         halved_substractions.append(halved_substraction)
                         self.steps.append(f'\n{axis} axis sensor {sensor + 1}: halved substraction = {halved_substraction:.2E}')
                     
@@ -68,15 +65,12 @@ class Calculations:
                 
                 if len(halved_substractions) > 0:
                     self._plot_calculation_graphs(inverted_distances[::-1], halved_substractions[::-1], axis)
-                    print(f"calculating axis {axis} slope of {inverted_distances} and {halved_substractions}")
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
-                    print(f"axis {axis} slope: {slope}")
                     
                     momentum_decimal = Decimal(str(MOMENTUM))
                     final_momentum_decimal = Decimal(str(FINAL_MOMENTUM))
                     
                     result = (slope / momentum_decimal) * final_momentum_decimal
-                    print(f"final result is: {result}")
                     self.steps.append(f'\n{axis} axis slope = {slope:.2E}')
                     self.steps.append(f'\n{axis} final result = {result:.6E}')
                     rounded_result = round(result, 4)
