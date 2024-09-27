@@ -61,7 +61,7 @@ class LeftFrame(ctk.CTkFrame):
 
         self.tabview.add("Distances")
         self.tabview.add("Calculations")
-        self.tabview.add("Export")
+        # self.tabview.add("Export")
 
         self.files_frame.grid(row = 0, column = 0, sticky = "nsew")
         self.tabview.tab("Files").grid_columnconfigure(0, weight = 1)
