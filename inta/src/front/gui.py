@@ -10,14 +10,6 @@ from src.front.settings import CLOSE_RED
 
 class GuiApp(ctk.CTk):
 
-    def resource_path(self, relative_path):
-        try:
-            base_path = sys._MEIPASS
-        except Exception:
-            base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
-
     def __init__(self):
         super().__init__()
 
@@ -30,7 +22,7 @@ class GuiApp(ctk.CTk):
         self.geometry("1000x600")
         self.title("Magnetic Moment Calculation")
         self.minsize(800, 500)
-        icon_path = self.resource_path("resource\\inta_icon.ico")
+        icon_path = self.services.resource_path("resource\\inta_icon.ico")
         self.iconbitmap(icon_path)
         self.update()
         self.lift()
