@@ -1,14 +1,13 @@
 import tkinter as tk
 import os
+import sys
 import logging
-import platform
 
 from tkinter import filedialog, messagebox
-
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
 from src.front.utils import Utils
-from src import config
+from src.front.settings import IMAGES
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -17,48 +16,61 @@ if os.path.exists('error_log.txt'):
     os.remove(path = 'error_log.txt')
 
 logging.basicConfig(
-    filename="error_log.txt",
-    filemode="a",
-    format="[%(asctime)s] - [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.ERROR,
+    filename = "error_log.txt",
+    filemode = "a",
+    format = "[%(asctime)s] - [%(levelname)s] %(message)s",
+    datefmt = "%Y-%m-%d %H:%M:%S",
+    level = logging.ERROR,
 )
 
 logger = logging.getLogger("urbanGUI")
 
-class GuiServices:
 
+class GuiServices:
     def __init__(self, frame_main) -> None:
         self.window = frame_main
-        self.numbers_sensors = 0
+        self.sensor_number = 0
         self.sensor_data = {}
         self.utils = Utils(self.window)
+        self.calculations = Calculations(self)
         self.operations_steps: str
+        self.files_frame = None
 
-    def load_files(self, next_frame):
-        gui_services = GuiServices(self.window)
-        filepaths = filedialog.askopenfilenames(filetypes=[("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt*")])
-        f = FileHandler(list(filepaths), gui_services)
-        self.sensor_data = f.load_csv_files(list(filepaths))
-        self.numbers_sensors = f.count_sensors()
-        self.drop_frame(next_frame)
-        self.input_distance(next_frame)
+    def set_files_frame(self, frame):
+        """ Establecer el marco donde se muestran los archivos cargados. """
+        self.files_frame = frame
 
-    def input_distance(self, next_frame):
-        for sensor in range(self.numbers_sensors):
-            frame_input = self.utils.create_frame(next_frame, tk.TOP, False)
-            self.utils.create_label(frame_input, f"Sensor Distance {sensor + 1} ", tk.LEFT)
-            self.utils.create_input(frame_input)
+    def load_files(self):
+        filepaths = filedialog.askopenfilenames(filetypes = [("All files", "*"), ("CSV files", "*.csv"), ("TXT files", "*.txt")])
 
-        self.utils.create_button(
-            "calculate", next_frame, "Calculate", "", self.send_distance, next_frame
-        )
+        if filepaths:
+            try:
+                f = FileHandler(self)
+                self.sensor_data = f.load_csv_files(list(filepaths))
+                self.sensor_number = f.count_sensors()
 
-    def send_distance(self, frame_main: tk.Frame):
-        distances = self.get_values(frame_main)
-        self.drop_frame(frame_main)
-        new_frame = self.utils.create_frame(frame_main, tk.TOP, False)
-        self.create_result(new_frame, distances)
+                self.update_files_ui(filepaths)
+                
+                return self.sensor_data
+            
+            except Exception as e: # TODO don't gotta catch em all
+                return None
+        
+        else:
+            return None
+
+
+    def update_files_ui(self, filepaths):
+        """ Actualizar la UI para ocultar el botón de selección de archivos y mostrar los nombres. """
+        if self.files_frame:
+            for widget in self.files_frame.winfo_children():
+                widget.destroy()
+
+            for filepath in filepaths:
+                filename = os.path.basename(filepath) 
+                label = tk.Label(self.files_frame, text = filename, bg = "white")
+                label.pack(pady = 5)
+
 
     def drop_frame(self, frame_main):
         for widget in frame_main.winfo_children():
@@ -66,36 +78,34 @@ class GuiServices:
                 self.drop_frame(widget)
             widget.destroy()
 
+
     def get_values(self, frame):
         values = []
         for widget in frame.winfo_children():
             if isinstance(widget, tk.Entry):
-                new_values = widget.get().replace(",",".")
+                new_values = widget.get().replace(",", ".")
                 values.append(new_values)
             elif isinstance(widget, tk.Frame):
                 values.extend(self.get_values(widget))
-                
+
         return values
 
-    def create_result(self, frame_main, distances):
-        gui_services = GuiServices(self.window)
-        calculations = Calculations(gui_services)
 
-        self.results = calculations.calculate_magnetic_moment(self.sensor_data, distances)
-        button = self.window.nametowidget(".!frame.export_button")
-        button.config(state=tk.NORMAL)
-        self.operations_steps = calculations.get_calculation_steps()
-        for result, image_path in zip(self.results, config.IMAGES):
-            self.utils.create_image_canvas(frame_main, image_path)
-            self.utils.create_label(frame_main, f"Magnetic Moment: {result}", "").configure(
-                padx = 10, pady = 10
-            )
+    def create_result(self, distances):
+        self.results = self.calculations.calculate_magnetic_moment(self.sensor_data, distances)
+        return self.results
+    
+    
+    def obtain_calculation_details(self):
+        details = self.calculations.get_calculation_steps()
+        return details
+
 
     def export_to_pdf(self):
         types = ["x", "y", "z"]
         pdf_path = "magnetic_moment.pdf"
 
-        canva = canvas.Canvas(pdf_path, pagesize=letter)
+        canva = canvas.Canvas(pdf_path, pagesize = letter)
         width, height = letter
 
         canva.setFont("Helvetica-Bold", 18)
@@ -104,7 +114,7 @@ class GuiServices:
 
         y_offset = height - 100
 
-        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, config.IMAGES)):
+        for i, (axis, moment_magnetic, image) in enumerate(zip(types, self.results, IMAGES)):
             if y_offset < 300:
                 canva.showPage()
                 y_offset = height - 100
@@ -112,10 +122,9 @@ class GuiServices:
             canva.setFont("Helvetica-Bold", 12)
             canva.drawString(100, y_offset, f"Axis {axis}")
 
-
             y_offset -= 80
 
-            canva.drawImage(ImageReader(image), 100, y_offset - 200, width=400, height=300)
+            canva.drawImage(ImageReader(self.resource_path(image)), 100, y_offset - 200, width = 400, height = 300)
 
             y_offset -= 220
 
@@ -131,7 +140,7 @@ class GuiServices:
         canva.drawCentredString(width / 2.0, height - 50, title)
 
         canva.setFont("Helvetica", 8)
-        calculation_steps = self.operations_steps.split('\n')
+        calculation_steps = self.obtain_calculation_details().split('\n')
         y_offset = height - 100
 
         for line in calculation_steps:
@@ -144,15 +153,18 @@ class GuiServices:
 
         canva.save()
 
-        if platform.system() == 'Windows':
-            print('windows')
-            os.startfile(pdf_path) #type: ignore
-        elif platform.system() == 'Linux':
-            os.system(f"xdg-open {pdf_path}")
-
     def show_message(self, msg, color):
         messagebox.showerror('Error', msg)
+
 
     def log_error(self, error_type, error_message):
         logger.error(f'{error_type}: {error_message}')
         self.show_message(f'{error_type}: {error_message}', 'red')
+
+    def resource_path(self, relative_path):
+            try:
+                base_path = sys._MEIPASS
+            except Exception:
+                base_path = os.path.abspath(".")
+
+            return os.path.join(base_path, relative_path)

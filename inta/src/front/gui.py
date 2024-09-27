@@ -1,57 +1,102 @@
-import tkinter as tk
-import logging
-
-# TODO review non-used variables
-# TODO english translation
-from src import config
+import os
+import sys
+import customtkinter as ctk
+from src.front.image_widget import InitialFrame, ResultFrame
+from src.front.menu import LeftFrame
+import pyautogui
 from src.front.gui_service import GuiServices
-from src.front.utils import Utils
+from src.front.settings import CLOSE_RED
 
-def start_gui():
 
-    # Configure the logger at the start of your application
-    logging.basicConfig(
-        filename='error_log.txt',
-        filemode='a',
-        format='%(asctime)s,%(name)s %(levelname)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        level=logging.ERROR
-    )
+class GuiApp(ctk.CTk):
 
-    logger = logging.getLogger('urbanGUI')
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
 
-    root = tk.Tk()
-    root.title("Magnetic Moment Calculation")
-    root.minsize(600, 400)
-    icon = tk.PhotoImage(file='src/front/resource/logo.png')
-    root.iconphoto(True, icon)
-    root.configure(background = config.PRIMARY_COLOR)
+        return os.path.join(base_path, relative_path)
 
-    utils = Utils(root)
+    def __init__(self):
+        super().__init__()
 
-    top_frame = utils.create_frame(root, tk.TOP)
-    center_frame = utils.create_frame(root, tk.TOP, complete=True, scrollable=True)
-    utils.create_image_canvas(center_frame, "src/front/resource/logo.png").configure(
-        background=config.PRIMARY_COLOR
-    )
-    
-    settings = GuiServices(root)
+        self.services = GuiServices(self)
 
-    utils.create_button(
-        "csv_button",
-        top_frame,
-        "Upload CSV files",
-        tk.LEFT,
-        settings.load_files,
-        center_frame,
-    )
-    utils.create_button(
-        "export_button",
-        top_frame,
-        "Export to PDF",
-        tk.LEFT,
-        settings.export_to_pdf,
-        "",
-    ).config(state=tk.DISABLED)
+        print(f'Ruta: {os.path.dirname(__file__)}')
 
-    root.mainloop()
+        # Main window configuration
+        ctk.set_appearance_mode("dark")
+        self.geometry("1000x600")
+        self.title("Magnetic Moment Calculation")
+        self.minsize(800, 500)
+        icon_path = self.resource_path("resource\\inta_icon.ico")
+        self.iconbitmap(icon_path)
+        self.update()
+        self.lift()
+        self.attributes("-topmost", True)
+        self.after_idle(self.attributes, "-topmost", False)
+        pyautogui.hotkey("winleft", "up")
+
+        # Configuración del layout principal
+        self.rowconfigure(0, weight = 0)
+        self.rowconfigure(1, weight = 1)
+        self.rowconfigure(2, weight = 1)
+        self.columnconfigure(0, weight = 1, uniform = "a")
+        self.columnconfigure(1, weight = 4, uniform = "a")
+
+        # Configurar el estado inicial de la aplicación
+        self.init_app_state()
+
+        self.mainloop()
+
+    def init_app_state(self):
+        # Inicializa el frame inicial en la columna 0 y 1
+        self.frame_col1 = InitialFrame(self)
+        self.frame_col1.grid(row = 0, column = 1, rowspan = 3, sticky = "nswe")
+
+        self.menu = LeftFrame(self, self.replace_frame_col1, self.services)
+        self.menu.grid(row = 0, column = 0, rowspan = 3, sticky = "nswe")
+
+        # Botón de reinicio
+        self.reset_button = ctk.CTkButton(
+            self, text = "Reset", command = self.reset_app, width = 120, height = 40, hover_color = CLOSE_RED
+        )
+        # Boton exportar pdf
+        self.export_pdf_button = ctk.CTkButton(
+            self, text = "Export PDF", command = self.export_pdf, width = 120, height = 40
+        )
+        # self.reset_button.grid(row = 2, column = 0, pady = 10, sticky = "e")
+        self.reset_button.grid_remove()
+        self.export_pdf_button.grid_remove()
+
+    def reset_app(self):
+        # Destruir frames actuales solo si existen
+        # if self.menu is not None:
+        #     self.menu.destroy()
+        # if self.frame_col1 is not None:
+        #     self.frame_col1.destroy()
+
+        # Restaurar el estado inicial de la aplicación
+        self.init_app_state()
+
+    def export_pdf(self):
+        print("Export PDF")
+        self.services.export_to_pdf()
+        pdf_path = 'magnetic_moment.pdf'
+        if pdf_path:
+            try:
+                # Abrir el PDF con la aplicación predeterminada
+                os.startfile(pdf_path)
+            except AttributeError as e:
+                print(e)
+
+    def replace_frame_col1(self, image_path):
+
+        self.reset_button.grid(row = 0, column = 1, pady = 10, sticky = "ne")
+        self.export_pdf_button.grid(row = 0, column = 1, pady = 10, sticky = "ne", padx = (0,130))
+
+        if self.frame_col1 is not None:
+            self.frame_col1.destroy()
+        self.frame_col1 = ResultFrame(self, image_path)
+        self.frame_col1.grid(row = 1, column = 1, rowspan = 3, sticky = "nswe")

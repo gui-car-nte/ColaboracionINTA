@@ -1,6 +1,10 @@
+from src.front.gui import GuiApp
 
-from src.front.gui import start_gui
 
+def main():
+    gui_starting = GuiApp
+
+    gui_starting()
 
 if __name__ == "__main__":
-    start_gui()
+    main()

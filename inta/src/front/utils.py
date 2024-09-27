@@ -1,6 +1,6 @@
 import tkinter as tk
-
-from src import config
+from src.front.panels import EntryPanel
+from src.front.settings import PRIMARY_COLOR, SECONDARY_COLOR
 from PIL import Image, ImageTk
 
 
@@ -10,7 +10,7 @@ class Utils():
 
     def create_frame(self, frame_in, side_in, complete = False, scrollable = False):
         frame = tk.Frame(frame_in)
-        frame.configure(background = config.PRIMARY_COLOR)
+        frame.configure(background = PRIMARY_COLOR)
 
         if complete:
             frame.pack(side = side_in, fill =  tk.BOTH, expand = True, pady = 10)
@@ -35,24 +35,24 @@ class Utils():
             button = tk.Button(
                 frame_in,
                 text = text_in,
-                background = config.SECONDARY_COLOR,
+                background = SECONDARY_COLOR,
                 name = name_in,
                 command = lambda: command_in(parameter_in),
             )
-            button.configure(fg="white")
+            button.configure(fg = "white")
             if side_in == "":
                 button.pack(pady = 10, anchor = tk.NW)
             else:
-                button.pack(side=side_in, pady = 10, anchor = tk.NW)
+                button.pack(side = side_in, pady = 10, anchor = tk.NW)
         else:
             button = tk.Button(
                 frame_in,
                 text = text_in,
-                background = config.SECONDARY_COLOR,
+                background = SECONDARY_COLOR,
                 name = name_in,
                 command = command_in,
             )
-            button.configure(fg="white")
+            button.configure(fg = "white")
             if side_in == "":
                 button.pack(pady = 10)
             else:
@@ -65,10 +65,10 @@ class Utils():
             result_label = tk.Label(
                 frame_in, text = text_in, wraplength = 300, justify = side_in
             )
-            result_label.pack(pady=20)
+            result_label.pack(pady = 20)
         else:
             label = tk.Label(frame_in, text = text_in)
-            label.configure(background = config.PRIMARY_COLOR)
+            label.configure(background = PRIMARY_COLOR)
             if side_in == "":
                 label.pack()
             else:
@@ -80,8 +80,7 @@ class Utils():
         # Aqui tendremos que llamar a la clase de check y poner la funcion en ella
         vcmd = (frame_in.register(self._validate_numeric), '%P')
 
-        entry = tk.Entry(frame_in, validate="key", validatecommand=vcmd)
-        entry.pack()
+        EntryPanel(frame_in)
 
     def create_image_canvas(self, frame, image_path = ""):
         if image_path == "":
@@ -94,7 +93,7 @@ class Utils():
 
             # Keep a reference to the image to prevent garbage collection # TODO research garbage collector
             canvas.image = photo # type: ignore
-      
+            
         else:
             image = Image.open(image_path)
             photo = ImageTk.PhotoImage(image)
@@ -109,26 +108,25 @@ class Utils():
         return canvas
 
     # TODO could be moved to utils folder or another file to shorten code, go case by case
-    # TODO '=' spacing
     def create_scroll(self, frame_main):
-        canvas = tk.Canvas(frame_main, bg = config.PRIMARY_COLOR)
-        canvas.pack(side=tk.LEFT, fill = tk.BOTH, expand = True)
+        canvas = tk.Canvas(frame_main, bg = PRIMARY_COLOR)
+        canvas.pack(side = tk.LEFT, fill = tk.BOTH, expand = True)
 
         scrollbar_y = tk.Scrollbar(frame_main, orient = tk.VERTICAL, command = canvas.yview)
         scrollbar_y.pack(side = tk.RIGHT, fill = tk.Y)
         canvas.configure(yscrollcommand = scrollbar_y.set)
 
-        inner_frame = tk.Frame(canvas, bg = config.PRIMARY_COLOR)
+        inner_frame = tk.Frame(canvas, bg = PRIMARY_COLOR)
         window = canvas.create_window((0, 0), window = inner_frame, anchor = "n")
 
         def center_frame(event):
             canvas_width = event.width
             canvas.coords(window, canvas_width // 2, 0)
-            canvas.configure(scrollregion=canvas.bbox("all"))
+            canvas.configure(scrollregion = canvas.bbox("all"))
 
         canvas.bind("<Configure>", center_frame)
         inner_frame.bind(
-            "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            "<Configure>", lambda e: canvas.configure(scrollregion = canvas.bbox("all"))
         )
 
         canvas.bind_all(
