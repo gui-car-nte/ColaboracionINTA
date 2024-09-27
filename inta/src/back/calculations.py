@@ -140,7 +140,7 @@ class Calculations:
 
         x_numeric = np.arange(len(x_axis))
 
-        sns.pointplot(x = x_numeric, y = 'series', data = data, ax = ax)
+        sns.pointplot(x = x_axis, y = 'series', data = data, ax = ax)
         sns.lineplot(x = [x_numeric[0], x_numeric[-1]], y = [series[0], series[-1]], ax = ax, color = '#7f6d85', linestyle = '-')
 
         ax.set_xticks(x_numeric)
