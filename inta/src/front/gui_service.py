@@ -163,7 +163,7 @@ class GuiServices:
 
     def resource_path(self, relative_path):
             try:
-                base_path = sys._MEIPASS
+                base_path = sys._MEIPASS # type: ignore # ? issue is non-relevant
             except Exception:
                 base_path = os.path.abspath(".")
 
