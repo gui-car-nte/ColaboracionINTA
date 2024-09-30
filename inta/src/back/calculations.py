@@ -25,6 +25,7 @@ class Calculations:
         self.gui_services = gui_services
         self.args = args
         self.steps = []
+        self.image_paths = []
 
 
     def calculate_magnetic_moment(self, sensor_data: dict, distances: list) -> list:
@@ -74,6 +75,7 @@ class Calculations:
                         self.gui_services.log_error("Missing Data", str(e))
                         continue
                 
+                self.image_paths = []
                 if len(halved_substractions) > 0:
                     self._plot_calculation_graphs(inverted_distances[::-1], halved_substractions[::-1], axis)
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
@@ -86,6 +88,8 @@ class Calculations:
                     self.steps.append(f'\n{axis} final result = {result:.6E}')
                     rounded_result = round(result, 4)
                     results.append(rounded_result)
+
+                    print(f'ruta imagenes: {self.image_paths}')
                 
             return results
         
@@ -168,10 +172,14 @@ class Calculations:
         plt.tight_layout()
         plot_name = f'{axis_name}_axis_graph.png'
         new_path = self.resource_path(f'resource/{plot_name}')
+        self.image_paths.append(new_path)
         fig.savefig(new_path)
         plt.close(fig)
 
         return new_path
+    
+    def get_image_paths(self):
+        return self.image_paths
 
 
     def _calculate_ytick_range(self, data: list) -> np.ndarray:

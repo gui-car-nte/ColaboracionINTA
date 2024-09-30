@@ -56,7 +56,7 @@ class GuiApp(ctk.CTk):
         )
         # Boton exportar pdf
         self.export_pdf_button = ctk.CTkButton(
-            self, text = "Export PDF", command = self.export_pdf, width = 120, height = 40
+            self, text = "Export PDF", command = self.services.export_to_pdf, width = 120, height = 40
         )
         # self.reset_button.grid(row = 2, column = 0, pady = 10, sticky = "e")
         self.reset_button.grid_remove()

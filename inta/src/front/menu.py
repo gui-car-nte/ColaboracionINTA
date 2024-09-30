@@ -139,16 +139,27 @@ class DistanceFrame(ctk.CTkFrame):
     def send_data(self):
         distances_list = self.service.get_values(self)
         final_calculation = self.service.create_result(distances_list)
+        paths_graphs = self.service.get_list_paths()
 
         image_data = []
-        for i in range(len(final_calculation)):
-            if i < len(IMAGES):
+        # for i in range(len(final_calculation)):
+        #     if i < len(IMAGES):
+        #         image_data.append(
+        #             (
+        #                 str(IMAGES[i]),
+        #                 str(f"Magnetic moment (mAm^2): {final_calculation[i]} (J/T)"),
+        #             )
+        #         )
+
+        for graph in paths_graphs:
+            for calculation in final_calculation:
                 image_data.append(
                     (
-                        str(IMAGES[i]),
-                        str(f"Magnetic moment (mAm^2): {final_calculation[i]} (J/T)"),
+                        str(graph),
+                        str(f"Magnetic moment (mAm^2): {calculation} (J/T)"),
                     )
                 )
+            
 
         self.replace_frame_func(image_data)
 

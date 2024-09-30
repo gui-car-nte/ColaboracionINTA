@@ -1,77 +1,73 @@
-import pandas as pd
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+import os
+from docx2pdf import convert
 
-# Crear la tabla original
-data = {
-    'Condition': ['Initial', 'After Deperm', 'After Perm'],
-    'mx (mA·m2)': ['2.8 ± 1.1', '3.1 ± 1.7', '3.4 ± 1.7'],
-    'my (mA·m2)': ['-1.7 ± 1.7', '-2.6 ± 1.3', '-1.3 ± 1.6'],
-    'mz (mA·m2)': ['1.1 ± 1.5', '0.6 ± 1.1', '0.9 ± 1.3'],
-    '|m| (mA·m2)': ['3.5 ± 2.0', '4.1 ± 2.0', '3.7 ± 2.0'],
-    'Expected Value (mA·m2)': ['< 50', '< 50', '< 50']
-}
 
-df = pd.DataFrame(data)
+def centrar_texto_celda(celda, texto):
+    """Centrar el texto horizontal y verticalmente dentro de una celda."""
+    celda.text = texto
+    # Centrar horizontalmente
+    for paragraph in celda.paragraphs:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-# Función para modificar la tabla
-def modify_table(df, condition, column, new_value):
-    if condition in df['Condition'].values and column in df.columns:
-        df.loc[df['Condition'] == condition, column] = new_value
-        print(f"Valor modificado para {condition} en {column}: {new_value}")
-    else:
-        print("Condición o columna no encontrada.")
+    # Centrar verticalmente
+    tc = celda._tc
+    tcPr = tc.get_or_add_tcPr()
+    vAlign = OxmlElement('w:vAlign')
+    vAlign.set(qn('w:val'), 'center')
+    tcPr.append(vAlign)
 
-# Modificar algunos valores
-modify_table(df, 'Initial', 'mx (mA·m2)', '3.0 ± 1.2')
-modify_table(df, 'After Deperm', 'my (mA·m2)', '-2.8 ± 1.4')
+def modificar_tabla_word(filepath, nueva_ruta):
+    """Modificar una tabla en un archivo Word y guardar los cambios."""
+    try:
+        # Abrir el documento
+        doc = Document(filepath)
+        # Seleccionar la segunda tabla (índice 1)
+        table = doc.tables[1]
 
-# Crear el PDF
-pdf_filename = "tabla_modificada.pdf"
-doc = SimpleDocTemplate(pdf_filename, pagesize=letter)
-elements = []
+        # Modificar el contenido de la tabla y centrar el texto
+        centrar_texto_celda(table.cell(1, 1), '9.8 ± 4.2')
+        centrar_texto_celda(table.cell(1, 2), '5.7 ± 1.5')
+        centrar_texto_celda(table.cell(1, 3), '5.7 ± 1.5')
+        centrar_texto_celda(table.cell(1, 4), '5.7 ± 1.5')
+        centrar_texto_celda(table.cell(1, 5), '< 60')
 
-# Añadir título
-styles = getSampleStyleSheet()
-title = Paragraph("Tabla 1. SMILE DPA Magnetic moment values (Modificada)", styles['Title'])
-elements.append(title)
+        # Guardar el documento modificado
+        doc.save(nueva_ruta)
+        return True
 
-# Convertir DataFrame a lista para ReportLab
-data = [df.columns.tolist()] + df.values.tolist()
+    except Exception as e:
+        print("Error en modificar_tabla_word", str(e))
+        return False
 
-# Crear la tabla
-table = Table(data)
+def convertir_word_a_pdf(ruta_word, ruta_pdf):
+    """Convertir un archivo .docx a PDF."""
+    try:
+        from docx2pdf import convert
+        convert(ruta_word, ruta_pdf)
+        return True
+    except Exception as e:
+        print("Error en convertir_word_a_pdf", str(e))
+        return False
 
-# Estilo de la tabla
-style = TableStyle([
-    ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0, 0), (-1, 0), 10),
-    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-    ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-    ('FONTSIZE', (0, 1), (-1, -1), 8),
-    ('TOPPADDING', (0, 1), (-1, -1), 6),
-    ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-    ('GRID', (0, 0), (-1, -1), 1, colors.black)
-])
-table.setStyle(style)
+def export_to_pdf():
+    """Ejecutar el proceso de modificar una tabla en un Word y convertirlo a PDF."""
+    archivo_word = "src/front/resource/Ejemplo_Informe_de_resultados.docx"
+    if archivo_word:
+        nueva_ruta_word = "tabla_modificada.docx"
+        ruta_pdf = "tabla_modificada.pdf"
+        
+        if modificar_tabla_word(archivo_word, nueva_ruta_word):
+            if convertir_word_a_pdf(nueva_ruta_word, ruta_pdf):
+                os.startfile(ruta_pdf)  # Abrir el PDF resultante
+                os.remove(nueva_ruta_word)  # Eliminar el archivo Word temporal
+            else:
+                print("No se pudo convertir el documento a PDF", "red")
+        else:
+            print("No se pudo modificar la tabla del documento", "red")
 
-# Añadir la tabla al documento
-elements.append(table)
 
-# Generar el PDF
-doc.build(elements)
-
-print(f"Se ha generado el PDF: {pdf_filename}")
-
-# Mostrar la tabla modificada en la consola
-print("\nTabla modificada:")
-print(df.to_string(index=False))
+export_to_pdf()

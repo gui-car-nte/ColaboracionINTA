@@ -118,40 +118,47 @@ class ResultFrame(ctk.CTkFrame):
 
     def update_image(self):
         image_path, label_text = self.image_data[self.current_index]
+        
+        # Asegurarnos de que la ruta sea correcta y el archivo exista
         image = Image.open(self.service.resource_path(image_path))
 
         # Set minimum dimensions for the image
         MIN_WIDTH, MIN_HEIGHT = 650, 480
 
+        # Obtener el tamaño actual del widget para redimensionar correctamente
+        current_width = self.winfo_width()
+        current_height = self.winfo_height()
+
         # Calculate max_size ensuring positive values and minimum dimensions
-        max_width = max(MIN_WIDTH, self.winfo_width() - 40)
-        max_height = max(MIN_HEIGHT, self.winfo_height() - 100)
+        max_width = max(MIN_WIDTH, current_width - 40)  # Resta márgenes
+        max_height = max(MIN_HEIGHT, current_height - 100)  # Resta márgenes
         max_size = (max_width, max_height)
 
-        # Resize image to fit the frame while maintaining aspect ratio
-        image.thumbnail(max_size, Image.LANCZOS)  # type: ignore
+        # Redimensionar la imagen para ajustarse al frame, manteniendo el aspecto
+        image.thumbnail(max_size, Image.LANCZOS)
 
-        # Ensure the image is at least the minimum size
-        if image.width < MIN_WIDTH or image.height < MIN_HEIGHT:
-            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS)  # type: ignore
-
+        # Convertir la imagen a un CTkImage
         ctk_image = ctk.CTkImage(
-            light_image = image, dark_image = image, size = (image.width, image.height)
+            light_image=image, dark_image=image, size=(image.width, image.height)
         )
 
-        self.image_label.configure(image = ctk_image)
-        self.desc_label.configure(text = label_text)
+        # Actualizar la imagen y la etiqueta descriptiva
+        self.image_label.configure(image=ctk_image)
+        self.desc_label.configure(text=label_text)
 
-        # Update button states
+        # Comprobar el estado de los botones
         if self.current_index > 0:
-            self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
+            self.prev_button.grid(row=2, column=0, padx=10, pady=10, sticky="w")
         else:
             self.prev_button.grid_remove()
 
         if self.current_index < len(self.image_data) - 1:
-            self.next_button.grid(row = 2, column = 2, padx = 10, pady = 10, sticky = "e")
+            self.next_button.grid(row=2, column=2, padx=10, pady=10, sticky="e")
         else:
             self.next_button.grid_remove()
+
+        # Asegurar que el layout se refresque correctamente
+        self.update_idletasks()
 
     def next_image(self):
         if self.current_index < len(self.image_data) - 1:
