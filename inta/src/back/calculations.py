@@ -7,7 +7,7 @@ from decimal import Decimal
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MOMENTUM
+from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MOMENTUM, GRAPH_TITLE
 
 decimal.getcontext().prec = PRECISION
 
@@ -15,7 +15,7 @@ class Calculations:
 
     def resource_path(self, relative_path):
         try:
-            base_path = sys._MEIPASS
+            base_path = sys._MEIPASS # type: ignore # ? issue is non-relevant
         except Exception:
             base_path = os.path.abspath(".")
 
@@ -152,7 +152,7 @@ class Calculations:
 
         ax.set_yticklabels([f'{Decimal(value):.2E}' for value in y_ticks])
 
-        ax.set_title(f'{axis_name} axis plot')
+        ax.set_title(GRAPH_TITLE)
         ax.set_xlabel('d^(-3)(m^-3)')
         ax.set_ylabel('B(T)')
 
@@ -194,7 +194,6 @@ class Calculations:
         tick_range = np.arange(float(floor), float(ceiling) + float(tick_interval), float(tick_interval))
 
         return tick_range
-
     
     
     def _dynamic_round(self, number: Decimal, precision: int) -> Decimal:
