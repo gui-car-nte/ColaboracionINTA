@@ -1,24 +1,18 @@
 # User Manual
 
-Once you have started the program, click the 'Upload CSV files' button.
+### Once the program is running, click the 'Select files' button and upload the sensor files.
 
-![Start Program](img/pantall1.png)
+![Start Program](img/main_screen.png)
 
-After clicked the button, you must select six csv files: Xmas.csv, Xmenos.csv, Ymas.csv, Ymenos.csv, Zmas.csv, Zmenos.csv
+### After the files have been selected and their format verified, input the distances in meters for each sensor and click the calculate button. The resulting graphs as well as the final result will now show up on the central panel, click the arrows to the left or right to cycle through them.
 
-![Select CSV files](img/Captura%20de%20pantalla%202024-07-03%20233408.png)
+![input distance](img/distances_tab.png)
 
-Next, enter the distances in meters for each sensor.
+### The user menu counts with a Files tab to view the selected files as well as a Calculations tab to view every step of the calculation in order of execution.
 
-![input distance](img/Captura%20de%20pantalla%202024-07-04%20092236.png)
+![Result screen](img/files_tab.png)
+![Result screen](img/calculations_tab.png)
 
-Finally, a screen will display the graphs and the final result of the magnetic moment. On this screen a button will be enabled to export the data to a PDF file.
+### If you wish to select a different set of files, the Reset button will display the main screen once clicked to make that possible. The Export PDF button will produce a .pdf which will contain the graphs, the final result of the magnetic moment and the operations performed step-by-step to obtain the magnetic moment for each axis.
 
-![Screen with result](img/pantallafinal.png)
-
-The PDF will contain the graphs, the final result of the magnetic moment and a step-by-step description of the operations performed to obtain the magnetic moment for each axis on the last page
-
-![PDF](img/magnetic_moment-1.png)
-![PDF](img/magnetic_moment-2.png)
-![PDF](img/magnetic_moment-3.png)
-![PDF](img/magnetic_moment-4.png)
+![PDF](img/pdf_display.png)

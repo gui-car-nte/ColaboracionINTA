@@ -1,10 +1,10 @@
 # ColaboracionINTA
 
-<!-- poner en ingles -->
+## SETUP:
 
-## Start virtual environment
+To use the program run the following commands on your terminal of choice.
 
-To create a virtual environment we must execute the following command in the terminal
+### 1. Create a virtual environment:
 
 Linux:
 
@@ -18,8 +18,7 @@ Windows:
 python -m venv mi_entorno
 ```
 
-## Activate virtual environment  
-To activate the virtual environment you must enter the following in the terminal
+### 2. Activate the virtual environment:
 
 Linux:
 
@@ -33,34 +32,16 @@ Windows:
 mi_entorno\Scripts\activate.bat
 ```
 
-## Start program
-
-In order to start the program we must first install the dependencies, to do this we must execute the following command
+### 3. Install the program's required modules:
 
 ```python
 pip install -r requirements.txt
 ```
 
-To start the program you must enter the following in the terminal
-
-Linux:
-
-```bash
-python3 main.py
-```
-
-Windows:
-```cmd
-python main.py
-```
-
-## Create executable file
-
-To create executable file you must enter the following in the terminal
+### 4. Create executable file:
 
 ```python
 pip install pyinstaller
 
-pyinstaller main.py --onefile --name=your_app_name --icon=youricon.ico
-pyinstaller your_app_name.spec
+pyinstaller main.py --onefile --add-data "src/front/resource/*;resource/" --name='Magnetic Moment Calculation' --icon=src\front\resource\inta_icon.ico
 ```

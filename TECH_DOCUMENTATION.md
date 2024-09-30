@@ -1,6 +1,6 @@
 # Technical Documentation: Magnetic Moment Calculation Algorithm
 ## Overview
-    This document provides a comprehensive description of the algorithm developed to calculate the magnetic moment from sensor data. The algorithm processes sensor readings, computes relevant intermediate values, and ultimately determines the magnetic moment along three axes (X, Y, and Z).
+    This document provides a comprehensive description of the algorithm developed to calculate the magnetic moment from the sensor data. The algorithm processes sensor readings, computes relevant intermediate values, and determines the magnetic moment along three axes (X, Y, and Z).
 
 ## Table of Contents
 1. Introduction
@@ -25,17 +25,21 @@ The magnetic moment calculation algorithm is designed to analyze sensor data fro
 - numpy
 
         Performs numerical operations and calculations. Provides support for arrays and matrices, and includes mathematical functions for performing calculations on these data structures, such as computing the slope of a linear regression line.
-- matplotlib
+- matplotlib & seaborn
 
         Generates plots and visualizations of the calculation, visual representations of the data. Plotting the halved subtractions against the inverted cube distances, which aids in understanding and analyzing the results.
 - tkinter
 
         Implements the graphical user interface (GUI) Provides a framework to create and manage the GUI, allowing users to interact with the program, input data, and view results.
 
+- pypdf2
+
+        Creates the .pdf file using the graphs created by the program and includes the all of the relevant information regarding the calculations.
+
 ## 3. Input Data
 The algorithm requires the following inputs:
 
-Sensor Data: A dictionary containing DataFrames for sensor readings along the X, Y, and Z axes. Each DataFrame contains readings from multiple sensors.
+Sensor Data: A dictionary containing Pandas DataFrames for sensor readings along the X, Y, and Z axes. Each DataFrame contains readings from multiple sensors.
 
 Distances: A list of distances from each sensor to the magnetic source.
 ## 4. Algorithm Steps
