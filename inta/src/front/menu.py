@@ -16,7 +16,7 @@ class LeftFrame(ctk.CTkFrame):
         self.tabview.add("Files")
         self.files_frame = FilesFrame(self.tabview.tab("Files"), self)
 
-        # Lista para almacenar los nombres de los archivos cargados
+        # List to storage names of files loaded.
         self.files = {}
 
         self.enable_file_selection_button()
@@ -33,8 +33,8 @@ class LeftFrame(ctk.CTkFrame):
             self.button_container,
             text = "Select files",
             command = self.import_files,
-            width = 120,  # Set a fixed width
-            height = 40,  # Set a fixed height
+            width = 120,
+            height = 40,
         )
         self.select_files_button.grid(row = 0, column = 0)
 
@@ -48,7 +48,7 @@ class LeftFrame(ctk.CTkFrame):
             self.files_frame.update_files(self.files)
             self.show_all_tabs()
         else:
-            print(
+            self.service.show_error(
                 "No files selected or failed to load files"
             )  # TODO replace with error call
 
@@ -61,7 +61,6 @@ class LeftFrame(ctk.CTkFrame):
 
         self.tabview.add("Distances")
         self.tabview.add("Calculations")
-        # self.tabview.add("Export")
 
         self.files_frame.grid(row = 0, column = 0, sticky = "nsew")
         self.tabview.tab("Files").grid_columnconfigure(0, weight = 1)
@@ -127,10 +126,8 @@ class DistanceFrame(ctk.CTkFrame):
         calculation_button.configure(state = "disabled")
 
         EntryPanel(self, self.service.sensor_number, calculation_button).pack()
-        # grid(column = 0, sticky = "ew", padx = 2, pady = 4)
 
         calculation_button.pack()
-        # grid(row = service.sensor_number, column = 0, pady = 10, padx = 10, sticky = "ew")
 
         self.grid_columnconfigure(0, weight = 1)
         for i in range(service.sensor_number):
@@ -142,24 +139,13 @@ class DistanceFrame(ctk.CTkFrame):
         paths_graphs = self.service.get_list_paths()
 
         image_data = []
-        # for i in range(len(final_calculation)):
-        #     if i < len(IMAGES):
-        #         image_data.append(
-        #             (
-        #                 str(IMAGES[i]),
-        #                 str(f"Magnetic moment (mAm^2): {final_calculation[i]} (J/T)"),
-        #             )
-        #         )
-
-        for graph in paths_graphs:
-            for calculation in final_calculation:
-                image_data.append(
-                    (
-                        str(graph),
-                        str(f"Magnetic moment (mAm^2): {calculation} (J/T)"),
-                    )
+        for graph, calculation in zip(paths_graphs, final_calculation):
+            image_data.append(
+                (
+                    str(graph),
+                    str(f"Magnetic moment (mAm^2): {calculation} (J/T)"),
                 )
-            
+            )
 
         self.replace_frame_func(image_data)
 

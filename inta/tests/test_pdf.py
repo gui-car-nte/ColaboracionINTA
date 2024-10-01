@@ -3,7 +3,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 import os
-from docx2pdf import convert
+# from docx2pdf import convert
 
 
 def centrar_texto_celda(celda, texto):

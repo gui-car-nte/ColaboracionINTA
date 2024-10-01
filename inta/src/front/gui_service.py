@@ -2,6 +2,7 @@ import tkinter as tk
 import os
 import sys
 import logging
+import pypandoc
 
 from tkinter import filedialog, messagebox
 from src.back.calculations import Calculations
@@ -108,22 +109,21 @@ class GuiServices:
         details = self.calculations.get_calculation_steps()
         return details
 
-    def centrar_texto_celda(self, celda, texto):
-        """Centrar el texto horizontal y verticalmente dentro de una celda."""
-        celda.text = texto
+    def centre_text_cell_centre(self, cell, text):
+        cell.text = text
         # Centrar horizontalmente
-        for paragraph in celda.paragraphs:
+        for paragraph in cell.paragraphs:
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Centrar verticalmente
-        tc = celda._tc
+        tc = cell._tc
         tcPr = tc.get_or_add_tcPr()
         vAlign = OxmlElement("w:vAlign")
         vAlign.set(qn("w:val"), "center")
         tcPr.append(vAlign)
 
-    def modificar_tabla_word(self, filepath, nueva_ruta):
-        """Modificar una tabla en un archivo Word y guardar los cambios."""
+    def modify_word_table(self, filepath, nueva_ruta):
+
         try:
             # Abrir el documento
             doc = Document(filepath)
@@ -131,66 +131,65 @@ class GuiServices:
             table = doc.tables[1]
 
             # Modificar el contenido de la tabla y centrar el texto
-            self.centrar_texto_celda(table.cell(1, 1), "9.8 ± 4.2")
-            self.centrar_texto_celda(table.cell(1, 2), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(1, 3), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(1, 4), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(1, 5), "< 60")
+            self.centre_text_cell_centre(table.cell(1, 1), "9.8 ± 4.2")
+            self.centre_text_cell_centre(table.cell(1, 2), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(1, 3), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(1, 4), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(1, 5), "< 60")
 
-            self.centrar_texto_celda(table.cell(2, 1), "9.8 ± 4.2")
-            self.centrar_texto_celda(table.cell(2, 2), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(2, 3), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(2, 4), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(2, 5), "< 55")
+            self.centre_text_cell_centre(table.cell(2, 1), "9.8 ± 4.2")
+            self.centre_text_cell_centre(table.cell(2, 2), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(2, 3), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(2, 4), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(2, 5), "< 55")
 
-            self.centrar_texto_celda(table.cell(3, 1), "9.8 ± 4.2")
-            self.centrar_texto_celda(table.cell(3, 2), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(3, 3), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(3, 4), "5.7 ± 1.5")
-            self.centrar_texto_celda(table.cell(3, 5), "< 45")
+            self.centre_text_cell_centre(table.cell(3, 1), "9.8 ± 4.2")
+            self.centre_text_cell_centre(table.cell(3, 2), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(3, 3), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(3, 4), "5.7 ± 1.5")
+            self.centre_text_cell_centre(table.cell(3, 5), "< 45")
 
             # Guardar el documento modificado
             doc.save(nueva_ruta)
             return True
 
         except Exception as e:
-            print("Error en modificar_tabla_word", str(e))
+            print("Error in modify_word_table", str(e))
             return False
 
-    def convertir_word_a_pdf(self, ruta_word, ruta_pdf):
-        """Convertir un archivo .docx a PDF."""
+    def convert_word_to_pdf(self, path_word, pdf_path):
         try:
-            convert(ruta_word, ruta_pdf)
+            sys.stderr = open("progess_pdf.txt", "w")
+            convert(path_word, pdf_path)
+            os.remove("progress_pdf.txt")
             return True
         except Exception as e:
-            print("Error en convertir_word_a_pdf", str(e))
+            self.log_error("Error", f"Error in convert_word_to_pdf {e}")
             return False
 
     def export_to_pdf(self):
-        """Ejecutar el proceso de modificar una tabla en un Word y convertirlo a PDF."""
-        
-        archivo_word = self.resource_path(
+        word_file = self.resource_path(
             "resource\\Ejemplo_Informe_de_resultados.docx"
         )
-        if archivo_word:
-            nueva_ruta_word = self.resource_path("resource\\tabla_modificada.docx")
-            ruta_pdf = "Informe_de_resultados.pdf"
+        if word_file:
+            new_path_word = self.resource_path("resource\\tabla_modificada.docx")
+            pdf_path = "Results_report.pdf"
 
-            if self.modificar_tabla_word(archivo_word, nueva_ruta_word):
-                if self.convertir_word_a_pdf(nueva_ruta_word, ruta_pdf):
-                    os.startfile(ruta_pdf)  # Abrir el PDF resultante
-                    os.remove(nueva_ruta_word)  # Eliminar el archivo Word temporal
+            if self.modify_word_table(word_file, new_path_word):
+                if self.convert_word_to_pdf(new_path_word, pdf_path):
+                    os.startfile(pdf_path)  # Abrir el PDF resultante
+                    os.remove(new_path_word)  # Eliminar el archivo Word temporal
                 else:
-                    print("No se pudo convertir el documento a PDF", "red")
+                    self.show_message("Could not convert document to PDF")
             else:
-                print("No se pudo modificar la tabla del documento", "red")
+                self.show_message("Could not change the document table")
 
-    def show_message(self, msg, color):
+    def show_message(self, msg):
         messagebox.showerror("Error", msg)
 
     def log_error(self, error_type, error_message):
         logger.error(f"{error_type}: {error_message}")
-        self.show_message(f"{error_type}: {error_message}", "red")
+        self.show_message(f"{error_type}: {error_message}")
 
     def resource_path(self, relative_path):
         try:
