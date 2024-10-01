@@ -46,6 +46,7 @@ class Calculations:
             if not axes_in_data:
                 raise ValueError('No valid axis data found in sensor files')
             
+            self.image_paths = []
             for axis in axes_in_data:
                 halved_substractions = []
                 
@@ -74,8 +75,8 @@ class Calculations:
                         self.steps.append(f'Sensor {sensor + 1} for {axis} axis missing data: {str(e)}')
                         self.gui_services.log_error("Missing Data", str(e))
                         continue
-                
-                self.image_paths = []
+                # self.gui_services.show_message(f'pre: {self.image_paths}')
+                # self.image_paths = []
                 if len(halved_substractions) > 0:
                     self._plot_calculation_graphs(inverted_distances[::-1], halved_substractions[::-1], axis)
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
