@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from src.front.gui_service import GuiServices
 from src.front.panels import EntryPanel
-from src.front.settings import IMAGES
+# from src.front.settings import IMAGES
 
 
 class LeftFrame(ctk.CTkFrame):
