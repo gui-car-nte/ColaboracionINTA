@@ -2,7 +2,6 @@ import tkinter as tk
 import os
 import sys
 import logging
-import pypandoc
 
 from tkinter import filedialog, messagebox
 from src.back.calculations import Calculations
@@ -161,11 +160,14 @@ class GuiServices:
         try:
             sys.stderr = open("progess_pdf.txt", "w")
             convert(path_word, pdf_path)
-            os.remove("progress_pdf.txt")
             return True
         except Exception as e:
             self.log_error("Error", f"Error in convert_word_to_pdf {e}")
             return False
+        finally:
+            sys.stderr.close()
+            if os.path.exists("progess_pdf.txt"):
+                os.remove("progess_pdf.txt")
 
     def export_to_pdf(self):
         word_file = self.resource_path(
