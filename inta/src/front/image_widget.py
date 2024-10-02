@@ -1,8 +1,6 @@
-import os
-import sys
 import customtkinter as ctk
 from tkinter import filedialog, Canvas
-from src.front.settings import BACKGROUND_COLOR, WHITE, CLOSE_RED
+from src.front.settings import BACKGROUND_COLOR
 from PIL import Image, ImageTk
 from typing import List, Tuple
 from src.front.gui_service import GuiServices
@@ -37,25 +35,22 @@ class InitialFrame(ctk.CTkFrame):
         self.columnconfigure(1, weight = 1)
         self.columnconfigure(2, weight = 1)
 
-        # Crear canvas para la imagen
+        # Create image for canvas
         self.canvas = Canvas(self, bg = BACKGROUND_COLOR, bd = 0, highlightthickness = 0)
-        # self.canvas.grid(row = 1, column = 1, sticky = "s")
         self.canvas.place(relx = 0.5, rely = 0.45, anchor = "center")
-        # print(self.winfo_height())
-        # self.canvas.pack(pady=(self.winfo_height(), 15), anchor="center")
-        # Cargar la imagen
+
+        # Load image
         image_path = self.service.resource_path("resource\\inta_logo.png")
         image = Image.open(image_path)
         self.photo = ImageTk.PhotoImage(image)
 
-        # Mostrar la imagen en el canvas
+        # show image
         self.canvas.create_image(0, 0, anchor = "nw", image = self.photo)
         self.canvas.config(width = image.width, height = image.height)
 
         self.label = ctk.CTkLabel(
             self, text = "Magnetic Moment Calculation", font = ("Calibri", 40, "bold"), fg_color='transparent'
         )
-        # self.label.grid(row = 2, column = 1, sticky = "n")
         self.label.place(relx = 0.5, rely = 0.65, anchor = "center")
 
 
@@ -65,7 +60,6 @@ class ResultFrame(ctk.CTkFrame):
         self.grid(column = 1, rowspan = 2)
         self.image_data = image_data
         self.current_index = 0
-        # self.close_edit_func = close_edit_func
         self.service = GuiServices(self)
 
         self.create_widgets()
@@ -118,40 +112,47 @@ class ResultFrame(ctk.CTkFrame):
 
     def update_image(self):
         image_path, label_text = self.image_data[self.current_index]
+        
+        # Asegurarnos de que la ruta sea correcta y el archivo exista
         image = Image.open(self.service.resource_path(image_path))
 
         # Set minimum dimensions for the image
         MIN_WIDTH, MIN_HEIGHT = 650, 480
 
+        # Obtener el tamaño actual del widget para redimensionar correctamente
+        current_width = self.winfo_width()
+        current_height = self.winfo_height()
+
         # Calculate max_size ensuring positive values and minimum dimensions
-        max_width = max(MIN_WIDTH, self.winfo_width() - 40)
-        max_height = max(MIN_HEIGHT, self.winfo_height() - 100)
+        max_width = max(MIN_WIDTH, current_width - 40)  # Resta márgenes
+        max_height = max(MIN_HEIGHT, current_height - 100)  # Resta márgenes
         max_size = (max_width, max_height)
 
-        # Resize image to fit the frame while maintaining aspect ratio
-        image.thumbnail(max_size, Image.LANCZOS)  # type: ignore
+        # Redimensionar la imagen para ajustarse al frame, manteniendo el aspecto
+        image.thumbnail(max_size, Image.LANCZOS) # type: ignore
 
-        # Ensure the image is at least the minimum size
-        if image.width < MIN_WIDTH or image.height < MIN_HEIGHT:
-            image = image.resize((max(image.width, MIN_WIDTH), max(image.height, MIN_HEIGHT)), Image.LANCZOS)  # type: ignore
-
+        # Convertir la imagen a un CTkImage
         ctk_image = ctk.CTkImage(
-            light_image = image, dark_image = image, size = (image.width, image.height)
+            light_image=image, dark_image=image, size=(image.width, image.height)
         )
 
-        self.image_label.configure(image = ctk_image)
-        self.desc_label.configure(text = label_text)
+        # Actualizar la imagen y la etiqueta descriptiva
+        self.image_label.configure(image=ctk_image)
+        self.desc_label.configure(text=label_text)
 
-        # Update button states
+        # Comprobar el estado de los botones
         if self.current_index > 0:
-            self.prev_button.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
+            self.prev_button.grid(row=2, column=0, padx=10, pady=10, sticky="w")
         else:
             self.prev_button.grid_remove()
 
         if self.current_index < len(self.image_data) - 1:
-            self.next_button.grid(row = 2, column = 2, padx = 10, pady = 10, sticky = "e")
+            self.next_button.grid(row=2, column=2, padx=10, pady=10, sticky="e")
         else:
             self.next_button.grid_remove()
+
+        # Asegurar que el layout se refresque correctamente
+        self.update_idletasks()
 
     def next_image(self):
         if self.current_index < len(self.image_data) - 1:
@@ -165,39 +166,3 @@ class ResultFrame(ctk.CTkFrame):
 
     def on_resize(self, event):
         self.update_image()
-
-
-class ImageOutput(Canvas):
-    def __init__(self, parent, path_image):
-        super().__init__(
-            master = parent,
-            background = BACKGROUND_COLOR,
-            bd = 0,
-            highlightthickness = 0,
-            relief = "ridge",
-        )
-        self.display_image(path_image)
-        self.grid(row = 0, column = 0, sticky = "nsew")
-
-    def display_image(self, path_image):
-        # Cargar la imagen usando PIL
-        image = Image.open(path_image)
-        self.photo = ImageTk.PhotoImage(image)
-        self.create_image(0, 0, anchor = "nw", image = self.photo)
-        self.config(width = image.width, height = image.height)
-
-
-class CloseOutput(ctk.CTkButton):
-    def __init__(self, parent, close_func):
-        super().__init__(
-            master = parent,
-            command = close_func,
-            text = "X",
-            text_color = WHITE,
-            fg_color = "transparent",
-            width = 40,
-            height = 40,
-            corner_radius = 0,
-            hover_color = CLOSE_RED,
-        )
-        self.place(relx = 0.99, rely = 0.01, anchor = "ne")

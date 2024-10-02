@@ -24,8 +24,9 @@ SLIDER_BG = '#64686b'
 # File handler
 START_ROW = 46
 END_ROW = 396
+GRAPH_TITLE = "Magnetic Field vs. inverse cube distance"
 FILE_NAMES = ["masX","masY","masZ","menosX","menosY","menosZ","Xmas","Xmenos","Ymas","Ymenos","Zmas","Zmenos"]
-IMAGES = ['resource/X_axis_graph.png','resource/Y_axis_graph.png','resource/Z_axis_graph.png']
+# IMAGES = ['resource/X_axis_graph.png','resource/Y_axis_graph.png','resource/Z_axis_graph.png']
 
 # Calculations
 MOMENTUM = 0.0000002

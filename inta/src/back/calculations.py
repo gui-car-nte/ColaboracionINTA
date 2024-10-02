@@ -7,7 +7,7 @@ from decimal import Decimal
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MOMENTUM
+from src.front.settings import PRECISION, START_ROW, END_ROW, MOMENTUM, FINAL_MOMENTUM, GRAPH_TITLE
 
 decimal.getcontext().prec = PRECISION
 
@@ -15,7 +15,7 @@ class Calculations:
 
     def resource_path(self, relative_path):
         try:
-            base_path = sys._MEIPASS
+            base_path = sys._MEIPASS # type: ignore # ? issue is non-relevant
         except Exception:
             base_path = os.path.abspath(".")
 
@@ -25,6 +25,7 @@ class Calculations:
         self.gui_services = gui_services
         self.args = args
         self.steps = []
+        self.image_paths = []
 
 
     def calculate_magnetic_moment(self, sensor_data: dict, distances: list) -> list:
@@ -45,6 +46,7 @@ class Calculations:
             if not axes_in_data:
                 raise ValueError('No valid axis data found in sensor files')
             
+            self.image_paths = []
             for axis in axes_in_data:
                 halved_substractions = []
                 
@@ -73,7 +75,8 @@ class Calculations:
                         self.steps.append(f'Sensor {sensor + 1} for {axis} axis missing data: {str(e)}')
                         self.gui_services.log_error("Missing Data", str(e))
                         continue
-                
+                # self.gui_services.show_message(f'pre: {self.image_paths}')
+                # self.image_paths = []
                 if len(halved_substractions) > 0:
                     self._plot_calculation_graphs(inverted_distances[::-1], halved_substractions[::-1], axis)
                     slope = self._slope_calculation(np.array(halved_substractions).astype(np.float64), np.array(inverted_distances).astype(np.float64))
@@ -152,7 +155,7 @@ class Calculations:
 
         ax.set_yticklabels([f'{Decimal(value):.2E}' for value in y_ticks])
 
-        ax.set_title(f'{axis_name} axis plot')
+        ax.set_title(GRAPH_TITLE)
         ax.set_xlabel('d^(-3)(m^-3)')
         ax.set_ylabel('B(T)')
 
@@ -168,10 +171,14 @@ class Calculations:
         plt.tight_layout()
         plot_name = f'{axis_name}_axis_graph.png'
         new_path = self.resource_path(f'resource/{plot_name}')
+        self.image_paths.append(new_path)
         fig.savefig(new_path)
         plt.close(fig)
 
         return new_path
+    
+    def get_image_paths(self):
+        return self.image_paths
 
 
     def _calculate_ytick_range(self, data: list) -> np.ndarray:
@@ -194,7 +201,6 @@ class Calculations:
         tick_range = np.arange(float(floor), float(ceiling) + float(tick_interval), float(tick_interval))
 
         return tick_range
-
     
     
     def _dynamic_round(self, number: Decimal, precision: int) -> Decimal:
