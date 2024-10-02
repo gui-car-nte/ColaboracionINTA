@@ -1,5 +1,7 @@
 # ColaboracionINTA
 
+Program capable of calculating magnetic moment based on data extracted from sensor readings and user-input distances.
+
 ## SETUP:
 
 To use the program run the following commands on your terminal of choice.
@@ -43,5 +45,5 @@ pip install -r requirements.txt
 ```python
 pip install pyinstaller
 
-pyinstaller main.py --onefile --add-data "src/front/resource/*;resource/" --name='Magnetic Moment Calculation' --icon=src\front\resource\inta_icon.ico
+pyinstaller main.py --onefile --noconsole --add-data "src/front/resource/*;resource/" --name='Magnetic Moment Calculation' --icon=src\front\resource\inta_icon.ico
 ```
