@@ -2,7 +2,8 @@ import tkinter as tk
 import os
 import sys
 import logging
-
+import datetime
+import threading
 from tkinter import filedialog, messagebox
 from src.back.calculations import Calculations
 from src.back.file_handler import FileHandler
@@ -12,6 +13,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx2pdf import convert
+import PyPDF2
+import customtkinter as ctk  # Asegúrate de importar customtkinter
 
 if os.path.exists("error_log.txt"):
     os.remove(path="error_log.txt")
@@ -23,8 +26,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     level=logging.ERROR,
 )
-
-logger = logging.getLogger("urbanGUI")
 
 
 class GuiServices:
@@ -60,7 +61,7 @@ class GuiServices:
 
                 return self.sensor_data
 
-            except Exception as e:  # TODO don't gotta catch em all
+            except Exception as e:
                 return None
 
         else:
@@ -110,11 +111,9 @@ class GuiServices:
 
     def centre_text_cell_centre(self, cell, text):
         cell.text = text
-        # Centrar horizontalmente
         for paragraph in cell.paragraphs:
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # Centrar verticalmente
         tc = cell._tc
         tcPr = tc.get_or_add_tcPr()
         vAlign = OxmlElement("w:vAlign")
@@ -122,14 +121,10 @@ class GuiServices:
         tcPr.append(vAlign)
 
     def modify_word_table(self, filepath, nueva_ruta):
-
         try:
-            # Abrir el documento
             doc = Document(filepath)
-            # Seleccionar la segunda tabla (índice 1)
             table = doc.tables[1]
 
-            # Modificar el contenido de la tabla y centrar el texto
             self.centre_text_cell_centre(table.cell(1, 1), "9.8 ± 4.2")
             self.centre_text_cell_centre(table.cell(1, 2), "5.7 ± 1.5")
             self.centre_text_cell_centre(table.cell(1, 3), "5.7 ± 1.5")
@@ -148,7 +143,6 @@ class GuiServices:
             self.centre_text_cell_centre(table.cell(3, 4), "5.7 ± 1.5")
             self.centre_text_cell_centre(table.cell(3, 5), "< 45")
 
-            # Guardar el documento modificado
             doc.save(nueva_ruta)
             return True
 
@@ -158,31 +152,68 @@ class GuiServices:
 
     def convert_word_to_pdf(self, path_word, pdf_path):
         try:
-            sys.stderr = open("progess_pdf.txt", "w")
             convert(path_word, pdf_path)
             return True
         except Exception as e:
             self.log_error("Error", f"Error in convert_word_to_pdf {e}")
             return False
-        finally:
-            sys.stderr.close()
-            if os.path.exists("progess_pdf.txt"):
-                os.remove("progess_pdf.txt")
+
+    def modify_pdf_metadata(self, pdf_path):
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            writer = PyPDF2.PdfWriter()
+
+            for page in reader.pages:
+                writer.add_page(page)
+
+            metadatos = reader.metadata
+            metadatos.update({
+                '/Title': pdf_path
+            })
+
+            writer.add_metadata(metadatos)
+
+            with open(f"{pdf_path}", 'wb') as output_file:
+                writer.write(output_file)
+        
+        return f"{pdf_path}"
+
+    def async_convert_and_modify_pdf(self, new_path_word, pdf_path, progress_bar, progress_window):
+        progress_bar.set(0.5)  # Actualiza la barra de progreso al 50% cuando comienza la conversión
+
+        if self.convert_word_to_pdf(new_path_word, pdf_path):
+            progress_bar.set(0.75)  # Actualiza la barra de progreso al 75%
+            modified_pdf = self.modify_pdf_metadata(pdf_path)
+            if modified_pdf:
+                os.startfile(modified_pdf)  # Abrir el PDF resultante
+            os.remove(new_path_word)  # Eliminar el archivo Word temporal
+
+        progress_bar.set(1)  # Progreso completo
+        progress_window.destroy()  # Cerrar la ventana de progreso
 
     def export_to_pdf(self):
-        word_file = self.resource_path(
-            "resource\\Ejemplo_Informe_de_resultados.docx"
-        )
+        word_file = self.resource_path("resource\\Ejemplo_Informe_de_resultados.docx")
         if word_file:
             new_path_word = self.resource_path("resource\\tabla_modificada.docx")
-            pdf_path = "Results_report.pdf"
+            now = datetime.datetime.now()
+            fecha_hora = now.strftime("%Y-%m-%d_%H-%M-%S")
+            pdf_path = f"Results_report_{fecha_hora}.pdf"
 
             if self.modify_word_table(word_file, new_path_word):
-                if self.convert_word_to_pdf(new_path_word, pdf_path):
-                    os.startfile(pdf_path)  # Abrir el PDF resultante
-                    os.remove(new_path_word)  # Eliminar el archivo Word temporal
-                else:
-                    self.show_message("Could not convert document to PDF")
+                # Crear ventana de progreso
+                progress_window = ctk.CTkToplevel(self.window)
+                progress_window.title("Generando PDF...")
+                progress_window.geometry("300x100")
+
+                progress_label = ctk.CTkLabel(progress_window, text="Generando el PDF, por favor espere...")
+                progress_label.pack(pady=10)
+
+                progress_bar = ctk.CTkProgressBar(progress_window)
+                progress_bar.pack(pady=20, padx=10)
+                progress_bar.set(0)
+
+                # Crear un hilo para la conversión a PDF y modificación de metadatos
+                threading.Thread(target=self.async_convert_and_modify_pdf, args=(new_path_word, pdf_path, progress_bar, progress_window)).start()
             else:
                 self.show_message("Could not change the document table")
 
@@ -195,7 +226,7 @@ class GuiServices:
 
     def resource_path(self, relative_path):
         try:
-            base_path = sys._MEIPASS  # type: ignore # ? issue is non-relevant
+            base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
 

@@ -59,16 +59,6 @@ class GuiApp(ctk.CTk):
     def reset_app(self):
         self.init_app_state()
 
-    def export_pdf(self):
-        print("Export PDF")
-        self.services.export_to_pdf()
-        pdf_path = 'magnetic_moment.pdf'
-        if pdf_path:
-            try:
-                os.startfile(pdf_path)
-            except AttributeError as e:
-                print(e)
-
     def replace_frame_col1(self, image_path):
 
         self.reset_button.grid(row = 0, column = 1, pady = 10, sticky = "ne")
